@@ -14,6 +14,8 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.team11260.fast-load-plugin'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
@@ -23,7 +25,24 @@ android {
     }
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://www.matthewo.tech/maven/' }
+    }
+
+    dependencies {
+        classpath 'org.team11260:fast-load-plugin:0.1'
+    }
+}
+
+repositories {
+    maven { url = 'https://www.matthewo.tech/maven/' }
+}
+
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+    implementation 'org.team11260:fast-load:0.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.20"
 }
