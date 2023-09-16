@@ -16,7 +16,6 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
     private val timer = ElapsedTime()
 
-
     init {
         val hardwareMap = opMode.hardwareMap
 
