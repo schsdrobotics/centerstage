@@ -14,7 +14,6 @@ private typealias Scaling = (Float, Float, Float) -> Double
 
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
-    private val timer = ElapsedTime()
 
     init {
         val hardwareMap = opMode.hardwareMap
