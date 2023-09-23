@@ -21,6 +21,5 @@ dependencies {
     implementation 'com.github.RR-9527:robot-code-v2:1.0.0'
     runtimeOnly 'org.tensorflow:tensorflow-lite:2.12.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-//    implementation 'org.team11260:fast-load:0.1.1'
 }
 
