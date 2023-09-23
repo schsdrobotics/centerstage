@@ -6,12 +6,15 @@ import com.qualcomm.robotcore.hardware.ServoImplEx
 
 class AxonServo(hw: HardwareMap, private val name: String) {
     private val pot: AnalogInput by lazy { hw["$name pot"] as AnalogInput }
-    val servo: ServoImplEx by lazy { hw[name] as ServoImplEx }
+    private val inner: ServoImplEx by lazy { hw[name] as ServoImplEx }
+
+    val servo
+        get() = inner
 
     var position
         get() = pot.voltage / 3.3 * 360.0
-        set(value) { servo.position = value }
+        set(value) { inner.position = value }
 
-    fun release() = servo.setPwmDisable()
-    fun hold() = servo.setPwmEnable()
+    fun release() = inner.setPwmDisable()
+    fun hold() = inner.setPwmEnable()
 }
