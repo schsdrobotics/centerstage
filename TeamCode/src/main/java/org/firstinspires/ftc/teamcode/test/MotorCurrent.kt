@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.test
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import kotlin.math.max
@@ -10,7 +11,9 @@ import kotlin.math.max
 class MotorCurrent : OpMode() {
     private val motor by lazy { hardwareMap.dcMotor["motor"] as DcMotorEx }
 
-    override fun init() { motor }
+    override fun init() {
+        motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+    }
     override fun loop() {
         val halved = (gamepad1.right_trigger.toDouble()) / 2.0
         val full = (gamepad1.left_trigger.toDouble())
