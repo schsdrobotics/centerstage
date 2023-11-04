@@ -42,6 +42,8 @@ class DriverControlled : OpModeEX() {
 
     override fun init_loopEX() {}
     override fun startEX() {}
-    override fun loopEX() {}
+    override fun loopEX() {
+
+    }
     override fun stopEX() {}
 }

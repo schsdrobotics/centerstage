@@ -19,18 +19,20 @@ class WristSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     }
 
     fun restore() = LambdaCommand()
-            .setInterruptible(false)
+            .setInterruptible(true)
             .setRequirements(this)
             .setExecute { wrist.position = 0.0 }
             .setFinish { false }
 
     fun deposit() = LambdaCommand()
-            .setInterruptible(false)
+            .setInterruptible(true)
             .setRequirements(this)
             .setExecute { wrist.position = 1.0 }
             .setFinish { false }
 
-    override fun periodic() {}
+    override fun periodic() {
+        opModeEX.telemetry.addData("position", wrist.position)
+    }
 
     override fun defaultCommandExecute() = restore().execute()
 
