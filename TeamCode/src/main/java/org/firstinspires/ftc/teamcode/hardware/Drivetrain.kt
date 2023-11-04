@@ -12,7 +12,7 @@ import kotlin.math.pow
 
 private typealias Scaling = (Float, Float, Float) -> Double
 
-class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
+class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
 
     init {
@@ -28,7 +28,8 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
 
         multiplierMap.keys.forEach {
             it.mode = DcMotor.RunMode.RUN_USING_ENCODER
-            it.direction = DcMotorSimple.Direction.FORWARD
+            it.direction = DcMotorSimple.Direction.REVERSE
+            it.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         }
     }
 
@@ -48,7 +49,7 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
 
     private fun stop() = multiplierMap.keys.forEach { it.power = 0.0 }
 
-    override fun loop() {
+    fun loop() {
         move(
             x = gamepad.left_stick_x,
             y = -gamepad.left_stick_y, // for some atrocious reason, down is positive
@@ -70,7 +71,7 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
 
     companion object {
         const val SCALE_FACTOR = 1.0
-        val TELEOP_SCALING: Scaling = { x, y, z -> max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble()) }
+        val TELEOP_SCALING: Scaling = { x, y, z -> max(0.05 , max(hypot(x, y), abs(z)).pow(2f).toDouble()) }
         val LINEAR_SCALING: Scaling = { x, y, z -> max(hypot(x, y), abs(z)).toDouble() }
     }
 }

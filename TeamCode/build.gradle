@@ -19,6 +19,7 @@ buildscript {
 
     dependencies {
         classpath 'org.team11260:fast-load-plugin:0.1.1'
+//        implementation 'com.github.Froze-N-Milk:mercurialftc:v0.0.5'
     }
 }
 
@@ -43,6 +44,7 @@ repositories {
 dependencies {
     implementation "org.team11260:fast-load:0.1.1"
     implementation 'org.ftclib.ftclib:core:2.1.1'
+    implementation 'com.github.Froze-N-Milk:mercurialftc:v0.0.5'
 
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')

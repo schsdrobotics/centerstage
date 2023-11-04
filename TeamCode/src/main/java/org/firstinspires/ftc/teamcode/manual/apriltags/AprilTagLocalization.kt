@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.manual
+package org.firstinspires.ftc.teamcode.manual.apriltags
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.hardware.Drivetrain
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import java.lang.invoke.MethodHandles.identity
 import kotlin.math.roundToInt
 
 @TeleOp
@@ -99,7 +98,7 @@ class AprilTagLocalization : OpMode() {
     companion object {
         private const val sixAndSevenEighths = 6.0 + 7.0 / 8.0
 
-        private val library: AprilTagLibrary by lazy {
+        val library: AprilTagLibrary by lazy {
             AprilTagLibrary.Builder()
                 .addTag(0, "LEFT", 0.166, VectorF(0f,0f,6f), METER, Quaternion.identityQuaternion())
                 .addTag(1, "CENTER", 0.166, VectorF(46f,0f,7.5f), METER, Quaternion.identityQuaternion())

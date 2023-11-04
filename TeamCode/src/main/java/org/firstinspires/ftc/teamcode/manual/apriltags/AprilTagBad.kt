@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.manual
+package org.firstinspires.ftc.teamcode.manual.apriltags
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
