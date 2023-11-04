@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.test
+package org.firstinspires.ftc.teamcode.manual
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.hardware.DriveSubsystem
-import org.firstinspires.ftc.teamcode.hardware.LiftSubsystem
-import org.firstinspires.ftc.teamcode.hardware.LiftSubsystem.Position.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.DriveSubsystem
+import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem
+import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.*
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 
-@TeleOp
-class HelpMe : OpModeEX() {
+@TeleOp(group = "!")
+class DriverControlled : OpModeEX() {
     private val gamepad by lazy { gamepadEX1() }
 
     private lateinit var lift: LiftSubsystem

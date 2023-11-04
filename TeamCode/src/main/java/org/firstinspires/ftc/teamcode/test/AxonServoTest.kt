@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.hardware.AxonServo
 
 @TeleOp
-class AxonServoTesting : OpMode() {
+class AxonServoTest : OpMode() {
     private val servo by lazy { AxonServo(hardwareMap, "servo") }
 
     override fun init() { }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware
+package org.firstinspires.ftc.teamcode.hardware.subsystem
 
 import com.arcrobotics.ftclib.drivebase.MecanumDrive
 import com.arcrobotics.ftclib.hardware.motors.Motor

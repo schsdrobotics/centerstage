@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.manual
+package org.firstinspires.ftc.teamcode.test
 
 import com.qualcomm.hardware.rev.RevColorSensorV3
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
