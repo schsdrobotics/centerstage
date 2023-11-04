@@ -5,7 +5,7 @@ import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 
-class WristSubsystem(val opmode: OpModeEX) : Subsystem(opmode) {
+class WristSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
 
     private val wrist by lazy { hw["wrist"] as Servo }
@@ -24,8 +24,6 @@ class WristSubsystem(val opmode: OpModeEX) : Subsystem(opmode) {
             .setRequirements(this)
             .setExecute { wrist.position = 0.0 }
             .setFinish { false }
-
-    fun prepare(): Nothing = TODO()
 
     fun deposit() = LambdaCommand()
             .setInterruptible(true)
