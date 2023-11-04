@@ -15,26 +15,24 @@ class WristSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
 
         wrist.position = 0.0
 
-        defaultCommand = deposit()
+        defaultCommand = restore()
     }
 
     fun restore() = LambdaCommand()
-            .setInterruptible(true)
-            .setInit { wrist.position = 1.0 }
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { wrist.position = 0.0 }
             .setFinish { false }
 
     fun deposit() = LambdaCommand()
-            .setInterruptible(true)
-            .setInit { wrist.position = 0.0 }
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { wrist.position = 1.0 }
             .setFinish { false }
 
     override fun periodic() {}
 
-    override fun defaultCommandExecute() = deposit().execute()
+    override fun defaultCommandExecute() = restore().execute()
 
     override fun close() {}
 
