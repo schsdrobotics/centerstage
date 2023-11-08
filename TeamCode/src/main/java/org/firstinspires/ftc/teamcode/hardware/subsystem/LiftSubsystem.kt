@@ -70,10 +70,9 @@ class LiftSubsystem(val opmode: OpModeEX) : Subsystem(opmode) {
     override fun close() {}
 
     enum class Position(val ticks: Int) {
-        ABSOLUTE_ZERO(20),
-        ZERO(40),
+        ZERO(0),
         LOW(170),
-        MID(315),
-        HIGH(610)
+        MID(340),
+        HIGH(630)
     }
 }
