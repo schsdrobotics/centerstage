@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.
 import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.MID
 import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.ZERO
 import org.firstinspires.ftc.teamcode.hardware.subsystem.WristSubsystem
+import org.firstinspires.ftc.teamcode.library.Feburary
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 
 
@@ -25,12 +26,14 @@ class DriverControlled : OpModeEX() {
 
     override fun registerSubsystems() {
         lift = LiftSubsystem(this)
-        drive = DriveSubsystem(this, gamepad.leftX(), gamepad.leftY(), gamepad.rightX())
+        drive = DriveSubsystem(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
         wrist = WristSubsystem(this)
         intake = IntakeSubsystem(this)
     }
 
-    override fun initEX() { }
+    override fun initEX() {
+        drive.feburary.init()
+    }
 
     override fun registerBindings() {
         gamepad.square().onTrue(lift.to(LOW))
@@ -44,6 +47,8 @@ class DriverControlled : OpModeEX() {
 
         gamepad.left_bumper().onTrue(wrist.restore())
         gamepad.right_bumper().onTrue(wrist.deposit())
+
+        gamepad.share().whileTrue(drive.align())
     }
 
     override fun init_loopEX() {}
@@ -56,6 +61,8 @@ class DriverControlled : OpModeEX() {
         for (hub in allHubs) {
             current += hub.getCurrent(CurrentUnit.AMPS)
         }
+
+        drive.feburary.test()
 
         telemetry.addData("current", current)
     }
