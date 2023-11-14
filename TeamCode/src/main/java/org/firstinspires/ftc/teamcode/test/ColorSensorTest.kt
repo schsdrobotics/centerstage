@@ -41,10 +41,7 @@ class ColorSensingDemo : OpMode() {
 
         telemetry.addData("differences", differences)
 
-
-
         val least = differences.minBy { abs(it.second.first + it.second.second + it.second.third) }
-
 
         telemetry.addData("colors", colors)
 

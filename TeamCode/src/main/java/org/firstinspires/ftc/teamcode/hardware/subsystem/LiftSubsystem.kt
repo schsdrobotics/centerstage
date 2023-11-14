@@ -73,6 +73,6 @@ class LiftSubsystem(val opmode: OpModeEX) : Subsystem(opmode) {
         ZERO(0),
         LOW(170),
         MID(340),
-        HIGH(630)
+        HIGH(640)
     }
 }

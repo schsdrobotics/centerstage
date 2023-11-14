@@ -40,6 +40,6 @@ class WristSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
 
     companion object {
         private const val DOWN = 0.0
-        private const val UP = 0.6
+        private const val UP = 0.35
     }
 }

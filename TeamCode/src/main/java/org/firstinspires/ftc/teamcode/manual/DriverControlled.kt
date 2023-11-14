@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.manual
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.DepositSubsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.DriveSubsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem
@@ -23,12 +24,14 @@ class DriverControlled : OpModeEX() {
     private lateinit var drive: DriveSubsystem
     private lateinit var wrist: WristSubsystem
     private lateinit var intake: IntakeSubsystem
+    private lateinit var deposit: DepositSubsystem
 
     override fun registerSubsystems() {
         lift = LiftSubsystem(this)
         drive = DriveSubsystem(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
         wrist = WristSubsystem(this)
         intake = IntakeSubsystem(this)
+        deposit = DepositSubsystem(this)
     }
 
     override fun initEX() {
@@ -47,6 +50,13 @@ class DriverControlled : OpModeEX() {
 
         gamepad.left_bumper().onTrue(wrist.restore())
         gamepad.right_bumper().onTrue(wrist.deposit())
+
+        gamepad.dpad_up().onTrue(deposit.open())
+        gamepad.dpad_down().onTrue(deposit.shut())
+
+        gamepad.dpad_left()
+                .onTrue(deposit.spin())
+                .onFalse(deposit.stop())
 
         gamepad.share().whileTrue(drive.align())
     }
