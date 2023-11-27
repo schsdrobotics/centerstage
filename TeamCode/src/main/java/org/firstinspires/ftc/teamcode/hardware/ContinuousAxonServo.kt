@@ -11,7 +11,10 @@ class ContinuousAxonServo(hw: HardwareMap, private val name: String) {
     val servo
         get() = inner
 
-    var position
+    val position
         get() = pot.voltage / 3.3 * 360.0
+
+    var power
+        get() = servo.power
         set(value) { servo.power = value }
 }

@@ -14,6 +14,9 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.
 import org.firstinspires.ftc.teamcode.hardware.subsystem.WristSubsystem
 import org.firstinspires.ftc.teamcode.library.Feburary
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
+import org.mercurialftc.mercurialftc.scheduler.commands.Command
+import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
+import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 
 
 @TeleOp(group = "!")
@@ -46,17 +49,28 @@ class DriverControlled : OpModeEX() {
 
         gamepad.guide().onTrue(drive.reset())
 
-        gamepad.options().toggle(intake.spin())
+        val halt = ParallelCommandGroup()
+        halt.addCommands(intake.stop(), deposit.stop())
+
+        val spinny = ParallelCommandGroup()
+        halt.addCommands(intake.spin(), deposit.spin())
+
+        gamepad.dpad_down().whileTrue(LambdaCommand()
+                .setRequirements(intake, deposit)
+                .setExecute { intake.spin(); deposit.spin() }
+                .setFinish { false }
+        )
+        gamepad.dpad_up().onTrue(LambdaCommand()
+                .setRequirements(intake, deposit)
+                .setExecute { intake.stop(); deposit.stop() }
+                .setFinish { false }
+        )
 
         gamepad.left_bumper().onTrue(wrist.restore())
         gamepad.right_bumper().onTrue(wrist.deposit())
 
-        gamepad.dpad_up().onTrue(deposit.open())
-        gamepad.dpad_down().onTrue(deposit.shut())
-
-        gamepad.dpad_left()
-                .onTrue(deposit.spin())
-                .onFalse(deposit.stop())
+        gamepad.dpad_left().onTrue(deposit.open())
+        gamepad.dpad_right().onTrue(deposit.shut())
 
         gamepad.share().whileTrue(drive.align())
     }

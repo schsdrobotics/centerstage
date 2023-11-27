@@ -21,18 +21,20 @@ class IntakeSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     }
 
     fun spin() = LambdaCommand()
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { motor.power = SPEED }
             .setFinish { false }
 
     fun stop() = LambdaCommand()
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { motor.power = 0.0 }
             .setFinish { false }
 
     override fun periodic() {}
 
-    override fun defaultCommandExecute() = stop().execute()
+    override fun defaultCommandExecute() = Unit
 
     override fun close() {}
 

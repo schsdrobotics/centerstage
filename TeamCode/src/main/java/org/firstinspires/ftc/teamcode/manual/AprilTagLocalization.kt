@@ -7,18 +7,16 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.*
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.*
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
-import org.firstinspires.ftc.teamcode.hardware.Drivetrain
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
-import java.lang.invoke.MethodHandles.identity
 import kotlin.math.roundToInt
 
 @TeleOp
 class AprilTagLocalization : OpMode() {
     private var position = VectorF(0f, 0f, 0f)
 
-    private val drive by lazy { Drivetrain(this) }
+//    private val drive by lazy { Drivetrain(this) }
 
     private val processor by lazy {
         AprilTagProcessor.Builder()
@@ -74,7 +72,7 @@ class AprilTagLocalization : OpMode() {
     }
 
     override fun init() {
-        drive
+//        drive
         processor
         portal
     }
@@ -88,7 +86,7 @@ class AprilTagLocalization : OpMode() {
 
         processDetections()
 
-        drive.loop()
+//        drive.loop()
     }
 
     override fun stop() {

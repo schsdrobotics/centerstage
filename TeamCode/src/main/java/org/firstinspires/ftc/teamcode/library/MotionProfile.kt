@@ -6,32 +6,15 @@ import kotlin.math.sqrt
 fun profile(at: Int, goal: Int) = profile(at.toDouble(), goal.toDouble())
 
 fun profile(at: Double, goal: Double): Double {
-    val split = 1.0 / 2.35
+    val split = 1.0 / 2.0
 
     val climb = split * goal
     val drop = goal - climb
     val midpoint = goal / 2.0
 
-    val flight = 2.0
-    val descent = 1.8
-
-    fun sigmoid(x: Double) = 1.0 / (1.0 + exp(-x))
-
-    fun template(coeff: Double, gain: Double, const: Double = 0.0, mult: Double = 1.0)
-            = { x: Double -> sigmoid(mult * (sqrt(coeff) / goal) * (gain * x - climb - const)) }
-
-//    fun rise(x: Double) = template(climb, flight)(x)
     fun rise(x: Double) = (x - climb) / climb + 1
 
-//    fun fall(x: Double) = template(drop, descent, goal, -1.0)(x)
-    fun fall(x: Double) = (-(x - drop) / climb ) + 1
-
-//    fun peak(x: Double): Double {
-//        val slope = (fall(drop) - rise(climb)) / (drop - climb)
-//        val intercept = rise(climb)
-//
-//        return slope * (x - climb) + intercept
-//    }
+    fun fall(x: Double) = -(x - drop) / climb + 1
 
     fun peak(x: Double) = 1.0
 

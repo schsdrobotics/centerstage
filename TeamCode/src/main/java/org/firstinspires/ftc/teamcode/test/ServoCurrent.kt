@@ -14,7 +14,7 @@ class ServoCurrent : OpMode() {
         val halved = (gamepad1.right_trigger.toDouble()) / 2.0
         val full = (gamepad1.left_trigger.toDouble())
 
-        servo.position = max(halved, full)
+        servo.power = max(halved, full)
 
         telemetry.addData("power", servo.position * 100.0)
         telemetry.addData("current (mA)", servo.servo)

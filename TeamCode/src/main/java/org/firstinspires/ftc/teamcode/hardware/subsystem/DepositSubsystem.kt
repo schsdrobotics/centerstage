@@ -25,11 +25,13 @@ class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
             .setFinish { false }
 
     fun spin() = LambdaCommand()
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { transfer.power = -1.0 }
             .setFinish { false }
 
     fun stop() = LambdaCommand()
+            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { transfer.power = 0.0 }
             .setFinish { false }
