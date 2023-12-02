@@ -32,7 +32,7 @@ class DriverControlled : OpModeEX() {
     override fun registerSubsystems() {
         lift = LiftSubsystem(this)
         drive = DriveSubsystem(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
-        wrist = WristSubsystem(this)
+        wrist = WristSubsystem(this, lift)
         intake = IntakeSubsystem(this)
         deposit = DepositSubsystem(this)
     }
@@ -49,22 +49,8 @@ class DriverControlled : OpModeEX() {
 
         gamepad.guide().onTrue(drive.reset())
 
-        val halt = ParallelCommandGroup()
-        halt.addCommands(intake.stop(), deposit.stop())
-
-        val spinny = ParallelCommandGroup()
-        halt.addCommands(intake.spin(), deposit.spin())
-
-        gamepad.dpad_down().whileTrue(LambdaCommand()
-                .setRequirements(intake, deposit)
-                .setExecute { intake.spin(); deposit.spin() }
-                .setFinish { false }
-        )
-        gamepad.dpad_up().onTrue(LambdaCommand()
-                .setRequirements(intake, deposit)
-                .setExecute { intake.stop(); deposit.stop() }
-                .setFinish { false }
-        )
+        gamepad.dpad_up().onTrue(ParallelCommandGroup().addCommands(intake.spin(), deposit.spin()))
+        gamepad.dpad_down().onTrue(ParallelCommandGroup().addCommands(intake.stop(), deposit.stop()))
 
         gamepad.left_bumper().onTrue(wrist.restore())
         gamepad.right_bumper().onTrue(wrist.deposit())

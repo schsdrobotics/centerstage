@@ -25,13 +25,11 @@ class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
             .setFinish { false }
 
     fun spin() = LambdaCommand()
-            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { transfer.power = -1.0 }
             .setFinish { false }
 
     fun stop() = LambdaCommand()
-            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { transfer.power = 0.0 }
             .setFinish { false }
@@ -43,7 +41,7 @@ class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     override fun close() {}
 
     companion object {
-        private const val CLOSED = 1.0
-        private const val OPEN = 0.0
+        private const val CLOSED = 0.0
+        private const val OPEN = 1.0
     }
 }

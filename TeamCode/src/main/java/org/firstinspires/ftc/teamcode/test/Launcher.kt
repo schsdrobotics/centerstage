@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.manual
+package org.firstinspires.ftc.teamcode.test
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 
 @TeleOp
 class Launcher : OpMode() {
-    private val motor: DcMotorEx by lazy { hardwareMap["motor"] as DcMotorEx }
+    private val motor: DcMotorEx by lazy { hardwareMap["intake"] as DcMotorEx }
 
     override fun init() {
         motor.direction = DcMotorSimple.Direction.REVERSE

@@ -17,17 +17,15 @@ class IntakeSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
         motor.direction = REVERSE
         motor.zeroPowerBehavior = BRAKE
 
-        defaultCommand = stop()
+//        defaultCommand = stop()
     }
 
     fun spin() = LambdaCommand()
-            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { motor.power = SPEED }
             .setFinish { false }
 
     fun stop() = LambdaCommand()
-            .setInterruptible(false)
             .setRequirements(this)
             .setExecute { motor.power = 0.0 }
             .setFinish { false }
@@ -39,6 +37,6 @@ class IntakeSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     override fun close() {}
 
     companion object {
-        private const val SPEED = 1.0
+        private const val SPEED = 0.6
     }
 }

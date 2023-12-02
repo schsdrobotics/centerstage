@@ -6,7 +6,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.library.Feburary
-import org.firstinspires.ftc.teamcode.library.Vector3
+import org.firstinspires.ftc.teamcode.library.util.Vector3
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.bindings.gamepadex.DomainSupplier
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand

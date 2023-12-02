@@ -1,7 +1,4 @@
-package org.firstinspires.ftc.teamcode.library
-
-import kotlin.math.exp
-import kotlin.math.sqrt
+package org.firstinspires.ftc.teamcode.library.util
 
 fun profile(at: Int, goal: Int) = profile(at.toDouble(), goal.toDouble())
 

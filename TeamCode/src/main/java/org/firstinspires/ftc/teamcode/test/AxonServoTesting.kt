@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode.test
 
-import android.os.SystemClock.sleep
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.hardware.AxonServo
-import org.firstinspires.ftc.teamcode.hardware.ContinuousAxonServo
-import org.firstinspires.ftc.teamcode.library.lerp
-import org.firstinspires.ftc.teamcode.library.profile
-import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 @TeleOp

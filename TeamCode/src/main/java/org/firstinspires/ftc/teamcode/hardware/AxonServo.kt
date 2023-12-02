@@ -15,6 +15,8 @@ class AxonServo(hw: HardwareMap, private val name: String) {
         get() = pot.voltage / 3.3 * 360.0
         set(value) { inner.position = value }
 
+    fun scaleRange(min: Double, max: Double) = inner.scaleRange(min, max)
+
     fun release() = inner.setPwmDisable()
     fun hold() = inner.setPwmEnable()
 }
