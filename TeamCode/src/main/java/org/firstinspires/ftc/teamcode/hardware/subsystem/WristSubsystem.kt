@@ -8,6 +8,8 @@ import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.WristSubsystem.Position.*
 import kotlin.Double.Companion.NaN
 import kotlin.math.abs
+import kotlin.math.round
+import kotlin.math.sign
 import kotlin.properties.Delegates
 
 class WristSubsystem(val opmode: OpModeEX, val lift: LiftSubsystem) : Subsystem(opmode) {
@@ -39,7 +41,7 @@ class WristSubsystem(val opmode: OpModeEX, val lift: LiftSubsystem) : Subsystem(
             .setRequirements(this)
             // prevent restoration if the lift is at 0
             // TODO: introduce a threshold instead
-            .setExecute { if (!lock && lift.current != 0.0) state = Restore }
+            .setExecute { if (!lock && lift.current >= 50 ) state = Restore }
             .setFinish { false }
 
     fun deposit() = LambdaCommand()
@@ -67,14 +69,36 @@ class WristSubsystem(val opmode: OpModeEX, val lift: LiftSubsystem) : Subsystem(
      * this is budget motion profiling
      */
     override fun periodic() {
+        opmode.telemetry.addData("stage", stage)
+        opmode.telemetry.addData("state", state)
+        opmode.telemetry.addData("lock", lock)
+
         if (state == Idle || stage == STAGES) return
+
+        opmode.telemetry.addData("watchdog", watchdog.milliseconds())
+        opmode.telemetry.addData("burden", stage * TIME_PER_STAGE)
 
         // TODO: test under looptime burden
         if (watchdog.milliseconds() >= stage * TIME_PER_STAGE) {
             stage++
 
             // TODO: is abs required here?
-            wrist.position = abs(state.factor + (Position.INTERVAL * stage))
+            val position = abs(state.factor + (Position.INTERVAL * stage))
+            val delta = (Position.INTERVAL * (STAGES / 2))
+
+            opmode.telemetry.addData("this is what you want", position)
+            opmode.telemetry.addData("delta", delta)
+            opmode.telemetry.addData("position 1", wrist.position)
+            opmode.telemetry.addData("!!this", abs((wrist.position / 360.0) - position))
+
+
+            if (abs((wrist.position / 360.0) - position) / (Position.INTERVAL) >= delta) {
+                state = Position.invert(state)
+                return
+            }
+
+            wrist.position = position
+            opmode.telemetry.addData("position 2", wrist.position)
         }
     }
 
@@ -90,6 +114,12 @@ class WristSubsystem(val opmode: OpModeEX, val lift: LiftSubsystem) : Subsystem(
         Deposit(0.35, 0);
 
         companion object {
+            fun invert(position: Position) = when (position) {
+                Idle -> Idle
+                Restore -> Deposit
+                Deposit -> Restore
+            }
+
             const val INTERVAL = 1.0 / STAGES // stage ^ -1
         }
     }
