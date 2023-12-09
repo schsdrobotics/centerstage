@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode.library
+package org.firstinspires.ftc.teamcode.util
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.library.util.Vector3
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
@@ -16,6 +15,8 @@ class Feburary(val hardwareMap: HardwareMap, val opmode: OpMode) {
         VisionPortal.easyCreateWithDefaults(hardwareMap["Webcam 1"] as WebcamName, processor)
     }
 
+
+
     val detections
         get() = processor.detections
 
@@ -27,34 +28,27 @@ class Feburary(val hardwareMap: HardwareMap, val opmode: OpMode) {
                 Some(detections.first())
             }
         }
-//        get() {
-//            val filtered = detections.filter { it.metadata.id == DESIRED.value }
-//
-//            return if (filtered.isEmpty()) {
-//                None()
-//            } else {
-//                Some(filtered.first())
-//            }
-//        }
 
-
-    fun init() {
-        processor
-        portal
-    }
+    fun init() { processor; portal }
 
     fun test() {
-        val currentDetections: List<AprilTagDetection> = processor.detections
+        val currentDetections = processor.detections.toList()
         opmode.telemetry.addData("# AprilTags Detected", currentDetections.size)
     }
 
     fun feed(): Vector3 {
         return when (detected) {
-            is None -> Vector3(0.0, 0.0, 0.0)
+            is None -> Vector3.Zero
             is Some -> {
                 val tag = (detected as Some<AprilTagDetection>).value
 
-                val (x, y, z) = Triple(tag.ftcPose.x, max(tag.ftcPose.y - DESIRED_PROXIMITY, DESIRED_PROXIMITY), tag.ftcPose.z)
+                if (tag.id != DESIRED.value) return Vector3.Zero
+
+                val (x, y, z) = Triple(
+                    tag.ftcPose.x,
+                    max(tag.ftcPose.y - DESIRED_PROXIMITY, DESIRED_PROXIMITY),
+                    tag.ftcPose.z
+                )
 
                 opmode.telemetry.addData("x", x * Gains.X)
                 opmode.telemetry.addData("y", y * Gains.Y)
@@ -74,10 +68,18 @@ class Feburary(val hardwareMap: HardwareMap, val opmode: OpMode) {
             const val Z = 0.1
         }
 
+        enum class Position {
+            Left,
+            Middle,
+            Right
+        }
+
         private val DESIRED = Some(5)
 
-        sealed class Option<T>
-        class None<T> : Option<T>()
-        class Some<T>(val value: T) : Option<T>()
+        private val DESIRE_MAP = mapOf(
+            Position.Left   to listOf(1, 4),
+            Position.Middle to listOf(2, 5),
+            Position.Right  to listOf(3, 6),
+        )
     }
 }

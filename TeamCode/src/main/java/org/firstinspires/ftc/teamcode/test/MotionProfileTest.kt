@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.hardware.profile.AsymmetricMotionProfile
 import org.firstinspires.ftc.teamcode.hardware.profile.Constraints
-import org.firstinspires.ftc.teamcode.library.util.profile
 
 @TeleOp
 class MotionProfileTest : OpMode() {

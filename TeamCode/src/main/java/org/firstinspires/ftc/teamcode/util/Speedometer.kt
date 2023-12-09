@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.library
+package org.firstinspires.ftc.teamcode.util
 
 import com.qualcomm.robotcore.util.ElapsedTime
 import java.util.concurrent.TimeUnit
 
-class LoopTimer {
+class Speedometer {
     private val elapsed = ElapsedTime()
     val times = mutableListOf<Long>(0)
 
