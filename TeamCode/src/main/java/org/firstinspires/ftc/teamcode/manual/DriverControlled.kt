@@ -3,19 +3,17 @@ package org.firstinspires.ftc.teamcode.manual
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.DepositSubsystem
-import org.firstinspires.ftc.teamcode.hardware.subsystem.DriveSubsystem
-import org.firstinspires.ftc.teamcode.hardware.subsystem.IntakeSubsystem
-import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem
-import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.HIGH
-import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.LOW
-import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.MID
-import org.firstinspires.ftc.teamcode.hardware.subsystem.LiftSubsystem.Position.ZERO
-import org.firstinspires.ftc.teamcode.hardware.subsystem.WristSubsystem
-import org.firstinspires.ftc.teamcode.library.Feburary
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Deposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Drive
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Intake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.HIGH
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.LOW
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.MID
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.ZERO
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Wrist
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.Command
-import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 
 
@@ -23,23 +21,25 @@ import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 class DriverControlled : OpModeEX() {
     private val gamepad by lazy { gamepadEX1() }
 
-    private lateinit var lift: LiftSubsystem
-    private lateinit var drive: DriveSubsystem
-    private lateinit var wrist: WristSubsystem
-    private lateinit var intake: IntakeSubsystem
-    private lateinit var deposit: DepositSubsystem
+    private lateinit var lift: Lift
+    private lateinit var drive: Drive
+    private lateinit var wrist: Wrist
+    private lateinit var intake: Intake
+    private lateinit var deposit: Deposit
 
     override fun registerSubsystems() {
-        lift = LiftSubsystem(this)
-        drive = DriveSubsystem(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
-        wrist = WristSubsystem(this, lift)
-        intake = IntakeSubsystem(this)
-        deposit = DepositSubsystem(this)
+        lift = Lift(this)
+        drive = Drive(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
+        wrist = Wrist(this, lift)
+        intake = Intake(this)
+        deposit = Deposit(this)
     }
 
     override fun initEX() {
         drive.feburary.init()
     }
+
+    fun inParallel(vararg commands: Command) = ParallelCommandGroup().addCommands(commands.toList())
 
     override fun registerBindings() {
         gamepad.square().onTrue(lift.to(LOW))
@@ -49,16 +49,15 @@ class DriverControlled : OpModeEX() {
 
         gamepad.guide().onTrue(drive.reset())
 
-        gamepad.dpad_up().onTrue(ParallelCommandGroup().addCommands(intake.spin(), deposit.spin()))
-        gamepad.dpad_down().onTrue(ParallelCommandGroup().addCommands(intake.stop(), deposit.stop()))
+        gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
+        gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
+        gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
 
         gamepad.left_bumper().onTrue(wrist.restore())
         gamepad.right_bumper().onTrue(wrist.deposit())
 
-        gamepad.dpad_left().onTrue(deposit.open())
-        gamepad.dpad_right().onTrue(deposit.shut())
-
-        gamepad.share().whileTrue(drive.align())
+        gamepad.share().onTrue(deposit.shut())
+        gamepad.options().onTrue(deposit.open())
     }
 
     override fun init_loopEX() {}

@@ -6,7 +6,7 @@ import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 
-class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
+class Deposit(opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
 
     private val door by lazy { hw["door"] as Servo }
@@ -29,6 +29,11 @@ class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
             .setExecute { transfer.power = -1.0 }
             .setFinish { false }
 
+    fun reverse() = LambdaCommand()
+            .setRequirements(this)
+            .setExecute { transfer.power = 1.0 }
+            .setFinish { false }
+
     fun stop() = LambdaCommand()
             .setRequirements(this)
             .setExecute { transfer.power = 0.0 }
@@ -41,7 +46,7 @@ class DepositSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
     override fun close() {}
 
     companion object {
-        private const val CLOSED = 0.0
-        private const val OPEN = 1.0
+        private const val CLOSED = 0.7
+        private const val OPEN = 0.0
     }
 }

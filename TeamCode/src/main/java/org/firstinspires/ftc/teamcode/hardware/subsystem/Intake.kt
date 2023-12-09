@@ -8,7 +8,7 @@ import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 
 
-class IntakeSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
+class Intake(opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
 
     private val motor by lazy { hw["intake"] as DcMotor }
@@ -19,6 +19,11 @@ class IntakeSubsystem(opmode: OpModeEX) : Subsystem(opmode) {
 
 //        defaultCommand = stop()
     }
+
+    fun reverse() = LambdaCommand()
+            .setRequirements(this)
+            .setExecute { motor.power = -(SPEED - (SPEED / 3.0)) }
+            .setFinish { false }
 
     fun spin() = LambdaCommand()
             .setRequirements(this)

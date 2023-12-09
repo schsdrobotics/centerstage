@@ -13,7 +13,7 @@ import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 
 
-class DriveSubsystem(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: DomainSupplier, val givenZ: DomainSupplier) : Subsystem(opmode) {
+class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: DomainSupplier, val givenZ: DomainSupplier) : Subsystem(opmode) {
     val hw = opmode.hardwareMap
 
     private val frontLeft by lazy { Motor(hw, "frontLeft") }
@@ -82,12 +82,6 @@ class DriveSubsystem(val opmode: OpModeEX, val givenX: DomainSupplier, val given
     fun defaultCommandExecute(vec: Vector3) = defaultCommandExecute(-vec.x, -vec.y, -vec.z)
 
     fun defaultCommandExecute(x: Double, y: Double, z: Double) {
-        opmode.telemetry.addLine("defaultCommandExecute x y z")
-        opmode.telemetry.addData("x", x)
-        opmode.telemetry.addData("x", y)
-        opmode.telemetry.addData("x", z)
-        opmode.telemetry.addLine("---------------------------")
-
         drive.driveFieldCentric(x, y, z,
                 imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES),
                 true,
@@ -95,12 +89,6 @@ class DriveSubsystem(val opmode: OpModeEX, val givenX: DomainSupplier, val given
     }
 
     override fun defaultCommandExecute() {
-        opmode.telemetry.addLine("defaultCommandExecute given")
-        opmode.telemetry.addData("x", givenX.asDouble)
-        opmode.telemetry.addData("x", givenY.asDouble)
-        opmode.telemetry.addData("x", givenZ.asDouble)
-        opmode.telemetry.addLine("---------------------------")
-
         drive.driveFieldCentric(
                 givenX.asDouble,
                 givenY.asDouble,
