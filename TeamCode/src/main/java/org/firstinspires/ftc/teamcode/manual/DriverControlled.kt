@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.LOW
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.MID
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.ZERO
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Wrist
+import org.firstinspires.ftc.teamcode.util.inParallel
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.Command
 import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
@@ -39,8 +40,6 @@ class DriverControlled : OpModeEX() {
         drive.feburary.init()
     }
 
-    fun inParallel(vararg commands: Command) = ParallelCommandGroup().addCommands(commands.toList())
-
     override fun registerBindings() {
         gamepad.square().onTrue(lift.to(LOW))
         gamepad.triangle().onTrue(lift.to(MID))
@@ -50,6 +49,7 @@ class DriverControlled : OpModeEX() {
         gamepad.guide().onTrue(drive.reset())
 
         gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
+        gamepad.right_stick_button().onTrue(inParallel(intake.fast(), deposit.spin()))
         gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
         gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
 
@@ -66,6 +66,8 @@ class DriverControlled : OpModeEX() {
         var current = 0.0
 
         val allHubs = hardwareMap.getAll(LynxModule::class.java)
+
+        hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) }
 
         for (hub in allHubs) {
             current += hub.getCurrent(CurrentUnit.AMPS)

@@ -21,9 +21,9 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
     private val backLeft by lazy { Motor(hw, "backLeft") }
     private val backRight by lazy { Motor(hw, "backRight") }
 
-    private val drive by lazy { MecanumDrive(frontLeft, frontRight, backLeft, backRight) }
+    val drive by lazy { MecanumDrive(frontLeft, frontRight, backLeft, backRight) }
 
-    private val imu by lazy { hw["imu"] as IMU }
+    val imu by lazy { hw["imu"] as IMU }
 
     val feburary by lazy { Feburary(hw, opmode) }
 

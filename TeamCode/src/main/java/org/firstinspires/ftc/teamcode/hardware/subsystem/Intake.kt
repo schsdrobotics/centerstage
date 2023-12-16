@@ -30,6 +30,11 @@ class Intake(opmode: OpModeEX) : Subsystem(opmode) {
             .setExecute { motor.power = SPEED }
             .setFinish { false }
 
+    fun fast() = LambdaCommand()
+            .setRequirements(this)
+            .setExecute { motor.power = 1.0 }
+            .setFinish { false }
+
     fun stop() = LambdaCommand()
             .setRequirements(this)
             .setExecute { motor.power = 0.0 }
@@ -42,6 +47,6 @@ class Intake(opmode: OpModeEX) : Subsystem(opmode) {
     override fun close() {}
 
     companion object {
-        private const val SPEED = 0.6
+        private const val SPEED = 0.7
     }
 }

@@ -12,7 +12,7 @@ class Feburary(val hardwareMap: HardwareMap, val opmode: OpMode) {
     val processor by lazy { AprilTagProcessor.easyCreateWithDefaults() }
 
     val portal by lazy {
-        VisionPortal.easyCreateWithDefaults(hardwareMap["Webcam 1"] as WebcamName, processor)
+        VisionPortal.easyCreateWithDefaults(hardwareMap["front"] as WebcamName, processor)
     }
 
 

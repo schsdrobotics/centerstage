@@ -43,7 +43,7 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
     double largestContourArea;
     private MatOfPoint largestContour;
     private PropPositions previousPropPosition;
-    private PropPositions recordedPropPosition = PropPositions.UNFOUND;
+    private PropPositions recordedPropPosition = PropPositions.Unfound;
     private final AtomicReference<Bitmap> lastFrame = new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
 
@@ -175,19 +175,19 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
         // if we didn't find any contours which were large enough, sets it to be unfound
         PropPositions propPosition;
         if (largestContour == null) {
-            propPosition = PropPositions.LEFT;
+            propPosition = PropPositions.Left;
         } else if (largestContourX < 320.0) {
-            propPosition = PropPositions.MIDDLE;
+            propPosition = PropPositions.Middle;
         } else if (largestContourX > 320.0) {
-            propPosition = PropPositions.RIGHT;
+            propPosition = PropPositions.Right;
         } else {
-            propPosition = PropPositions.LEFT;
+            propPosition = PropPositions.Left;
         }
 
         // if we have found a new prop position, and it is not unfound, updates the recorded position,
         // this makes sure that if our camera is playing up, we only need to see the prop in the correct position
         // and we will hold onto it
-        if (propPosition != previousPropPosition && propPosition != PropPositions.UNFOUND) {
+        if (propPosition != previousPropPosition) {
             recordedPropPosition = propPosition;
         }
 
@@ -232,7 +232,7 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
     }
 
     /**
-     * @return the last found prop position, if none have been found, returns {@link PropPositions#UNFOUND}
+     * @return the last found prop position, if none have been found, returns {@link PropPositions#Unfound}
      */
     public PropPositions getRecordedPropPosition() {
         return recordedPropPosition;
@@ -251,10 +251,10 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
 
     // the enum that stores the 4 possible prop positions
     public enum PropPositions {
-        LEFT,
-        MIDDLE,
-        RIGHT,
-        UNFOUND;
+        Left,
+        Middle,
+        Right,
+        Unfound
     }
     @Override
     public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {

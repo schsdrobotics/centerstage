@@ -91,14 +91,14 @@ public class ColourMassDetectionOpMode extends OpMode {
 
         // now we can use recordedPropPosition in our auto code to modify where we place the purple and yellow pixels
         switch (recordedPropPosition) {
-            case LEFT:
+            case Left:
                 // code to do if we saw the prop on the left
                 break;
             // we can also just add the unfound case here to do fallthrough intstead of the overriding method above, whatever you prefer!
-            case MIDDLE:
+            case Middle:
                 // code to do if we saw the prop on the middle
                 break;
-            case RIGHT:
+            case Right:
                 // code to do if we saw the prop on the right
                 break;
         }
@@ -109,8 +109,8 @@ public class ColourMassDetectionOpMode extends OpMode {
 
         // now we can use recordedPropPosition to determine where the prop is! if we never saw a prop, your recorded position will be UNFOUND.
         // if it is UNFOUND, you can manually set it to any of the other positions to guess
-        if (recordedPropPosition == ColourMassDetectionProcessor.PropPositions.UNFOUND) {
-            recordedPropPosition = ColourMassDetectionProcessor.PropPositions.MIDDLE;
+        if (recordedPropPosition == ColourMassDetectionProcessor.PropPositions.Unfound) {
+            recordedPropPosition = ColourMassDetectionProcessor.PropPositions.Middle;
         }
         return recordedPropPosition;
     }
