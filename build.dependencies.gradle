@@ -24,6 +24,8 @@ dependencies {
 
     //noinspection GradleDependency
     implementation 'com.github.Froze-N-Milk:mercurialftc:v0.0.5'
+    implementation 'com.github.Dairy-Foundation.Dairy:Core:beta-0-1'
+    implementation 'com.github.Dairy-Foundation.Dairy:Calcified:beta-0-1'
 
     //noinspection GradleDependency
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.9'
