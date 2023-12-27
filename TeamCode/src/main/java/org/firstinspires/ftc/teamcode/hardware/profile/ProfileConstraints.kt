@@ -1,23 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.profile;
 
-public class Constraints {
-    public double accel;
-    public double decel;
-    public double velo;
+data class ProfileConstraints(val velocity: Double, val accel: Double, val decel: Double) {
+    constructor(velocity: Double, accel: Double) : this(velocity, accel, accel)
 
-    public Constraints(double velo, double accel) {
-        this(accel, accel, velo);
-    }
-
-    public Constraints(double velo, double accel, double decel) {
-        this.velo = Math.abs(velo);
-        this.accel = Math.abs(accel);
-        this.decel = Math.abs(decel);
-    }
-
-    public void convert(double factor) {
-        this.velo *= factor;
-        this.accel *= factor;
-        this.decel *= factor;
-    }
+    operator fun times(factor: Double) = ProfileConstraints(velocity * factor, accel * factor, decel * factor)
 }

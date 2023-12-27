@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.hardware.profile.AsymmetricMotionProfile
 import org.firstinspires.ftc.teamcode.hardware.axon.AxonServo
-import org.firstinspires.ftc.teamcode.hardware.profile.Constraints
+import org.firstinspires.ftc.teamcode.hardware.profile.ProfileConstraints
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
@@ -67,6 +67,6 @@ class Wrist(val opmode: OpModeEX, val lift: Lift) : Subsystem(opmode) {
     }
 
     companion object {
-        private val constraint = Constraints(5.0, 0.125, 0.05)
+        private val constraint = ProfileConstraints(5.0, 0.125, 0.05)
     }
 }
