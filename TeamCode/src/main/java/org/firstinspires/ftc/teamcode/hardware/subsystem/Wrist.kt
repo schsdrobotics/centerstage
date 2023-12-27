@@ -67,7 +67,6 @@ class Wrist(val opmode: OpModeEX, val lift: Lift) : Subsystem(opmode) {
     }
 
     companion object {
-        private val constraint = Constraints(12.0, 3.0, 1.0)
-
+        private val constraint = Constraints(5.0, 0.125, 0.05)
     }
 }

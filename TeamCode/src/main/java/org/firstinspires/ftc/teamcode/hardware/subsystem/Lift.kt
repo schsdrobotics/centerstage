@@ -30,7 +30,8 @@ class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
 
     override fun periodic() {
         current = abs(left.currentPosition).toDouble()
-        opModeEX.telemetry.addData("lift", current)
+
+        opModeEX.telemetry.addData("lift.position", current)
     }
 
     override fun defaultCommandExecute() {

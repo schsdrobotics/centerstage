@@ -21,6 +21,7 @@ import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 @TeleOp(group = "!")
 class DriverControlled : OpModeEX() {
     private val gamepad by lazy { gamepadEX1() }
+    private val gamepad2 by lazy { gamepadEX2() }
 
     private lateinit var lift: Lift
     private lateinit var drive: Drive
@@ -49,8 +50,11 @@ class DriverControlled : OpModeEX() {
         gamepad.guide().onTrue(drive.reset())
 
         gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
+
         gamepad.right_stick_button().onTrue(inParallel(intake.fast(), deposit.spin()))
+
         gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
+
         gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
 
         gamepad.left_bumper().onTrue(wrist.restore())
