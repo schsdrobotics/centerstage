@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.test
+package org.firstinspires.ftc.teamcode.test.servo
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.profile.Constraints
 
 @TeleOp
 class ServoTest : OpMode() {
-    val servo by lazy { hardwareMap["servo"] as ServoImplEx }
+    val servo by lazy { hardwareMap["wrist"] as ServoImplEx }
     val timer = ElapsedTime()
     val profile = AsymmetricMotionProfile(1.0, 0.25, Constraints(0.15, 0.15, 0.05))
 
@@ -21,6 +21,7 @@ class ServoTest : OpMode() {
 
     override fun loop() {
         val p = profile.calculate(timer.seconds())
+
         servo.position = p.x
 
         telemetry.addData("p", p.x)
