@@ -44,7 +44,6 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
                 )
         )
 
-
         defaultCommand = move()
     }
 
@@ -52,7 +51,7 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
             .setInterruptible(false)
             .setRequirements(this)
             .setRunStates(OpModeEX.OpModeEXRunStates.LOOP)
-            .setExecute { defaultCommandExecute(feburary.feed()) }
+            .setExecute { driveRobotCentric(feburary.feed()) }
             .setFinish { false }
 
     fun move(vec: Vector3) = move(vec.x, vec.y, vec.z)
@@ -61,14 +60,14 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
             .setInterruptible(true)
             .setRequirements(this)
             .setRunStates(OpModeEX.OpModeEXRunStates.LOOP)
-            .setExecute { defaultCommandExecute(givenX.asDouble, givenY.asDouble, givenZ.asDouble) }
+            .setExecute { driveFieldCentric(givenX.asDouble, givenY.asDouble, givenZ.asDouble) }
             .setFinish { false }
 
     fun move(x: Double, y: Double, z: Double) = LambdaCommand()
             .setInterruptible(true)
             .setRequirements(this)
             .setRunStates(OpModeEX.OpModeEXRunStates.LOOP)
-            .setExecute { defaultCommandExecute(x, y, z) }
+            .setExecute { driveFieldCentric(x, y, z) }
             .setFinish { false }
 
     fun reset() = LambdaCommand()
@@ -78,17 +77,22 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
             .setFinish { true }
 
     override fun periodic() {}
+    override fun defaultCommandExecute() = driveFieldCentric()
 
-    fun defaultCommandExecute(vec: Vector3) = defaultCommandExecute(-vec.x, -vec.y, -vec.z)
+    fun driveRobotCentric(vec: Vector3) {
+        drive.driveRobotCentric(vec.x, vec.y, vec.z, true)
+    }
 
-    fun defaultCommandExecute(x: Double, y: Double, z: Double) {
+    fun driveFieldCentric(vec: Vector3) = driveFieldCentric(-vec.x, -vec.y, -vec.z)
+
+    fun driveFieldCentric(x: Double, y: Double, z: Double) {
         drive.driveFieldCentric(x, y, z,
                 imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES),
                 true,
         )
     }
 
-    override fun defaultCommandExecute() {
+    fun driveFieldCentric() {
         drive.driveFieldCentric(
                 givenX.asDouble,
                 givenY.asDouble,

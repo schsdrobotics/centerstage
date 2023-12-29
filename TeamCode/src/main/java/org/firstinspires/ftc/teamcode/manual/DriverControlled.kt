@@ -48,38 +48,33 @@ class DriverControlled : OpModeEX() {
         gamepad.cross().onTrue(lift.to(ZERO))
 
         gamepad.guide().onTrue(drive.reset())
+        gamepad.left_stick_button().whileTrue(drive.align())
 
-        gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
+//        gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
 
-        gamepad.right_stick_button().onTrue(inParallel(intake.fast(), deposit.spin()))
+//        gamepad.right_stick_button().onTrue(inParallel(intake.fast(), deposit.spin()))
 
-        gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
+//        gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
+//
+//        gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
+//
+//        gamepad.left_bumper().onTrue(wrist.restore())
+//        gamepad.right_bumper().onTrue(wrist.deposit())
+//
+//        gamepad.share().onTrue(deposit.shut())
+//        gamepad.options().onTrue(deposit.open())
 
-        gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
-
-        gamepad.left_bumper().onTrue(wrist.restore())
-        gamepad.right_bumper().onTrue(wrist.deposit())
-
-        gamepad.share().onTrue(deposit.shut())
-        gamepad.options().onTrue(deposit.open())
     }
 
     override fun init_loopEX() {}
-    override fun startEX() {}
+    override fun startEX() {
+        telemetry.msTransmissionInterval = 20
+    }
+
     override fun loopEX() {
-        var current = 0.0
-
-        val allHubs = hardwareMap.getAll(LynxModule::class.java)
-
-        hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) }
-
-        for (hub in allHubs) {
-            current += hub.getCurrent(CurrentUnit.AMPS)
-        }
-
         drive.feburary.test()
 
-        telemetry.addData("current", current)
+        telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
     }
     override fun stopEX() {}
 }

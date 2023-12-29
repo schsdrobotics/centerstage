@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.hardware.profile.ProfileConstraints
 
 @TeleOp
 class MotionProfileTest : OpMode() {
-    private val profile = AsymmetricMotionProfile(0.0, 20000.0, ProfileConstraints(1.75, 10.0))
+    private val profile = AsymmetricMotionProfile(0.0, 20000.0, ProfileConstraints(1.0, 0.05))
     private val motor by lazy { hardwareMap["motor"] as DcMotorEx }
     private val timer = ElapsedTime()
 
@@ -20,12 +20,21 @@ class MotionProfileTest : OpMode() {
         motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
-    override fun start() = timer.reset()
+    override fun start() {
+        timer.reset()
+    }
 
     override fun loop() {
-        motor.power = profile.calculate(timer.seconds()).a
+        val state = profile.calculate(timer.milliseconds())
 
-        telemetry.addData("power", motor.power)
+        motor.targetPosition = state.x.toInt()
+        motor.mode = DcMotor.RunMode.RUN_TO_POSITION
+        motor.power = 0.5
+
+        telemetry.addData("x", state.x)
+        telemetry.addData("a", state.a)
+        telemetry.addData("v", state.v)
         telemetry.addData("position", motor.currentPosition)
+        telemetry.addData("error", state.x - motor.currentPosition)
     }
 }
