@@ -28,7 +28,23 @@ operator fun AprilTagPoseFtc.times(other: AprilTagPoseFtc) = AprilTagPoseFtc(
         elevation * other.elevation
 )
 
+operator fun AprilTagPoseFtc.times(factor: Double) = AprilTagPoseFtc(
+        x * factor,
+        y * factor,
+        z * factor,
+        yaw * factor,
+        pitch * factor,
+        roll * factor,
+        range * factor,
+        bearing * factor,
+        elevation * factor
+)
+
+operator fun AprilTagPoseFtc.times(factor: Int) = this * factor.toDouble()
+
 operator fun AprilTagPoseFtc.div(other: AprilTagPoseFtc) = this * other.reciprocal()
+operator fun AprilTagPoseFtc.div(other: Double) = this * (1.0 / other)
+operator fun AprilTagPoseFtc.div(other: Int) = this / other.toDouble()
 
 operator fun AprilTagPoseFtc.unaryMinus() = AprilTagPoseFtc(
         -x,
