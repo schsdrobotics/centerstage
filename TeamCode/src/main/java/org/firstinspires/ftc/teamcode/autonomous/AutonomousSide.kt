@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous
 
-import org.firstinspires.ftc.teamcode.util.hsv
+import org.firstinspires.ftc.teamcode.util.sugar.hsv
 import org.opencv.core.Scalar
 
 enum class AutonomousSide(val lower: Scalar, val upper: Scalar) {

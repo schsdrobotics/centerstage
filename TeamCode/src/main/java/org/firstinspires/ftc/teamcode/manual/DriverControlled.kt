@@ -12,10 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.LOW
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.MID
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.ZERO
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Wrist
-import org.firstinspires.ftc.teamcode.util.inParallel
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
-import org.mercurialftc.mercurialftc.scheduler.commands.Command
-import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 
 
 @TeleOp(group = "!")

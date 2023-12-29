@@ -5,12 +5,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.util.structures.None
+import org.firstinspires.ftc.teamcode.util.structures.Option
+import org.firstinspires.ftc.teamcode.util.structures.Some
+import org.firstinspires.ftc.teamcode.util.structures.Vector3
 import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 
 class Feburary(val hardwareMap: HardwareMap, val opmode: OpMode) {

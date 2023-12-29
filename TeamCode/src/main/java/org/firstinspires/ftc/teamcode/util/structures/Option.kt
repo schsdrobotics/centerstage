@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util
+package org.firstinspires.ftc.teamcode.util.structures
 
 sealed class Option<T>
 class None<T> : Option<T>()

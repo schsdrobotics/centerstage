@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.processors;
 
-import static org.firstinspires.ftc.teamcode.util.HsvKt.hsv;
+import static org.firstinspires.ftc.teamcode.util.sugar.HsvKt.hsv;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
