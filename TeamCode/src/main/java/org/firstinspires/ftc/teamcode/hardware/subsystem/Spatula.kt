@@ -28,6 +28,11 @@ class Spatula(opmode: OpModeEX) : Subsystem(opmode) {
             .setExecute { state = DOWN }
             .setFinish { false }
 
+    fun to(state: State) = LambdaCommand()
+            .setRequirements(this)
+            .setExecute { this.state = state }
+            .setFinish { false }
+
     override fun periodic() { spatula.position = state.position }
 
     override fun defaultCommandExecute() = Unit
