@@ -12,8 +12,7 @@ class ServoUnboundAnalog : OpMode() {
     val servo by lazy { hardwareMap["servo"] as Servo }
 
     override fun init() {
-        servo.direction = Servo.Direction.REVERSE
-        servo.scaleRange(0.3, 0.6)
+//        servo.scaleRange(0.05, 0.15)
     }
 
     override fun loop() {
