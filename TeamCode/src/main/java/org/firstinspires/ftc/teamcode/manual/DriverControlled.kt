@@ -46,21 +46,6 @@ class DriverControlled : OpModeEX() {
 
         gamepad.guide().onTrue(drive.reset())
         gamepad.left_stick_button().whileTrue(drive.align())
-
-//        gamepad.dpad_up().onTrue(inParallel(intake.spin(), deposit.spin()))
-
-//        gamepad.right_stick_button().onTrue(inParallel(intake.fast(), deposit.spin()))
-
-//        gamepad.dpad_left().onTrue(inParallel(intake.stop(), deposit.stop()))
-//
-//        gamepad.dpad_down().onTrue(inParallel(intake.reverse(), deposit.reverse()))
-//
-//        gamepad.left_bumper().onTrue(wrist.restore())
-//        gamepad.right_bumper().onTrue(wrist.deposit())
-//
-//        gamepad.share().onTrue(deposit.shut())
-//        gamepad.options().onTrue(deposit.open())
-
     }
 
     override fun init_loopEX() {}
