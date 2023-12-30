@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.manual
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift
@@ -11,7 +10,6 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.HIGH
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.LOW
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.MID
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift.Position.ZERO
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Wrist
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 
 
@@ -22,16 +20,12 @@ class DriverControlled : OpModeEX() {
 
     private lateinit var lift: Lift
     private lateinit var drive: Drive
-    private lateinit var wrist: Wrist
     private lateinit var intake: Intake
-    private lateinit var deposit: Deposit
 
     override fun registerSubsystems() {
         lift = Lift(this)
         drive = Drive(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
-        wrist = Wrist(this, lift)
         intake = Intake(this)
-        deposit = Deposit(this)
     }
 
     override fun initEX() {
