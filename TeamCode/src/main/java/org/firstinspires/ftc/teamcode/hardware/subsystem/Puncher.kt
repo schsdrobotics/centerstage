@@ -8,12 +8,12 @@ import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 
 class Puncher(opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
-    private val spatula by lazy { hw["puncher"] as Servo }
+    private val puncher by lazy { hw["puncher"] as Servo }
 
     private var state = NONE
 
     override fun init() {
-        spatula.direction = Servo.Direction.REVERSE
+//        puncher.direction = Servo.Direction.REVERSE
     }
 
     fun to(state: State) = LambdaCommand()
@@ -21,16 +21,16 @@ class Puncher(opmode: OpModeEX) : Subsystem(opmode) {
             .setExecute { this.state = state }
             .setFinish { false }
 
-    override fun periodic() { spatula.position = state.position }
+    override fun periodic() { puncher.position = state.position }
 
     override fun defaultCommandExecute() = Unit
 
-    override fun close() { spatula.position = NONE.position }
+    override fun close() { puncher.position = NONE.position }
 
     companion object {
         enum class State(val position: Double) {
             NONE(0.0),
-            ONE(0.5),
+            ONE(0.47),
             TWO(1.0)
         }
     }
