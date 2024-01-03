@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem
 import com.arcrobotics.ftclib.drivebase.MecanumDrive
 import com.arcrobotics.ftclib.hardware.motors.Motor
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.*
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.UP
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -37,7 +37,7 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
 
         drive
 
-        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(BACKWARD, UP)))
+        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(RIGHT, UP)))
 
         defaultCommand = move()
     }
