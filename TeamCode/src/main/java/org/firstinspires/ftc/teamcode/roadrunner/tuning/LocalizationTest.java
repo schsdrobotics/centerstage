@@ -16,6 +16,8 @@ public class LocalizationTest extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
+            telemetry.addData("testing", "this");
+
             waitForStart();
 
             while (opModeIsActive()) {
