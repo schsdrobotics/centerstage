@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.*
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.UP
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.util.Feburary
@@ -34,6 +35,8 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
         frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
         backLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
         backRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+
+        backLeft.motor.direction = DcMotorSimple.Direction.REVERSE
 
         drive
 

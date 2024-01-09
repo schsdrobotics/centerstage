@@ -22,9 +22,10 @@ import kotlin.math.PI
 open class PurplePixel(val side: AutonomousSide) : OpModeEX() {
     // TODO: refactor when mirror logic exists to remove this redundancy
     val start = when (side) {
-        Red -> Pose2d(12.0, -62.0, PI / 2.0)
-        Blue -> Pose2d(12.0, 62.0, PI / 2.0)
+        Red -> Pose2d(12.0, -62.0, 90.deg)
+        Blue -> Pose2d(12.0, 62.0, 90.deg)
     }
+
 
     val drive by lazy { MecanumDrive(hardwareMap, start) }
 
