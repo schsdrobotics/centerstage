@@ -8,11 +8,12 @@ import kotlin.math.max
 
 @TeleOp
 class MotorCurrent : OpMode() {
-    private val motor by lazy { hardwareMap.dcMotor["motor"] as DcMotorEx }
+    private val motor by lazy { hardwareMap.dcMotor["intake"] as DcMotorEx }
 
     override fun init() { motor }
     override fun loop() {
         val halved = (gamepad1.right_trigger.toDouble()) / 2.0
+
         val full = (gamepad1.left_trigger.toDouble())
 
         motor.power = max(halved, full)

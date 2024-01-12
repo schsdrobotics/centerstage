@@ -9,7 +9,7 @@ import kotlin.math.max
 
 @TeleOp
 class ServoUnboundAnalog : OpMode() {
-    val servo by lazy { hardwareMap["servo"] as Servo }
+    val servo by lazy { hardwareMap["puncher"] as Servo }
 
     override fun init() {
 //        servo.scaleRange(0.05, 0.15)

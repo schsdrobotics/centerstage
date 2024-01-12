@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Puncher.Companion.State
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Puncher.Companion.State.ONE
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Puncher.Companion.State.TWO
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.ALIGN
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.DOWN
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.UP
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
@@ -25,18 +26,19 @@ class DriverControlled : OpModeEX() {
     private val gamepad by lazy { gamepadEX1() }
     private val gamepad2 by lazy { gamepadEX2() }
 
-//    private lateinit var lift: Lift
+    private lateinit var lift: Lift
     private lateinit var drive: Drive
-//    private lateinit var intake: Intake
-//    private lateinit var spatula: Spatula
-//    private lateinit var puncher: Puncher
+    private lateinit var intake: Intake
+    private lateinit var spatula: Spatula
+    private lateinit var puncher: Puncher
+
 
     override fun registerSubsystems() {
-//        lift = Lift(this)
         drive = Drive(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
-//        intake = Intake(this)
-//        spatula = Spatula(this)
-//        puncher = Puncher(this)
+        intake = Intake(this)
+        spatula = Spatula(this)
+        puncher = Puncher(this)
+        lift = Lift(this, spatula)
     }
 
     override fun initEX() {
@@ -44,20 +46,41 @@ class DriverControlled : OpModeEX() {
     }
 
     override fun registerBindings() {
-//        gamepad.square().onTrue(lift.to(LOW))
-//        gamepad.triangle().onTrue(lift.to(MID))
-//        gamepad.circle().onTrue(lift.to(HIGH))
-//        gamepad.cross().onTrue(lift.to(ZERO))
+        gamepad.square().onTrue(lift.to(LOW))
+        gamepad.triangle().onTrue(lift.to(MID))
+        gamepad.circle().onTrue(lift.to(HIGH))
+        gamepad.cross().onTrue(lift.to(ZERO))
 //
         gamepad.guide().onTrue(drive.reset())
 //        gamepad.left_stick_button().whileTrue(drive.align())
+
+        gamepad.left_trigger().applyDeadZone(0.3)
+        gamepad.left_trigger().buildBinding()
+                .lessThanEqualTo(0.6)
+                .bind()
+                .onTrue(intake.reverse(slow = true))
+        gamepad.left_trigger().buildBinding()
+                .greaterThan(0.6)
+                .bind()
+                .onTrue(intake.reverse(slow = false))
+
+        gamepad.right_trigger().applyDeadZone(0.3)
+        gamepad.right_trigger().buildBinding()
+                .lessThanEqualTo(0.6)
+                .bind()
+                .onTrue(intake.forward(slow = true))
+        gamepad.right_trigger().buildBinding()
+                .greaterThan(0.6)
+                .bind()
+                .onTrue(intake.forward(slow = false))
+
+        gamepad.dpad_left().onTrue(puncher.to(NONE))
+        gamepad.dpad_up().onTrue(puncher.to(ONE))
+        gamepad.dpad_right().onTrue(puncher.to(TWO))
 //
-//        gamepad.dpad_left().onTrue(puncher.to(NONE))
-//        gamepad.dpad_up().onTrue(puncher.to(ONE))
-//        gamepad.dpad_right().onTrue(puncher.to(TWO))
-//
-//        gamepad.dpad_left().onTrue(spatula.to(DOWN))
-//        gamepad.dpad_right().onTrue(spatula.to(UP))
+        gamepad.dpad_down().onTrue(spatula.to(ALIGN))
+        gamepad.right_bumper().onTrue(spatula.to(DOWN))
+        gamepad.left_bumper().onTrue(spatula.to(UP))
     }
 
     override fun init_loopEX() {}

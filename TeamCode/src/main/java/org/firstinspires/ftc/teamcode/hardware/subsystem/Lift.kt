@@ -9,14 +9,15 @@ import org.mercurialftc.mercurialftc.scheduler.commands.Command
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 import kotlin.math.abs
+import kotlin.math.pow
 
-class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
+class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
 
-    private val right by lazy { hw["lift.right"] as DcMotorEx }
-    private val left by lazy { hw["lift.left"] as DcMotorEx }
+    private val right by lazy { hw["leftLift"] as DcMotorEx }
+    private val left by lazy { hw["rightLift"] as DcMotorEx }
 
-    private val directions by lazy { mapOf(right to 1, left to -1) }
+    private val directions by lazy { mapOf(right to -1, left to -1) }
     private val motors
         get() = directions.keys
 
@@ -31,21 +32,34 @@ class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
     override fun periodic() {
         current = abs(left.currentPosition).toDouble()
 
-        opModeEX.telemetry.addData("lift.position", current)
+        opmode.telemetry.addData("ticks", current)
+        opmode.telemetry.addData("ticks error", target - current)
     }
 
     override fun defaultCommandExecute() {
         val error = target - current
 
-        val g = if (error < 0 || current < 30) 0.0 else kG
+        val g = if (abs(error) < 10 || current < 100 || error < 0) 0.0 else kG
 
-        val output = (kP * error) + g + (kM * current)
+        val kP = when {
+            target == 0.0 && current <= 30 -> zeroKP
+            target <= 70 -> lowKP
+            error >= 0 -> posKP
+            error < 0 -> negKP
+
+            else -> 0.001
+        }
+
+        // if (target <= 70) zeroKP else if (error >= 0) posKP else negKP
+
+        if (current in 20.0..40.0) spatula.align().execute()
+
+        val output = (kP * error) + g * (current / Position.HIGH.ticks).pow(1.0 / 4.0)
 
         directions.forEach { it.key.power = output * it.value }
     }
 
     fun to(ticks: Int): Command {
-        opmode.telemetry.addData("ticks", ticks)
         return LambdaCommand()
                 .setInterruptible(true)
                 .setInit { preparePID(ticks) }
@@ -71,14 +85,17 @@ class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
 
     enum class Position(val ticks: Int) {
         ZERO(0),
-        LOW(100),
-        MID(300),
-        HIGH(400)
+        LOW(245),
+        MID(485),
+        HIGH(970) // -10
     }
 
     companion object {
-        private const val kP = 0.00175
-        private const val kG = 0.2
-        private const val kM = 0.0005
+        private const val posKP = 0.0018
+        private const val negKP = 0.0023
+        private const val lowKP = 0.0032
+        private const val zeroKP = 0.0045
+
+        private const val kG = 0.3
     }
 }

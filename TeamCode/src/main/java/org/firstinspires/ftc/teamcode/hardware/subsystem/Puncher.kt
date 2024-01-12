@@ -29,9 +29,9 @@ class Puncher(opmode: OpModeEX) : Subsystem(opmode) {
 
     companion object {
         enum class State(val position: Double) {
-            NONE(0.0),
-            ONE(0.47),
-            TWO(1.0)
+            TWO(0.05),
+            ONE(0.8),
+            NONE(1.0)
         }
     }
 }
