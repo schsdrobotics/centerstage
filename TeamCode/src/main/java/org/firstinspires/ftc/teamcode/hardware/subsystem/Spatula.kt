@@ -47,12 +47,12 @@ class Spatula(opmode: OpModeEX) : Subsystem(opmode) {
 
     companion object {
         enum class State(val position: Double) {
-            DOWN(0.15),
-            ALIGN(0.1),
-            UP(0.89),
+            ALIGN(0.09),
+            DOWN(0.105),
+            UP(1.0),
         }
 
-        private const val ZERO = 0.3
+        private const val ZERO = 0.1
         private const val ONE  = 0.6
     }
 }

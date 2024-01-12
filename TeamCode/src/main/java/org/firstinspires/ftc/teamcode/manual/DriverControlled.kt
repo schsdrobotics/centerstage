@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.DOWN
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.UP
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
+import org.mercurialftc.mercurialftc.scheduler.bindings.Binding
+import java.util.function.DoubleSupplier
 
 
 @TeleOp(group = "!")
@@ -54,25 +56,23 @@ class DriverControlled : OpModeEX() {
         gamepad.guide().onTrue(drive.reset())
 //        gamepad.left_stick_button().whileTrue(drive.align())
 
-        gamepad.left_trigger().applyDeadZone(0.3)
-        gamepad.left_trigger().buildBinding()
-                .lessThanEqualTo(0.6)
-                .bind()
-                .onTrue(intake.reverse(slow = true))
-        gamepad.left_trigger().buildBinding()
-                .greaterThan(0.6)
-                .bind()
-                .onTrue(intake.reverse(slow = false))
+        listOf(Pair(gamepad.left_trigger(), intake::reverse), Pair(gamepad.right_trigger(), intake::forward)).forEach {
+            it.first.buildBinding()
+                    .greaterThanEqualTo(0.3)
+                    .lessThanEqualTo(0.6)
+                    .bind()
+                    .whileTrue(it.second(true))
 
-        gamepad.right_trigger().applyDeadZone(0.3)
-        gamepad.right_trigger().buildBinding()
-                .lessThanEqualTo(0.6)
-                .bind()
-                .onTrue(intake.forward(slow = true))
-        gamepad.right_trigger().buildBinding()
-                .greaterThan(0.6)
-                .bind()
-                .onTrue(intake.forward(slow = false))
+            it.first.buildBinding()
+                    .greaterThan(0.6)
+                    .bind()
+                    .whileTrue(it.second(false))
+        }
+//
+//        val rightTriggerZeroed = gamepad.right_trigger().buildBinding().lessThan(0.3).bind() as Binding<*>
+//        val leftTriggerZeroed = gamepad.left_trigger().buildBinding().lessThan(0.3).bind() as Binding<*>
+//
+//        rightTriggerZeroed.and(leftTriggerZeroed).onTrue(intake.stop())
 
         gamepad.dpad_left().onTrue(puncher.to(NONE))
         gamepad.dpad_up().onTrue(puncher.to(ONE))

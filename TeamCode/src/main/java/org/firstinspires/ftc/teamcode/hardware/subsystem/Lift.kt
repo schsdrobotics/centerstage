@@ -21,48 +21,31 @@ class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
     private val motors
         get() = directions.keys
 
-    var current = 0.0
-    var target = 0.0
+    var current = 0
+    var target = 0
 
     override fun init() {
         reset()
-        defaultCommand = to(current.toInt())
+        defaultCommand = to(current)
     }
 
     override fun periodic() {
-        current = abs(left.currentPosition).toDouble()
+        current = abs(left.currentPosition)
 
         opmode.telemetry.addData("ticks", current)
         opmode.telemetry.addData("ticks error", target - current)
     }
 
     override fun defaultCommandExecute() {
-        val error = target - current
-
-        val g = if (abs(error) < 10 || current < 100 || error < 0) 0.0 else kG
-
-        val kP = when {
-            target == 0.0 && current <= 30 -> zeroKP
-            target <= 70 -> lowKP
-            error >= 0 -> posKP
-            error < 0 -> negKP
-
-            else -> 0.001
-        }
-
-        // if (target <= 70) zeroKP else if (error >= 0) posKP else negKP
-
-        if (current in 20.0..40.0) spatula.align().execute()
-
-        val output = (kP * error) + g * (current / Position.HIGH.ticks).pow(1.0 / 4.0)
-
-        directions.forEach { it.key.power = output * it.value }
+        motors.forEach { it.targetPosition = this.target }
+        motors.forEach { it.power = 0.3 }
+        motors.forEach { it.mode = RUN_TO_POSITION }
     }
 
     fun to(ticks: Int): Command {
         return LambdaCommand()
                 .setInterruptible(true)
-                .setInit { preparePID(ticks) }
+                .setInit { this.target = ticks }
                 .setRequirements(this)
                 .setExecute { defaultCommandExecute() }
                 .setFinish { false }
@@ -71,14 +54,11 @@ class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
     fun to(position: Position) = to(position.ticks)
 
     private fun reset() {
-        motors.forEach { it.direction = REVERSE }
         motors.forEach { it.mode = STOP_AND_RESET_ENCODER }
-        motors.forEach { it.mode = RUN_WITHOUT_ENCODER }
         motors.forEach { it.zeroPowerBehavior = BRAKE }
-    }
-
-    fun preparePID(targetPosition: Int) {
-        this.target = targetPosition.toDouble()
+        motors.forEach { it.targetPosition = 0 }
+        motors.forEach { it.mode = RUN_WITHOUT_ENCODER }
+        motors.forEach { it.mode = RUN_TO_POSITION }
     }
 
     override fun close() {}
@@ -88,14 +68,5 @@ class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
         LOW(245),
         MID(485),
         HIGH(970) // -10
-    }
-
-    companion object {
-        private const val posKP = 0.0018
-        private const val negKP = 0.0023
-        private const val lowKP = 0.0032
-        private const val zeroKP = 0.0045
-
-        private const val kG = 0.3
     }
 }

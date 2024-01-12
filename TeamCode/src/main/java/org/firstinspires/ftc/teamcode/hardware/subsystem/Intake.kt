@@ -27,12 +27,12 @@ class Intake(opmode: OpModeEX) : Subsystem(opmode) {
     fun reverse(slow: Boolean) = LambdaCommand()
             .setRequirements(this)
             .setExecute { motor.power = -(if (slow) SLOWED else SPEED) }
-            .setFinish { false }
+            .setFinish { true }
 
     fun forward(slow: Boolean) = LambdaCommand()
             .setRequirements(this)
             .setExecute { motor.power = if (slow) SLOWED else SPEED }
-            .setFinish { false }
+            .setFinish { true }
 
     fun stop() = LambdaCommand()
             .setRequirements(this)
