@@ -5,41 +5,64 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.UP
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.ALIGN
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
+import org.mercurialftc.mercurialftc.scheduler.bindings.gamepadex.DomainSupplier
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
+import kotlin.math.abs
+import kotlin.math.sin
 
-class Spatula(opmode: OpModeEX) : Subsystem(opmode) {
+class Spatula(val opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
     private val spatula by lazy { hw["spatula"] as Servo }
 
     private var state = DOWN
+    private var ticks = 0
 
     override fun init() {
         spatula.scaleRange(ZERO, ONE)
         spatula.direction = Servo.Direction.REVERSE
+        spatula.position = DOWN.position
+
+        opmode.telemetry.addLine("inited")
     }
 
     fun score() = LambdaCommand()
             .setRequirements(this)
             .setExecute { state = UP }
-            .setFinish { false }
+            .setFinish { true }
 
     fun transfer() = LambdaCommand()
             .setRequirements(this)
             .setExecute { state = DOWN }
-            .setFinish { false }
+            .setFinish { true }
 
     fun align() = LambdaCommand()
             .setRequirements(this)
             .setExecute { state = ALIGN }
-            .setFinish { false }
+            .setFinish { true }
 
     fun to(state: State) = LambdaCommand()
             .setRequirements(this)
             .setExecute { this.state = state }
             .setFinish { false }
 
-    override fun periodic() { spatula.position = state.position }
+    fun liftAt(ticks: Int) { this.ticks = ticks }
+
+    override fun periodic() {
+//        if (state == UP && ticks <= 50) return
+//        if (ticks in 20..100) {
+//            spatula.position = ALIGN.position
+//            return
+//        }
+
+        spatula.position = state.position
+
+        opmode.telemetry.addData("sin", sin(opmode.runtime))
+
+        opmode.telemetry.addData("state", state)
+        opmode.telemetry.addData("state pos", state.position)
+        opmode.telemetry.addData("spatula pos", spatula.position)
+    }
 
     override fun defaultCommandExecute() = Unit
 
@@ -47,12 +70,12 @@ class Spatula(opmode: OpModeEX) : Subsystem(opmode) {
 
     companion object {
         enum class State(val position: Double) {
-            ALIGN(0.09),
-            DOWN(0.105),
-            UP(1.0),
+            ALIGN(0.0),
+            DOWN(0.44), // 0.142
+            UP(0.75),
         }
 
-        private const val ZERO = 0.1
-        private const val ONE  = 0.6
+        private const val ZERO = 0.0
+        private const val ONE  = 1.0
     }
 }

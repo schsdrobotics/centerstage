@@ -34,13 +34,12 @@ class DriverControlled : OpModeEX() {
     private lateinit var spatula: Spatula
     private lateinit var puncher: Puncher
 
-
     override fun registerSubsystems() {
         drive = Drive(this, gamepad.leftX().invert(), gamepad.leftY().invert(), gamepad.rightX().invert())
         intake = Intake(this)
         spatula = Spatula(this)
+        lift = Lift(this)
         puncher = Puncher(this)
-        lift = Lift(this, spatula)
     }
 
     override fun initEX() {
@@ -52,35 +51,36 @@ class DriverControlled : OpModeEX() {
         gamepad.triangle().onTrue(lift.to(MID))
         gamepad.circle().onTrue(lift.to(HIGH))
         gamepad.cross().onTrue(lift.to(ZERO))
-//
+
         gamepad.guide().onTrue(drive.reset())
-//        gamepad.left_stick_button().whileTrue(drive.align())
 
         listOf(Pair(gamepad.left_trigger(), intake::reverse), Pair(gamepad.right_trigger(), intake::forward)).forEach {
             it.first.buildBinding()
-                    .greaterThanEqualTo(0.3)
-                    .lessThanEqualTo(0.6)
+                    .greaterThanEqualTo(0.0)
+                    .lessThanEqualTo(0.3)
+                    .bind()
+                    .whileTrue(intake.stop())
+
+            it.first.buildBinding()
+                    .greaterThan(0.3)
+                    .lessThan(0.6)
                     .bind()
                     .whileTrue(it.second(true))
 
             it.first.buildBinding()
-                    .greaterThan(0.6)
+                    .greaterThanEqualTo(0.6)
                     .bind()
                     .whileTrue(it.second(false))
         }
-//
-//        val rightTriggerZeroed = gamepad.right_trigger().buildBinding().lessThan(0.3).bind() as Binding<*>
-//        val leftTriggerZeroed = gamepad.left_trigger().buildBinding().lessThan(0.3).bind() as Binding<*>
-//
-//        rightTriggerZeroed.and(leftTriggerZeroed).onTrue(intake.stop())
 
-        gamepad.dpad_left().onTrue(puncher.to(NONE))
-        gamepad.dpad_up().onTrue(puncher.to(ONE))
-        gamepad.dpad_right().onTrue(puncher.to(TWO))
-//
-        gamepad.dpad_down().onTrue(spatula.to(ALIGN))
-        gamepad.right_bumper().onTrue(spatula.to(DOWN))
-        gamepad.left_bumper().onTrue(spatula.to(UP))
+
+        gamepad.dpad_up().onTrue(puncher.next())
+        gamepad.dpad_left().onTrue(intake.up())
+        gamepad.dpad_right().onTrue(intake.down())
+        gamepad.dpad_down().onTrue(lift.bang())
+
+        gamepad.left_bumper().onTrue(spatula.score())
+        gamepad.right_bumper().onTrue(spatula.transfer())
     }
 
     override fun init_loopEX() {}
@@ -89,7 +89,7 @@ class DriverControlled : OpModeEX() {
     }
 
     override fun loopEX() {
-        drive.feburary.test()
+//        drive.feburary.test()
 
         telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
     }

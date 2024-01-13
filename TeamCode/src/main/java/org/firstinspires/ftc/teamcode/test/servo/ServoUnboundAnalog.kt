@@ -9,16 +9,21 @@ import kotlin.math.max
 
 @TeleOp
 class ServoUnboundAnalog : OpMode() {
-    val servo by lazy { hardwareMap["puncher"] as Servo }
+//    val left by lazy { hardwareMap["leftChad"] as Servo }
+//    val right by lazy { hardwareMap["rightChad"] as Servo }
+
+    val spatula by lazy { hardwareMap["spatula"] as Servo }
+
 
     override fun init() {
 //        servo.scaleRange(0.05, 0.15)
+        listOf(spatula).forEach { it.direction = Servo.Direction.REVERSE }
     }
 
     override fun loop() {
         val magnitude = gamepad1.right_trigger.toDouble()
 
-        servo.position = magnitude
+        listOf(spatula).forEach { it.position = magnitude }
 
         telemetry.addData("trigger", magnitude)
         telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })

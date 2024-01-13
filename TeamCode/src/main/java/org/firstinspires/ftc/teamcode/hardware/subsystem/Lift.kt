@@ -4,14 +4,19 @@ import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode.*
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*
+import org.firstinspires.ftc.teamcode.util.sugar.WaitCommand
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.Command
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
+import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
+import org.mercurialftc.mercurialftc.scheduler.commands.SequentialCommandGroup
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 
-class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
+class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap
 
     private val right by lazy { hw["leftLift"] as DcMotorEx }
@@ -31,6 +36,7 @@ class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
 
     override fun periodic() {
         current = abs(left.currentPosition)
+//        spatula.liftAt(current)
 
         opmode.telemetry.addData("ticks", current)
         opmode.telemetry.addData("ticks error", target - current)
@@ -38,18 +44,34 @@ class Lift(val opmode: OpModeEX, val spatula: Spatula) : Subsystem(opmode) {
 
     override fun defaultCommandExecute() {
         motors.forEach { it.targetPosition = this.target }
-        motors.forEach { it.power = 0.3 }
+        motors.forEach { it.power = 0.5 }
         motors.forEach { it.mode = RUN_TO_POSITION }
     }
+
+    fun next(): Command {
+        val position = Position.values().map { Pair(it, it.ticks - current) }.maxByOrNull { it.second }!!.first
+
+        return to(position)
+    }
+
+    fun previous(): Command {
+        val position = Position.values().map { Pair(it, it.ticks - current) }.minByOrNull { it.second }!!.first
+
+        return to(position)
+    }
+
+    fun adjust(offset: Int) = to(max(Position.ZERO.ticks, min(Position.HIGH.ticks, current + offset)))
 
     fun to(ticks: Int): Command {
         return LambdaCommand()
                 .setInterruptible(true)
-                .setInit { this.target = ticks }
                 .setRequirements(this)
+                .setInit { this.target = ticks }
                 .setExecute { defaultCommandExecute() }
-                .setFinish { false }
+                .setFinish { (abs(target - current) <= 3) && false }
     }
+
+    fun bang() = SequentialCommandGroup().addCommands(to(30), WaitCommand(200), to(0))
 
     fun to(position: Position) = to(position.ticks)
 

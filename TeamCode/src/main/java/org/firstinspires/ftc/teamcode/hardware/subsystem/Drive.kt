@@ -71,7 +71,7 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
     fun reset() = LambdaCommand()
             .setRequirements(this)
             .setRunStates(OpModeEX.OpModeEXRunStates.LOOP)
-            .setExecute { imu.resetYaw() }
+            .setExecute { imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(RIGHT, UP))) }
             .setFinish { true }
 
     override fun periodic() {}
