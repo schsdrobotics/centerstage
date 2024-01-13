@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem
+package org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial
 
 import com.qualcomm.robotcore.hardware.Servo
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.DOWN
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.UP
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Spatula.Companion.State.ALIGN
+import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Spatula.Companion.State.DOWN
+import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Spatula.Companion.State.UP
+import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Spatula.Companion.State.ALIGN
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
-import org.mercurialftc.mercurialftc.scheduler.bindings.gamepadex.DomainSupplier
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
-import kotlin.math.abs
 import kotlin.math.sin
 
 class Spatula(val opmode: OpModeEX) : Subsystem(opmode) {
@@ -71,7 +69,7 @@ class Spatula(val opmode: OpModeEX) : Subsystem(opmode) {
     companion object {
         enum class State(val position: Double) {
             ALIGN(0.0),
-            DOWN(0.44), // 0.142
+            DOWN(0.412), // 0.142
             UP(0.75),
         }
 

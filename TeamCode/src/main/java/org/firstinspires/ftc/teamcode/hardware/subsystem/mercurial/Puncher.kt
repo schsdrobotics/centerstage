@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem
+package org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial
 
 import com.qualcomm.robotcore.hardware.Servo
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Puncher.Companion.State.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Puncher.Companion.State.*
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem
+package org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial
 
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.hardware.profile.AsymmetricMotionProfile
@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.hardware.profile.ProfileConstraints
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Wrist.Position.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Wrist.Position.*
 import kotlin.properties.Delegates
 
 class Wrist(val opmode: OpModeEX, val lift: Lift) : Subsystem(opmode) {

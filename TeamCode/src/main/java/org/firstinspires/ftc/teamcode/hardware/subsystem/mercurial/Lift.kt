@@ -1,20 +1,17 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem
+package org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial
 
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode.*
 import com.qualcomm.robotcore.hardware.DcMotorEx
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*
 import org.firstinspires.ftc.teamcode.util.sugar.WaitCommand
 import org.mercurialftc.mercurialftc.scheduler.OpModeEX
 import org.mercurialftc.mercurialftc.scheduler.commands.Command
 import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
-import org.mercurialftc.mercurialftc.scheduler.commands.ParallelCommandGroup
 import org.mercurialftc.mercurialftc.scheduler.commands.SequentialCommandGroup
 import org.mercurialftc.mercurialftc.scheduler.subsystems.Subsystem
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 
 class Lift(val opmode: OpModeEX) : Subsystem(opmode) {
     private val hw = opmode.hardwareMap

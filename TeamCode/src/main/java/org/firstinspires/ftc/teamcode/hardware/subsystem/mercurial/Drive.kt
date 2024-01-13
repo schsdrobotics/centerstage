@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem
+package org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial
 
 import com.arcrobotics.ftclib.drivebase.MecanumDrive
 import com.arcrobotics.ftclib.hardware.motors.Motor
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.*
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.UP
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -40,7 +40,7 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
 
         drive
 
-        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(RIGHT, UP)))
+        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(LogoFacingDirection.LEFT, UsbFacingDirection.DOWN)))
 
         defaultCommand = move()
     }
@@ -71,7 +71,7 @@ class Drive(val opmode: OpModeEX, val givenX: DomainSupplier, val givenY: Domain
     fun reset() = LambdaCommand()
             .setRequirements(this)
             .setRunStates(OpModeEX.OpModeEXRunStates.LOOP)
-            .setExecute { imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(RIGHT, UP))) }
+            .setExecute { imu.resetYaw() }
             .setFinish { true }
 
     override fun periodic() {}
