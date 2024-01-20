@@ -9,7 +9,7 @@ import kotlin.math.max
 
 @TeleOp
 class ServoUnboundAnalog : OpMode() {
-    val spatula by lazy { hardwareMap["puncher"] as Servo }
+    val spatula by lazy { hardwareMap["spatula"] as Servo }
 
     override fun init() { listOf(spatula).forEach { it.direction = Servo.Direction.REVERSE } }
 

@@ -1,63 +1,58 @@
 package org.firstinspires.ftc.teamcode.autonomous.purplePixel
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket
+import com.acmerobotics.roadrunner.InstantAction
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Vector2d
-import com.acmerobotics.roadrunner.ftc.*
+import com.acmerobotics.roadrunner.ftc.runBlocking
+import com.arcrobotics.ftclib.command.CommandScheduler
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.*
+import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Blue
+import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Red
+import org.firstinspires.ftc.teamcode.autonomous.framework.Close
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Left
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Middle
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 import org.firstinspires.ftc.vision.VisionPortal
-import org.mercurialftc.mercurialftc.scheduler.OpModeEX
-import kotlin.math.PI
 
 
 // TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own things
 @Autonomous(group = "Purple Pixel")
-open class PurplePixel(val side: AutonomousSide) : OpModeEX() {
+open class PurplePixel(val side: AutonomousSide) : OpMode() {
+    val lift by lazy { Lift(hardwareMap, telemetry) }
+    val puncher by lazy { Puncher(hardwareMap, telemetry) }
+    val spatula by lazy { Spatula(hardwareMap, telemetry) }
+    val intake by lazy { Intake(hardwareMap) }
+
     // TODO: refactor when mirror logic exists to remove this redundancy
     val start = when (side) {
-        Red -> Pose2d(12.0, -62.0, 90.deg)
-        Blue -> Pose2d(12.0, 62.0, 90.deg)
+        Red -> Pose2d(0.0, 0.0, 90.deg)
+        Blue -> Pose2d(0.0, 0.0, (-90).deg)
     }
 
-
     val drive by lazy { MecanumDrive(hardwareMap, start) }
+    val builder by lazy { drive.actionBuilder(start, side == Blue) }
 
     // TODO: implement path mirroring logic for when you flip colors
     val path by lazy {
         when (recordedPropPosition) {
-            Left -> drive.actionBuilder(start)
-                    .splineTo(Vector2d(6.5, -35.5), 135.deg) // purple pixel
-                    .setReversed(true)
-                    .splineTo(Vector2d(50.0, -35.0), 0.deg) // to backdrop left
-                    .setTangent(90.deg)
-                    .lineToY(-10.0) // basic park
-                    .build()
+            Left -> Close(builder).left
+            Middle -> Close(builder).middle
+            Right -> Close(builder).right
 
-            Middle -> drive.actionBuilder(start)
-                .splineTo(Vector2d(12.0, -(25.0 + HEIGHT / 2.0)), 90.deg) // purple pixel
-                .setReversed(true)
-                .setTangent(0.deg)
-                .lineToXLinearHeading(50.0, 180.deg) // to backdrop middle
-                .setTangent(90.deg)
-                .lineToY(-10.0) // basic park
-                .build()
-
-            Right -> drive.actionBuilder(start)
-                    .splineToSplineHeading(Pose2d(50.0, -35.0, 180.deg), 0.deg) // to backdrop right
-                    .setTangent(180.deg)
-                    .splineTo(Vector2d(25.0 + (WIDTH / 2.0), -30.0), 180.deg) // purple pixel right
-                    .setTangent(45.deg)
-                    .lineToY(-10.0) // basic park
-                    .build()
-
-            Unfound -> drive.actionBuilder(start).build()
+            Unfound -> builder.build()
         }
     }
 
@@ -65,21 +60,19 @@ open class PurplePixel(val side: AutonomousSide) : OpModeEX() {
 
     val portal by lazy {
         VisionPortal.Builder()
-            .setCamera(hardwareMap["front"] as WebcamName)
+            .setCamera(hardwareMap["back"] as WebcamName)
             .addProcessor(processor)
             .build()
     }
 
     var recordedPropPosition = Unfound
 
-    override fun registerBindings() = Unit
+    override fun init() {
+        CommandScheduler.getInstance().reset()
+        drive
+    }
 
-
-    override fun registerSubsystems() {}
-
-    override fun initEX() { drive }
-
-    override fun init_loopEX() {
+    override fun init_loop() {
         telemetry.addData("Big Contour woah very big", processor.largestContourArea)
         telemetry.addData("Currently Recorded Position", processor.recordedPropPosition)
         telemetry.addData("Camera State", portal.cameraState)
@@ -87,29 +80,33 @@ open class PurplePixel(val side: AutonomousSide) : OpModeEX() {
         telemetry.addData("Currently Detected Mass Area", processor.largestContourArea)
     }
 
-    override fun startEX() {
+    override fun start() {
         if (portal.cameraState == VisionPortal.CameraState.STREAMING) {
             portal.stopLiveView()
             portal.stopStreaming()
         }
 
         recordedPropPosition = getPropPositions()
-
-        runBlocking(path)
     }
 
-    override fun loopEX() { telemetry.addData("detected", recordedPropPosition) }
+    var b = true
 
-    override fun stopEX() = Unit
+    override fun loop() {
+        telemetry.addData("detected", recordedPropPosition)
+        if (b) b = path.run(TelemetryPacket())
+        CommandScheduler.getInstance().run()
+    }
+
+    override fun stop() { CommandScheduler.getInstance().reset() }
 
     private fun getPropPositions(): PropPositions {
         val recorded = processor.recordedPropPosition
 
-        return if (recorded == Unfound) Left else recorded
+        return if (recorded == Unfound) Middle else recorded
     }
 
     companion object {
-        const val MINIMUM_MASS = 8200.0
+        const val MINIMUM_MASS = 7000.0
 
         const val HEIGHT = 16.0
         const val WIDTH = 11.0

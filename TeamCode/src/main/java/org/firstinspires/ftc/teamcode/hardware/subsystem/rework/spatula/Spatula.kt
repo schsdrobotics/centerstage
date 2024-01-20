@@ -6,9 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo
 import org.firstinspires.ftc.robotcore.external.Telemetry
 
 class Spatula(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
-    private val spatula by lazy { hw["spatula"] as Servo }
+    private val spatula by lazy {
+        val it = hw["spatula"] as Servo
+        it.direction = Servo.Direction.REVERSE
+        it
+    }
 
-    var state = State.DOWN
+    var state = State.TRANSFER
 
     fun to(state: State) { this.state = state }
 
@@ -19,8 +23,8 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     }
 
     enum class State(val position: Double) {
-        UP(0.4), // 0.142
-        ALIGN(0.78), // 0.142
-        DOWN(0.75),
+        SCORE(0.55),
+        TRANSFER(0.207),
+        ALIGN(0.195),
     }
 }

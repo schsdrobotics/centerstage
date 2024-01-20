@@ -8,7 +8,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import kotlin.math.abs
 
 class Puncher(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
-    private val puncher by lazy { hw["puncher"] as Servo }
+    private val puncher by lazy {
+        val it = hw["puncher"] as Servo
+        it.direction = Servo.Direction.REVERSE
+        it
+    }
 
     var state = State.NONE
     var count = 0
@@ -24,8 +28,8 @@ class Puncher(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     }
 
     enum class State(val position: Double) {
-        TWO(0.05),
-        ONE(0.7),
-        NONE(1.0)
+        TWO(1.0),
+        ONE(0.2),
+        NONE(0.0),
     }
 }

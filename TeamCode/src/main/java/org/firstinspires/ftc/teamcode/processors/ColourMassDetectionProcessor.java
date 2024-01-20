@@ -175,13 +175,13 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
         // if we didn't find any contours which were large enough, sets it to be unfound
         PropPositions propPosition;
         if (largestContour == null) {
-            propPosition = PropPositions.Left;
-        } else if (largestContourX < 320.0) {
-            propPosition = PropPositions.Middle;
-        } else if (largestContourX > 320.0) {
             propPosition = PropPositions.Right;
-        } else {
+        } else if (largestContourX <= left.getAsDouble()) {
             propPosition = PropPositions.Left;
+        } else if (largestContourX >= right.getAsDouble()) {
+            propPosition = PropPositions.Middle;
+        } else {
+            propPosition = PropPositions.Right;
         }
 
         // if we have found a new prop position, and it is not unfound, updates the recorded position,
