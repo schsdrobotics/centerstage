@@ -2,17 +2,25 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive
 
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.arcrobotics.ftclib.drivebase.MecanumDrive
+import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.hardware.motors.Motor
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.internal.network.ApChannel.Band
-import org.firstinspires.ftc.teamcode.hardware.Bandaid
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
+import org.firstinspires.ftc.teamcode.util.SlewRateLimiter
+import org.firstinspires.ftc.teamcode.util.structures.Vector3
+import org.firstinspires.ftc.teamcode.util.structures.plus
+import kotlin.math.pow
 
-class Drive(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
+class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadEx) : SubsystemBase() {
+
     private val frontLeft by lazy { Motor(hw, "frontLeft") }
     private val frontRight by lazy { Motor(hw, "frontRight") }
     private val backLeft by lazy { Motor(hw, "backLeft") }
@@ -20,8 +28,16 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     val drive by lazy { MecanumDrive(frontLeft, frontRight, backLeft, backRight) }
 
+    val limiters = listOf(
+        SlewRateLimiter(0.1, -1.0),
+        SlewRateLimiter(0.1, -1.0)
+    )
+
     val angle
         get() = imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
+
+    val fed
+        get() = Vector3(-gamepad.leftX, -gamepad.leftY, -gamepad.rightX)
 
     val imu by lazy { (hw["imu"] as IMU) }
 
@@ -35,7 +51,7 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
         drive
 
-        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.DOWN)))
+        imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(LogoFacingDirection.LEFT, UsbFacingDirection.DOWN)))
     }
 
     fun reset() { imu.resetYaw() }
@@ -45,6 +61,14 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     }
 
     override fun periodic() {
+        val slewed = Vector3(limiters[0].calculate(fed.x), limiters[1].calculate(fed.y), fed.z.pow(2))
+
+        val corrective = Vector3(0.0, 0.0, 0.0)
+
+        val final = slewed + corrective
+
+        move(final.x, final.y, final.z)
+
         telemetry.addData("imu angle", angle)
     }
 

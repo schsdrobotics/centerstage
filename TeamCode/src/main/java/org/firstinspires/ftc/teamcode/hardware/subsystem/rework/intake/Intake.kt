@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake
 
-import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
-import org.firstinspires.ftc.teamcode.hardware.subsystem.mercurial.Intake
-import org.mercurialftc.mercurialftc.scheduler.commands.LambdaCommand
 
 class Intake(val hw: HardwareMap) : SubsystemBase() {
     private val rightChad by lazy { hw["rightChad"] as Servo }
     private val leftChad by lazy { hw["leftChad"] as Servo }
     private val chads by lazy { listOf(leftChad, rightChad) }
 
-    private val motor by lazy { hw["intake"] as DcMotor }
+    private val motor by lazy { hw["perp"] as DcMotor }
 
     var target = (UP + DOWN) / 2.0
     var count = 0
@@ -41,7 +38,7 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
 
     companion object {
         const val STEPS = 5.0
-        const val DOWN = 0.07
+        const val DOWN = 0.09
         const val UP = 0.23
 
         const val SLICE = (UP - DOWN) / STEPS

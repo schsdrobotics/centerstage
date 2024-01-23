@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.autonomous.purplePixel
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
-import com.acmerobotics.roadrunner.InstantAction
-import com.acmerobotics.roadrunner.Pose2d
-import com.acmerobotics.roadrunner.Vector2d
-import com.acmerobotics.roadrunner.ftc.runBlocking
 import com.arcrobotics.ftclib.command.CommandScheduler
+import com.arcrobotics.ftclib.command.Subsystem
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Blue
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Red
 import org.firstinspires.ftc.teamcode.autonomous.framework.Close
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
@@ -24,26 +20,22 @@ import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.Pr
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
-import org.firstinspires.ftc.teamcode.util.extensions.deg
 import org.firstinspires.ftc.vision.VisionPortal
 
 
 // TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own things
 @Autonomous(group = "Purple Pixel")
-open class PurplePixel(val side: AutonomousSide) : OpMode() {
-    val lift by lazy { Lift(hardwareMap, telemetry) }
+abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) : OpMode() {
     val puncher by lazy { Puncher(hardwareMap, telemetry) }
-    val spatula by lazy { Spatula(hardwareMap, telemetry) }
+    val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
+    val lift by lazy { Lift(hardwareMap, telemetry) }
     val intake by lazy { Intake(hardwareMap) }
 
     // TODO: refactor when mirror logic exists to remove this redundancy
-    val start = when (side) {
-        Red -> Pose2d(0.0, 0.0, 90.deg)
-        Blue -> Pose2d(0.0, 0.0, (-90).deg)
-    }
+    val start = Close.start
 
-    val drive by lazy { MecanumDrive(hardwareMap, start) }
     val builder by lazy { drive.actionBuilder(start, side == Blue) }
+    val drive by lazy { MecanumDrive(hardwareMap, start) }
 
     // TODO: implement path mirroring logic for when you flip colors
     val path by lazy {
@@ -67,9 +59,18 @@ open class PurplePixel(val side: AutonomousSide) : OpMode() {
 
     var recordedPropPosition = Unfound
 
+    open fun register(vararg subsystems: Subsystem) {
+        CommandScheduler.getInstance().registerSubsystem(*subsystems)
+    }
+
     override fun init() {
         CommandScheduler.getInstance().reset()
+
         drive
+
+        CommandScheduler.getInstance().schedule(
+
+        )
     }
 
     override fun init_loop() {

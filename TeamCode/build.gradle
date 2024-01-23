@@ -44,12 +44,11 @@ repositories {
 dependencies {
     implementation "org.team11260:fast-load:0.1.1"
     implementation 'org.ftclib.ftclib:core:2.1.1'
-    implementation 'com.github.Froze-N-Milk:mercurialftc:v0.0.5'
 
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.20"
 
-    implementation 'com.acmerobotics.roadrunner:core:1.0.0-beta3'
-    implementation 'com.acmerobotics.roadrunner:actions:1.0.0-beta3'
+    implementation 'com.acmerobotics.roadrunner:core:1.0.0-beta6'
+    implementation 'com.acmerobotics.roadrunner:actions:1.0.0-beta6'
 }

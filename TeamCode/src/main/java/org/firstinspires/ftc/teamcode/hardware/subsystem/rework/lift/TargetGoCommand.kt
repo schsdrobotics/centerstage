@@ -12,5 +12,5 @@ class TargetGoCommand(ticks: Int, val lift: Lift) : SequentialCommandGroup() {
         addRequirements(lift)
     }
 
-    override fun isFinished() = abs(lift.target - lift.current) <= 2
+    override fun isFinished() = abs(lift.target - lift.position) <= 10
 }
