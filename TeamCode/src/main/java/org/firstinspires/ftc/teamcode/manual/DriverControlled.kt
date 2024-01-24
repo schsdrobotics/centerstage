@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeToC
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ReverseCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.Launcher
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.AdjustCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
@@ -43,9 +44,12 @@ class DriverControlled : CommandOpMode() {
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val launcher by lazy { Launcher(hardwareMap) }
     val intake by lazy { Intake(hardwareMap) }
+    val led by lazy { Led(hardwareMap) }
 
     val secondary by lazy { GamepadEx(gamepad2) }
     val gamepad by lazy { GamepadEx(gamepad1) }
+
+    var condition = "none"
 
     // TODO: move into Lift
     // x, y -> sequentially, x, then y
@@ -55,7 +59,7 @@ class DriverControlled : CommandOpMode() {
             // default case: at zero, target non-zero
             // align, go, score
             lift.atZero && target != ZERO -> {
-                telemetry.addLine("lift.atZero && target != ZERO")
+                condition = ("lift.atZero && target != ZERO")
                 SequentialCommandGroup(
                     ToCommand(Spatula.State.ALIGN, spatula),
                     TargetGoCommand(target, lift),
@@ -66,17 +70,20 @@ class DriverControlled : CommandOpMode() {
             // adjustment case: lift not zeroed, target isn't zero
             // go + score
             lift.position >= CLEAR.ticks && target != ZERO -> {
-                telemetry.addLine("lift.position >= CLEAR.ticks && target != ZERO")
-                TargetGoCommand(target, lift)
+                condition = ("lift.position >= CLEAR.ticks && target != ZERO")
+                SequentialCommandGroup(
+                        TargetGoCommand(target, lift),
+                        ToCommand(Spatula.State.SCORE, spatula),
+                )
             }
 
             //
             lift.position <= 30 && target == ZERO -> {
-                telemetry.addLine("lift.position <= 30 && target == ZERO")
+                condition = ("lift.position <= 30 && target == ZERO")
 
                 SequentialCommandGroup(
                         ToCommand(Spatula.State.ALIGN, spatula),
-                        TargetGoCommand(target, lift),
+                        TargetGoCommand(ZERO, lift),
                         ToCommand(Spatula.State.TRANSFER, spatula),
                 )
             }
@@ -85,7 +92,7 @@ class DriverControlled : CommandOpMode() {
             // ensure lift is high enough before dropping
             // align, wait 300ms, (go + transfer)
             target == ZERO -> {
-                telemetry.addLine("target == ZERO")
+                condition = ("target == ZERO")
 
                 SequentialCommandGroup(
                         if (!lift.cleared) TargetGoCommand(300, lift) else InstantCommand(),
@@ -100,7 +107,11 @@ class DriverControlled : CommandOpMode() {
             // base case
             else -> {
                 telemetry.addLine("else")
-                TargetGoCommand(target, lift)
+
+                SequentialCommandGroup(
+                        TargetGoCommand(target, lift),
+                        ToCommand(Spatula.State.SCORE, spatula),
+                )
             }
         }
 
@@ -108,10 +119,10 @@ class DriverControlled : CommandOpMode() {
 
 
     override fun initialize() {
-        GamepadButton(gamepad, Button.A).whenPressed(to(ZERO))
-        GamepadButton(gamepad, Button.X).whenPressed(to(LOW))
-        GamepadButton(gamepad, Button.Y).whenPressed(to(MID))
-        GamepadButton(gamepad, Button.B).whenPressed(to(HIGH))
+
+        GamepadButton(gamepad, Button.X).whenPressed(InstantCommand({ to(LOW).schedule() }))
+        GamepadButton(gamepad, Button.Y).whenPressed(InstantCommand({ to(MID).schedule() }))
+        GamepadButton(gamepad, Button.B).whenPressed(InstantCommand({ to(HIGH).schedule() }))
 
         GamepadButton(gamepad, Button.DPAD_UP).whenPressed(IntakeToCommand(Intake.UP, intake))
         GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(IntakeToCommand(Intake.DOWN, intake))
@@ -125,14 +136,39 @@ class DriverControlled : CommandOpMode() {
         GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(PuncherNextCommand(puncher))
 
         GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
-//
+
+
         Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
-                .whileActiveContinuous(ParallelCommandGroup(ForwardCommand(intake), PuncherDropCommand(puncher), ToCommand(Spatula.State.ALIGN, spatula)))
-                .whenInactive(ParallelCommandGroup(IntakeStopCommand(intake), ToCommand(Spatula.State.TRANSFER, spatula)))
+                .whileActiveContinuous(
+                    ParallelCommandGroup(
+                        ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
+                        PuncherDropCommand(puncher),
+                        ToCommand(Spatula.State.HOUSE, spatula)
+                    )
+                )
+                .whenInactive(
+                    ParallelCommandGroup(
+                        IntakeStopCommand(intake),
+                        ToCommand(Spatula.State.TRANSFER, spatula)
+                    )
+                )
 
         Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.LEFT_TRIGGER).isDown }
-                .whileActiveContinuous(ParallelCommandGroup(ReverseCommand(intake), PuncherDropCommand(puncher), ToCommand(Spatula.State.ALIGN, spatula)))
-                .whenInactive(ParallelCommandGroup(IntakeStopCommand(intake), ToCommand(Spatula.State.TRANSFER, spatula)))
+                .whileActiveContinuous(
+                    ParallelCommandGroup(
+                        ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
+                        PuncherDropCommand(puncher),
+                        ToCommand(Spatula.State.HOUSE, spatula)
+                    )
+                )
+                .whenInactive(
+                    ParallelCommandGroup(
+                        IntakeStopCommand(intake),
+                        ToCommand(Spatula.State.TRANSFER, spatula)
+                    )
+                )
+
+        register(led)
     }
 
     override fun run() {
@@ -143,7 +179,10 @@ class DriverControlled : CommandOpMode() {
         val end = now()
         val time = end - start
 
-        telemetry.addData("loop time", 1.0 / time)
+        led.periodic()
+
+        telemetry.addData("loop time (hZ)", 1.0 / time)
+        telemetry.addData("condition", condition)
         telemetry.update()
     }
 }

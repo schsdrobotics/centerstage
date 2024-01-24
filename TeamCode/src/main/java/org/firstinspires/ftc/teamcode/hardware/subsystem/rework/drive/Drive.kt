@@ -29,8 +29,8 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
     val drive by lazy { MecanumDrive(frontLeft, frontRight, backLeft, backRight) }
 
     val limiters = listOf(
-        SlewRateLimiter(0.1, -1.0),
-        SlewRateLimiter(0.1, -1.0)
+        SlewRateLimiter(10.0, -10.0),
+        SlewRateLimiter(10.0, -10.0)
     )
 
     val angle
@@ -61,7 +61,7 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
     }
 
     override fun periodic() {
-        val slewed = Vector3(limiters[0].calculate(fed.x), limiters[1].calculate(fed.y), fed.z.pow(2))
+        val slewed = Vector3(limiters[0].calculate(fed.x), limiters[1].calculate(fed.y), fed.z)
 
         val corrective = Vector3(0.0, 0.0, 0.0)
 

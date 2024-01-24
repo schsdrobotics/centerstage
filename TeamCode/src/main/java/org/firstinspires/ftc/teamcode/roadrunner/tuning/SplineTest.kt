@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.roadrunner.tuning
 
+import com.acmerobotics.roadrunner.InstantAction
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Vector2d
 import com.acmerobotics.roadrunner.ftc.runBlocking
@@ -21,7 +22,7 @@ class SplineTest : LinearOpMode() {
 
             waitForStart()
 
-            runBlocking(Close(builder).left)
+            runBlocking(Close(builder, InstantAction {}, InstantAction {}).left)
         } else {
             throw RuntimeException()
         }

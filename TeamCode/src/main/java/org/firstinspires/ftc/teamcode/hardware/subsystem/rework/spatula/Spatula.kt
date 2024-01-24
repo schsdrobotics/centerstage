@@ -28,14 +28,15 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
         telemetry.addData("spatula angle", angle.toString())
 
         spatula.position = when (state) {
-            State.SCORE -> if (lift.cleared) State.SCORE.position else State.ALIGN.position
+            State.SCORE -> if (true) State.SCORE.position else State.ALIGN.position
             else -> state.position
         }
     }
 
     enum class State(val position: Double, val angle: Double) {
         SCORE(0.55, 205.0),
-        TRANSFER(0.207, 90.0),
-        ALIGN(0.195, 80.0),
+        TRANSFER(0.20, 90.0),
+        ALIGN(0.18, 80.0),
+        HOUSE(0.17, 60.0),
     }
 }

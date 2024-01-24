@@ -63,7 +63,7 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     fun go() {
         motors.forEach { it.targetPosition = this.target }
-        motors.forEach { it.power = 0.6 }
+        motors.forEach { it.power = 0.7 }
         motors.forEach { it.mode = DcMotor.RunMode.RUN_TO_POSITION }
     }
 

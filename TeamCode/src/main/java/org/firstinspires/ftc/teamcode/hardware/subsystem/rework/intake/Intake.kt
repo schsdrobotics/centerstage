@@ -13,18 +13,16 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
 
     private val motor by lazy { hw["perp"] as DcMotor }
 
-    var target = (UP + DOWN) / 2.0
+    var target = UP
     var count = 0
 
     init {
         motor.direction = DcMotorSimple.Direction.REVERSE
         motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-        chads.forEach { it.direction = Servo.Direction.REVERSE }
     }
 
-    fun forward() { motor.power = 1.0 }
-    fun reverse() { motor.power = -1.0 }
+    fun forward(speed: Double) { motor.power = speed }
+    fun reverse(speed: Double) { motor.power = -speed }
     fun stop() { motor.power = 0.0 }
 
     fun to(position: Double) { target = position }
@@ -32,15 +30,23 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     fun up() = to(UP)
     fun down() = to(DOWN)
 
-    fun next() { this.target = (DOWN + SLICE * (count % STEPS - 1)).also { count++ } }
+    fun next() {
+        if (count % STEPS == 0.0) {
+            this.target = UP
+        } else {
+            this.target = (DOWN + SLICE * (count % STEPS + 1))
+        }
+
+        count++
+    }
 
     override fun periodic() { chads.forEach { it.position = target } }
 
     companion object {
-        const val STEPS = 5.0
-        const val DOWN = 0.09
-        const val UP = 0.23
+        const val STEPS = 7.0
+        const val UP = 0.97
+        const val DOWN = UP - 0.16
 
-        const val SLICE = (UP - DOWN) / STEPS
+        const val SLICE = (0.87 - DOWN) / STEPS
     }
 }

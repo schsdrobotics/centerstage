@@ -26,6 +26,9 @@ public final class ManualFeedbackTuner extends LinearOpMode {
                     throw new RuntimeException("Odometry wheel locations not set! Run AngularRampLogger to tune them.");
                 }
             }
+
+            drive.imu.resetYaw();
+            
             waitForStart();
 
             while (opModeIsActive()) {

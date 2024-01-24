@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous.framework
 import com.acmerobotics.roadrunner.Action
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 
-abstract class Auto(val builder: TrajectoryActionBuilder) {
+abstract class Auto(val builder: TrajectoryActionBuilder, val purple: Action, val yellow: Action) {
     abstract val left: Action
     abstract val middle: Action
     abstract val right: Action

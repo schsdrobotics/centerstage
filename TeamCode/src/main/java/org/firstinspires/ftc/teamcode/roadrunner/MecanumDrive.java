@@ -62,32 +62,33 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
 
         // drive model parameters
-        public double inPerTick = 0.00105;
-        public double lateralInPerTick = 0.000710852255287083;
-        public double trackWidthTicks = 10153.655;
+        public double inPerTick = 0.0010755;
+        public double lateralInPerTick = 0.0007098385859568284;
+
+        public double trackWidthTicks = 9895.80508777806;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.445;
-        public double kV = 0.000105;
-        public double kA = 0.000025;
+        public double kS = 1.9;
+        public double kV = 0.000113;
+        public double kA = 0.00003;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 50;
+        public double maxWheelVel = 30;
+        public double minProfileAccel = -10;
+        public double maxProfileAccel = 30;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 9.0;
+        public double axialGain = 8.0;
         public double lateralGain = 4.0;
-        public double headingGain = 30.0; // shared with turn
+        public double headingGain = 10.0; // shared with turn
 
-        public double axialVelGain = 2.0;
+        public double axialVelGain = 1.5;
         public double lateralVelGain = 0.2;
-        public double headingVelGain = 1.0; // shared with turn, was formerly 1.0
+        public double headingVelGain = 1; // shared with turn, was formerly 1.0
     }
 
     public static Params PARAMS = new Params();
@@ -218,6 +219,7 @@ public final class MecanumDrive {
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
         imu.initialize(parameters);
+        imu.resetYaw();
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 

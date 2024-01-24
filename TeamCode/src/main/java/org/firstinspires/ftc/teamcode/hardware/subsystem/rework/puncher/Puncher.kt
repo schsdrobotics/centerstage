@@ -18,6 +18,8 @@ class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = 
         it
     }
 
+    init { this.puncher.position = state.position }
+
     var distance = 0.0
 
     fun update() { distance = pacer.getDistance(DistanceUnit.CM) }
