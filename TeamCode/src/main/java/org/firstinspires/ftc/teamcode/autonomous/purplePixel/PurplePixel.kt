@@ -31,8 +31,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.vision.VisionPortal
 
 
-// TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own things
-@Autonomous(group = "Purple Pixel")
+// TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own thingso
 abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) : OpMode() {
     val puncher by lazy { Puncher(hardwareMap, telemetry, Puncher.State.TWO) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
