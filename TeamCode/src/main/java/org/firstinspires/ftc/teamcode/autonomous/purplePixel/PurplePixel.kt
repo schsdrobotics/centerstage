@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous.purplePixel
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.acmerobotics.roadrunner.Action
 import com.acmerobotics.roadrunner.InstantAction
+import com.acmerobotics.roadrunner.NullAction
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.Subsystem
@@ -12,13 +13,16 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Blue
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
 import org.firstinspires.ftc.teamcode.autonomous.framework.Close
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.TargetGoCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherDropCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherNextCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherOneCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.ToCommand
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
@@ -44,19 +48,14 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
     val builder by lazy { drive.actionBuilder(start, side == Blue) }
     val drive by lazy { MecanumDrive(hardwareMap, start) }
 
-    val dropPurple = InstantAction { CommandScheduler.getInstance().schedule(PuncherNextCommand(puncher)) }
-    val dropYellow = InstantAction { CommandScheduler.getInstance().schedule(
-            SequentialCommandGroup(ToCommand(Spatula.State.SCORE, spatula), WaitCommand(500), TargetGoCommand(150, lift), PuncherDropCommand(puncher))
-    ) }
-
     // TODO: implement path mirroring logic for when you flip colors
-    val path: Action by lazy {
+    val path: AutoActions by lazy {
         when (recordedPropPosition) {
-            Left -> Close(builder, dropPurple, dropYellow).left
-            Middle -> Close(builder, dropPurple, dropYellow).middle
-            Right -> Close(builder, dropPurple, dropYellow).right
+            Left -> Close(builder).left
+            Middle -> Close(builder).middle
+            Right -> Close(builder).right
 
-            Unfound -> builder.build()
+            Unfound -> AutoActions(NullAction(), NullAction())
         }
     }
 
@@ -84,11 +83,10 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
     }
 
     override fun init_loop() {
-        telemetry.addData("Big Contour woah very big", processor.largestContourArea)
-        telemetry.addData("Currently Recorded Position", processor.recordedPropPosition)
-        telemetry.addData("Camera State", portal.cameraState)
-        telemetry.addData("Currently Detected Mass Center", "x: " + processor.largestContourX + ", y: " + processor.largestContourY)
-        telemetry.addData("Currently Detected Mass Area", processor.largestContourArea)
+        telemetry.addData("largest detected contour area", processor.largestContourArea)
+        telemetry.addData("recorded prop position", processor.recordedPropPosition)
+        telemetry.addData("camera state", portal.cameraState)
+        telemetry.addData("detected mass center", "x: " + processor.largestContourX + ", y: " + processor.largestContourY)
 
         CommandScheduler.getInstance().run()
     }
@@ -100,13 +98,21 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
         }
 
         recordedPropPosition = Left
-    }
 
-    var b = true
+        CommandScheduler.getInstance().schedule(SequentialCommandGroup(
+            ActionCommand(path.purple, emptySet()),
+            PuncherOneCommand(puncher),
+            ActionCommand(path.yellow, emptySet()),
+            ToCommand(Spatula.State.SCORE, spatula),
+            WaitCommand(500),
+            TargetGoCommand(150, lift),
+            PuncherDropCommand(puncher)
+        ))
+    }
 
     override fun loop() {
         telemetry.addData("detected", recordedPropPosition)
-        if (b) b = path.run(TelemetryPacket())
+
         CommandScheduler.getInstance().run()
     }
 
