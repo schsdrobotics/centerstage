@@ -119,7 +119,6 @@ class DriverControlled : CommandOpMode() {
 
 
     override fun initialize() {
-
         GamepadButton(gamepad, Button.X).whenPressed(InstantCommand({ to(LOW).schedule() }))
         GamepadButton(gamepad, Button.Y).whenPressed(InstantCommand({ to(MID).schedule() }))
         GamepadButton(gamepad, Button.B).whenPressed(InstantCommand({ to(HIGH).schedule() }))
