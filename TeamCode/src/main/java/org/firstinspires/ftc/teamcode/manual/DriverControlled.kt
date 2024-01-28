@@ -2,17 +2,19 @@ package org.firstinspires.ftc.teamcode.manual
 
 import com.acmerobotics.roadrunner.now
 import com.arcrobotics.ftclib.command.CommandOpMode
+import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
-import com.arcrobotics.ftclib.command.WaitCommand
 import com.arcrobotics.ftclib.command.button.GamepadButton
 import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button
 import com.arcrobotics.ftclib.gamepad.TriggerReader
+import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ForwardCommand
@@ -32,9 +34,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherN
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherDropCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.ToCommand
-import org.firstinspires.ftc.teamcode.util.sugar.nowMs
-import kotlin.math.max
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
@@ -50,6 +50,8 @@ class DriverControlled : CommandOpMode() {
     val gamepad by lazy { GamepadEx(gamepad1) }
 
     var condition = "none"
+    var logged = "none"
+
 
     // TODO: move into Lift
     // x, y -> sequentially, x, then y
@@ -60,10 +62,11 @@ class DriverControlled : CommandOpMode() {
             // align, go, score
             lift.atZero && target != ZERO -> {
                 condition = ("lift.atZero && target != ZERO")
+                logged = target.toString()
                 SequentialCommandGroup(
-                    ToCommand(Spatula.State.ALIGN, spatula),
+                    FlipToCommand(Spatula.State.ALIGN, spatula),
                     TargetGoCommand(target, lift),
-                    ToCommand(Spatula.State.SCORE, spatula),
+                    FlipToCommand(Spatula.State.SCORE, spatula),
                 )
             }
 
@@ -71,20 +74,22 @@ class DriverControlled : CommandOpMode() {
             // go + score
             lift.position >= CLEAR.ticks && target != ZERO -> {
                 condition = ("lift.position >= CLEAR.ticks && target != ZERO")
+                logged = target.toString()
                 SequentialCommandGroup(
                         TargetGoCommand(target, lift),
-                        ToCommand(Spatula.State.SCORE, spatula),
+                        FlipToCommand(Spatula.State.SCORE, spatula),
                 )
             }
 
             //
             lift.position <= 30 && target == ZERO -> {
                 condition = ("lift.position <= 30 && target == ZERO")
+                logged = target.toString()
 
                 SequentialCommandGroup(
-                        ToCommand(Spatula.State.ALIGN, spatula),
+                        FlipToCommand(Spatula.State.ALIGN, spatula),
                         TargetGoCommand(ZERO, lift),
-                        ToCommand(Spatula.State.TRANSFER, spatula),
+                        FlipToCommand(Spatula.State.TRANSFER, spatula),
                 )
             }
 
@@ -93,24 +98,26 @@ class DriverControlled : CommandOpMode() {
             // align, wait 300ms, (go + transfer)
             target == ZERO -> {
                 condition = ("target == ZERO")
+                logged = target.toString()
 
                 SequentialCommandGroup(
                         if (!lift.cleared) TargetGoCommand(300, lift) else InstantCommand(),
-                        ToCommand(Spatula.State.ALIGN, spatula),
+                        FlipToCommand(Spatula.State.ALIGN, spatula),
                         ParallelCommandGroup(
                                 TargetGoCommand(ZERO, lift),
-                                ToCommand(Spatula.State.TRANSFER, spatula)
+                                FlipToCommand(Spatula.State.TRANSFER, spatula)
                         )
                 )
             }
 
             // base case
             else -> {
-                telemetry.addLine("else")
+                condition = "base case"
+                logged = target.toString()
 
                 SequentialCommandGroup(
                         TargetGoCommand(target, lift),
-                        ToCommand(Spatula.State.SCORE, spatula),
+                        FlipToCommand(Spatula.State.SCORE, spatula),
                 )
             }
         }
@@ -119,10 +126,10 @@ class DriverControlled : CommandOpMode() {
 
 
     override fun initialize() {
-        GamepadButton(gamepad, Button.A).whenPressed(to(ZERO)::schedule)
-        GamepadButton(gamepad, Button.X).whenPressed(to(LOW)::schedule)
-        GamepadButton(gamepad, Button.Y).whenPressed(to(MID)::schedule)
-        GamepadButton(gamepad, Button.B).whenPressed(to(HIGH)::schedule)
+        GamepadButton(gamepad, Button.A).whenPressed(InstantCommand({ to(ZERO).schedule() }))
+        GamepadButton(gamepad, Button.X).whenPressed(InstantCommand({ to(LOW).schedule() }))
+        GamepadButton(gamepad, Button.Y).whenPressed(InstantCommand({ to(MID).schedule() }))
+        GamepadButton(gamepad, Button.B).whenPressed(InstantCommand({ to(HIGH).schedule() }))
 
         GamepadButton(gamepad, Button.DPAD_UP).whenPressed(IntakeToCommand(Intake.UP, intake))
         GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(IntakeToCommand(Intake.DOWN, intake))
@@ -133,23 +140,25 @@ class DriverControlled : CommandOpMode() {
         GamepadButton(gamepad, Button.LEFT_STICK_BUTTON).whenPressed(ResetYawCommand(drive))
 
         GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeNextCommand(intake))
+
         GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(PuncherNextCommand(puncher))
+        GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(FlipToCommand(Spatula.State.SCORE, spatula))
+        GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(FlipToCommand(Spatula.State.ALIGN, spatula))
 
         GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
-
 
         Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
                 .whileActiveContinuous(
                     ParallelCommandGroup(
                         ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
                         PuncherDropCommand(puncher),
-                        ToCommand(Spatula.State.HOUSE, spatula)
+                        FlipToCommand(Spatula.State.HOUSE, spatula)
                     )
                 )
                 .whenInactive(
                     ParallelCommandGroup(
                         IntakeStopCommand(intake),
-                        ToCommand(Spatula.State.TRANSFER, spatula)
+                        FlipToCommand(Spatula.State.TRANSFER, spatula)
                     )
                 )
 
@@ -158,17 +167,19 @@ class DriverControlled : CommandOpMode() {
                     ParallelCommandGroup(
                         ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
                         PuncherDropCommand(puncher),
-                        ToCommand(Spatula.State.HOUSE, spatula)
+                        FlipToCommand(Spatula.State.HOUSE, spatula)
                     )
                 )
                 .whenInactive(
                     ParallelCommandGroup(
                         IntakeStopCommand(intake),
-                        ToCommand(Spatula.State.TRANSFER, spatula)
+                        FlipToCommand(Spatula.State.TRANSFER, spatula)
                     )
                 )
 
         register(led)
+
+        while(opModeInInit()) { CommandScheduler.getInstance().run() }
     }
 
     override fun run() {
@@ -179,10 +190,10 @@ class DriverControlled : CommandOpMode() {
         val end = now()
         val time = end - start
 
-        led.periodic()
-
         telemetry.addData("loop time (hZ)", 1.0 / time)
         telemetry.addData("condition", condition)
+        telemetry.addData("target", logged)
+        telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
         telemetry.update()
     }
 }

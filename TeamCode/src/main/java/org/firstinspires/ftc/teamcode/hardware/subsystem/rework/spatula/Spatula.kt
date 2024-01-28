@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import kotlin.math.round
 
 class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var state: State = State.TRANSFER) : SubsystemBase() {
-    private val spatula by lazy {
+    val spatula by lazy {
         val it = hw["spatula"] as Servo
         it.direction = Servo.Direction.REVERSE
         it
@@ -35,8 +35,9 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
 
     enum class State(val position: Double, val angle: Double) {
         SCORE(0.55, 205.0),
-        TRANSFER(0.20, 90.0),
+        TRANSFER(0.195, 85.0),
         ALIGN(0.18, 80.0),
         HOUSE(0.17, 60.0),
+        AUTO(0.3, 115.0),
     }
 }

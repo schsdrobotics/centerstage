@@ -21,8 +21,6 @@ class SplineTest : LinearOpMode() {
             val builder = drive.actionBuilder(Close.start)
 
             waitForStart()
-
-            runBlocking(Close(builder, InstantAction {}, InstantAction {}).left)
         } else {
             throw RuntimeException()
         }

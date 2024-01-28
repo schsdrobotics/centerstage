@@ -9,10 +9,10 @@ import kotlin.math.max
 
 @TeleOp
 class ServoUnboundAnalog : OpMode() {
-    val leftChad by lazy { hardwareMap["leftChad"] as Servo }
-    val rightChad by lazy { hardwareMap["rightChad"] as Servo }
+    val leftChad by lazy { hardwareMap["puncher"] as Servo }
+//    val rightChad by lazy { hardwareMap["rightChad"] as Servo }
 
-    val servos by lazy { listOf(leftChad, rightChad) }
+    val servos by lazy { listOf(leftChad) }
 
     override fun init() {  }
 

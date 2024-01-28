@@ -8,7 +8,7 @@ import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.Subsystem
 
 
-class ActionCommand(action: Action, requirements: Set<Subsystem>) : Command {
+class ActionCommand(action: Action, requirements: Set<Subsystem> = emptySet()) : Command {
     private val action: Action
     private val requirements: Set<Subsystem>
     var finished = false
