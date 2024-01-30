@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
+import kotlin.math.abs
 import kotlin.math.round
 
 class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var state: State = State.TRANSFER) : SubsystemBase() {
@@ -18,8 +19,8 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
     private val encoder by lazy { hw["spatula encoder"] as AnalogInput }
 
     val angle get() = round(encoder.voltage / 3.3 * 360.0)
-    val up get() = angle >= State.SCORE.angle
-    val down get() = angle <= State.TRANSFER.angle
+    val up get() = abs(angle - State.SCORE.angle) <= 3
+    val down get() = abs(angle - State.TRANSFER.angle) <= 3
 
     fun to(state: State) { this.state = state }
 
@@ -35,7 +36,7 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
 
     enum class State(val position: Double, val angle: Double) {
         SCORE(0.55, 205.0),
-        TRANSFER(0.195, 85.0),
+        TRANSFER(0.193, 85.0),
         ALIGN(0.18, 80.0),
         HOUSE(0.17, 60.0),
         AUTO(0.3, 115.0),

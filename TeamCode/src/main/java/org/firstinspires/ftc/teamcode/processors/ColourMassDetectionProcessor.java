@@ -110,9 +110,10 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
 
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
-
         // this method processes the image (frame) taken by the camera, and tries to find a suitable prop
         // you dont need to call it
+
+        Core.rotate(frame, frame, Core.ROTATE_180);
 
         // this converts the frame from RGB to HSV, which is supposed to be better for doing colour blob detection
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGB2HSV);

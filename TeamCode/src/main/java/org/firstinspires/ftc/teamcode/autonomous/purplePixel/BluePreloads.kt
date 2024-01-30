@@ -4,4 +4,4 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 
 @Autonomous(group = "Purple Pixel")
-class RedPurplePixel : PurplePixel(AutonomousSide.Red)
+class BluePreloads : Preloads(AutonomousSide.Blue)

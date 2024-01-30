@@ -15,6 +15,7 @@ import com.arcrobotics.ftclib.gamepad.TriggerReader
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
+import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ForwardCommand
@@ -38,9 +39,9 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCo
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
-    val drive by lazy { Drive(hardwareMap, telemetry, gamepad) }
+    val puncher by lazy { Puncher(hardwareMap, telemetry, spatula) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
-    val puncher by lazy { Puncher(hardwareMap, telemetry) }
+    val drive by lazy { Drive(hardwareMap, telemetry, gamepad) }
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val launcher by lazy { Launcher(hardwareMap) }
     val intake by lazy { Intake(hardwareMap) }
@@ -49,87 +50,11 @@ class DriverControlled : CommandOpMode() {
     val secondary by lazy { GamepadEx(gamepad2) }
     val gamepad by lazy { GamepadEx(gamepad1) }
 
-    var condition = "none"
-    var logged = "none"
-
-
-    // TODO: move into Lift
-    // x, y -> sequentially, x, then y
-    // x + y -> x and y in parallel
-    fun to(target: Lift.Position) =
-        when {
-            // default case: at zero, target non-zero
-            // align, go, score
-            lift.atZero && target != ZERO -> {
-                condition = ("lift.atZero && target != ZERO")
-                logged = target.toString()
-                SequentialCommandGroup(
-                    FlipToCommand(Spatula.State.ALIGN, spatula),
-                    TargetGoCommand(target, lift),
-                    FlipToCommand(Spatula.State.SCORE, spatula),
-                )
-            }
-
-            // adjustment case: lift not zeroed, target isn't zero
-            // go + score
-            lift.position >= CLEAR.ticks && target != ZERO -> {
-                condition = ("lift.position >= CLEAR.ticks && target != ZERO")
-                logged = target.toString()
-                SequentialCommandGroup(
-                        TargetGoCommand(target, lift),
-                        FlipToCommand(Spatula.State.SCORE, spatula),
-                )
-            }
-
-            //
-            lift.position <= 30 && target == ZERO -> {
-                condition = ("lift.position <= 30 && target == ZERO")
-                logged = target.toString()
-
-                SequentialCommandGroup(
-                        FlipToCommand(Spatula.State.ALIGN, spatula),
-                        TargetGoCommand(ZERO, lift),
-                        FlipToCommand(Spatula.State.TRANSFER, spatula),
-                )
-            }
-
-            // restorative case: target is zero
-            // ensure lift is high enough before dropping
-            // align, wait 300ms, (go + transfer)
-            target == ZERO -> {
-                condition = ("target == ZERO")
-                logged = target.toString()
-
-                SequentialCommandGroup(
-                        if (!lift.cleared) TargetGoCommand(300, lift) else InstantCommand(),
-                        FlipToCommand(Spatula.State.ALIGN, spatula),
-                        ParallelCommandGroup(
-                                TargetGoCommand(ZERO, lift),
-                                FlipToCommand(Spatula.State.TRANSFER, spatula)
-                        )
-                )
-            }
-
-            // base case
-            else -> {
-                condition = "base case"
-                logged = target.toString()
-
-                SequentialCommandGroup(
-                        TargetGoCommand(target, lift),
-                        FlipToCommand(Spatula.State.SCORE, spatula),
-                )
-            }
-        }
-
-    fun to(target: () -> Lift.Position) = to(target())
-
-
     override fun initialize() {
-        GamepadButton(gamepad, Button.A).whenPressed(InstantCommand({ to(ZERO).schedule() }))
-        GamepadButton(gamepad, Button.X).whenPressed(InstantCommand({ to(LOW).schedule() }))
-        GamepadButton(gamepad, Button.Y).whenPressed(InstantCommand({ to(MID).schedule() }))
-        GamepadButton(gamepad, Button.B).whenPressed(InstantCommand({ to(HIGH).schedule() }))
+        GamepadButton(gamepad, Button.A).whenPressed(LiftTo(ZERO, lift, spatula))
+        GamepadButton(gamepad, Button.X).whenPressed(LiftTo(LOW, lift, spatula))
+        GamepadButton(gamepad, Button.Y).whenPressed(LiftTo(MID, lift, spatula))
+        GamepadButton(gamepad, Button.B).whenPressed(LiftTo(HIGH, lift, spatula))
 
         GamepadButton(gamepad, Button.DPAD_UP).whenPressed(IntakeToCommand(Intake.UP, intake))
         GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(IntakeToCommand(Intake.DOWN, intake))
@@ -152,7 +77,7 @@ class DriverControlled : CommandOpMode() {
                     ParallelCommandGroup(
                         ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
                         PuncherDropCommand(puncher),
-                        FlipToCommand(Spatula.State.HOUSE, spatula)
+//                        FlipToCommand(Spatula.State.HOUSE, spatula)
                     )
                 )
                 .whenInactive(
@@ -167,7 +92,7 @@ class DriverControlled : CommandOpMode() {
                     ParallelCommandGroup(
                         ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
                         PuncherDropCommand(puncher),
-                        FlipToCommand(Spatula.State.HOUSE, spatula)
+//                        FlipToCommand(Spatula.State.HOUSE, spatula)
                     )
                 )
                 .whenInactive(
@@ -191,8 +116,6 @@ class DriverControlled : CommandOpMode() {
         val time = end - start
 
         telemetry.addData("loop time (hZ)", 1.0 / time)
-        telemetry.addData("condition", condition)
-        telemetry.addData("target", logged)
         telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
         telemetry.update()
     }

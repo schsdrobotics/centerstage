@@ -30,13 +30,12 @@ import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.Pr
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
-import org.firstinspires.ftc.teamcode.util.structures.Vector3
 import org.firstinspires.ftc.vision.VisionPortal
 
 
 // TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own thingso
-abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) : OpMode() {
-    val puncher by lazy { Puncher(hardwareMap, telemetry, Puncher.State.TWO) }
+abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : OpMode() {
+    val puncher by lazy { Puncher(hardwareMap, telemetry, spatula, Puncher.State.TWO) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val intake by lazy { Intake(hardwareMap) }
@@ -81,12 +80,6 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
         drive
 
         spatula.spatula.position = Spatula.State.SCORE.position
-
-        CommandScheduler.getInstance().schedule(
-                TargetGoCommand(200, lift)
-                        .andThen(FlipToCommand(Spatula.State.AUTO, spatula))
-                        .andThen(TargetGoCommand(100, lift))
-        )
     }
 
     override fun init_loop() {
@@ -106,9 +99,12 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
             portal.stopStreaming()
         }
 
-        recordedPropPosition = Left
+        recordedPropPosition = Right
 
         CommandScheduler.getInstance().schedule(SequentialCommandGroup(
+            TargetGoCommand(200, lift)
+                .andThen(FlipToCommand(Spatula.State.AUTO, spatula))
+                .andThen(TargetGoCommand(100, lift)),
             ActionCommand(path.purple),
             PuncherOneCommand(puncher),
             TargetGoCommand(150, lift),
@@ -117,11 +113,12 @@ abstract class PurplePixel(val side: AutonomousSide, val close: Boolean = true) 
             FlipToCommand(Spatula.State.SCORE, spatula),
             WaitCommand(500),
             TargetGoCommand(125, lift),
-            DriveAdjustCommand(Vector2d(0.0, -0.1), 0.0, { puncher.distance <= 8.0 }, drive),
+            DriveAdjustCommand(Vector2d(-0.15, 0.0), 0.0, { puncher.distance == 0.0 || puncher.distance <= 14.0 }, drive),
+//            DriveAdjustCommand(Vector2d(-0.2, 0.0), 0.0, { puncher.distance == 0.0 || puncher.distance >= 7.0 }, drive),
+            WaitCommand(250),
             PuncherDropCommand(puncher),
             WaitCommand(500),
             FlipToCommand(Spatula.State.TRANSFER, spatula),
-            WaitCommand(500),
             TargetGoCommand(0, lift),
         ))
     }

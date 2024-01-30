@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.util.structures.plus
 import kotlin.math.pow
 
 class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadEx, val auto: Boolean = false) : SubsystemBase() {
-
     private val frontLeft by lazy { Motor(hw, "frontLeft") }
     private val frontRight by lazy { Motor(hw, "frontRight") }
     private val backLeft by lazy { Motor(hw, "backLeft") }
@@ -33,7 +32,7 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
         SlewRateLimiter(10.0, -10.0)
     )
 
-    var last = 0.0
+    var target = 0.0
 
     val angle
         get() = imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
@@ -56,29 +55,38 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
         imu.initialize(IMU.Parameters(RevHubOrientationOnRobot(LogoFacingDirection.LEFT, UsbFacingDirection.DOWN)))
     }
 
-    fun reset() { imu.resetYaw() }
+    fun reset() { imu.resetYaw(); target = angle }
 
     fun move(x: Double, y: Double, theta: Double) {
         drive.driveFieldCentric(x, y, theta, angle, true)
     }
 
     override fun periodic() {
+        telemetry.addData("angle target", target)
+        telemetry.addData("imu angle", angle)
+
         val slewed = Vector3(limiters[0].calculate(fed.x), limiters[1].calculate(fed.y), fed.z)
+
+        if (slewed.z != 0.0) target = angle
+
+        val headingCorrection = run {
+            val error = target - angle
+
+            Gains.HEADING * error
+        }
 
         val corrective = Vector3(0.0, 0.0, 0.0)
 
         val final = slewed + corrective
 
         if (!auto) move(final.x, final.y, final.z)
-
-        telemetry.addData("imu angle", angle)
     }
 
     fun stop() = move(0.0, 0.0, 0.0)
 
     companion object {
         object Gains {
-            const val HEADING = 0.01
+            const val HEADING = 0.05
         }
     }
 }

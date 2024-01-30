@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 
-class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = NONE) : SubsystemBase() {
+class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var spatula: Spatula, var state: State = NONE) : SubsystemBase() {
     private val pacer by lazy { hw["distance"] as Rev2mDistanceSensor }
     private val timer: ElapsedTime
 
@@ -36,10 +37,12 @@ class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = 
     override fun periodic() {
         puncher.position = state.position
 
-        if (timer.milliseconds() > 500) {
+        if (spatula.state == Spatula.State.SCORE && timer.milliseconds() > 500) {
             update()
 
             timer.reset()
+        } else {
+            distance = 0.0
         }
 
         telemetry.addData("puncher state", state.toString())
@@ -48,7 +51,7 @@ class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = 
 
     enum class State(val position: Double) {
         TWO(1.0),
-        ONE(0.13),
+        ONE(0.125),
         NONE(0.0),
     }
 }
