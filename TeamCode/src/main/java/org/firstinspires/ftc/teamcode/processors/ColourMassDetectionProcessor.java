@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 
 public class ColourMassDetectionProcessor implements VisionProcessor, CameraStreamSource {
-    private final DoubleSupplier minArea, left, right;
+    private final DoubleSupplier minArea, partition;
     private final Scalar upper; // lower bounds for masking
     private final Scalar lower; // upper bounds for masking
     private final TextPaint textPaint;
@@ -53,16 +53,14 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
      * @param lower   the lower masked bound, a three a value scalar in the form of a HSV
      * @param upper   the upper masked bound, a three a value scalar in the form of a HSV
      * @param minArea the minimum area for a detected blob to be considered the prop
-     * @param left    the dividing point for the prop to be on the left
-     * @param right   the diving point for the prop to be on the right
+     * @param partition    the dividing point for the prop to be on the left
      */
-    public ColourMassDetectionProcessor(@NonNull Scalar lower, @NonNull Scalar upper, DoubleSupplier minArea, DoubleSupplier left, DoubleSupplier right) {
+    public ColourMassDetectionProcessor(@NonNull Scalar lower, @NonNull Scalar upper, DoubleSupplier minArea, DoubleSupplier partition) {
         this.contours = new ArrayList<>();
         this.lower = lower;
         this.upper = upper;
         this.minArea = minArea;
-        this.left = left;
-        this.right = right;
+        this.partition = partition;
 
         // setting up the paint for the text in the center of the box
         textPaint = new TextPaint();
@@ -176,13 +174,13 @@ public class ColourMassDetectionProcessor implements VisionProcessor, CameraStre
         // if we didn't find any contours which were large enough, sets it to be unfound
         PropPositions propPosition;
         if (largestContour == null) {
-            propPosition = PropPositions.Right;
-        } else if (largestContourX <= left.getAsDouble()) {
             propPosition = PropPositions.Left;
-        } else if (largestContourX >= right.getAsDouble()) {
+        } else if (largestContourX <= partition.getAsDouble()) {
             propPosition = PropPositions.Middle;
-        } else {
+        } else if (largestContourX >= partition.getAsDouble()) {
             propPosition = PropPositions.Right;
+        } else {
+            propPosition = PropPositions.Left;
         }
 
         // if we have found a new prop position, and it is not unfound, updates the recorded position,

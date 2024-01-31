@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.util.SlewRateLimiter
 import org.firstinspires.ftc.teamcode.util.structures.Vector3
 import org.firstinspires.ftc.teamcode.util.structures.plus
 import kotlin.math.pow
+import kotlin.math.sign
 
 class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadEx, val auto: Boolean = false) : SubsystemBase() {
     private val frontLeft by lazy { Motor(hw, "frontLeft") }
@@ -38,7 +39,7 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
         get() = imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
 
     val fed
-        get() = Vector3(-gamepad.leftX, -gamepad.leftY, -gamepad.rightX)
+        get() = Vector3(-gamepad.leftX, -gamepad.leftY, -gamepad.rightX.let { it.pow(2) * it.sign })
 
     val imu by lazy { (hw["imu"] as IMU) }
 
@@ -62,7 +63,7 @@ class Drive(val hw: HardwareMap, val telemetry: Telemetry, val gamepad: GamepadE
     }
 
     override fun periodic() {
-        telemetry.addData("angle target", target)
+//        telemetry.addData("angle target", target)
         telemetry.addData("imu angle", angle)
 
         val slewed = Vector3(limiters[0].calculate(fed.x), limiters[1].calculate(fed.y), fed.z)

@@ -45,13 +45,13 @@ class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var spatula: Spatul
             distance = 0.0
         }
 
-        telemetry.addData("puncher state", state.toString())
+//        telemetry.addData("puncher state", state.toString())
         telemetry.addData("puncher distance", distance)
     }
 
     enum class State(val position: Double) {
         TWO(1.0),
-        ONE(0.125),
+        ONE(0.24),
         NONE(0.0),
     }
 }

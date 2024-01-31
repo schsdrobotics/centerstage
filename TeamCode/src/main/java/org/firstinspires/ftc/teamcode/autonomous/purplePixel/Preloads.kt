@@ -59,7 +59,7 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
         }
     }
 
-    val processor by lazy { ColourMassDetectionProcessor(side.lower, side.upper, { MINIMUM_MASS }, { 213.0 }, { 426.0 }) }
+    val processor by lazy { ColourMassDetectionProcessor(side.lower, side.upper, { MINIMUM_MASS }, { 426.0 }) }
 
     val portal by lazy {
         VisionPortal.Builder()
@@ -134,7 +134,7 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
     private fun getPropPositions(): PropPositions {
         val recorded = processor.recordedPropPosition
 
-        return if (recorded == Unfound) Middle else recorded
+        return if (recorded == Unfound) Left else recorded
     }
 
     companion object {

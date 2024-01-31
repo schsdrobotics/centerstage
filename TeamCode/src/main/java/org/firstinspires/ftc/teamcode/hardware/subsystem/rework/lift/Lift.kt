@@ -47,7 +47,7 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     fun adjust(ticks: Int) { this.target = max(0, min(this.target + ticks, Position.HIGH.ticks)) }
 
-    fun target(ticks: Int) { this.target = ticks }
+    fun target(ticks: Int) { this.target = ticks; }
 
 //    fun toNext() { target = (++count).let { Position.values()[count % 4] }.ticks }
 //    fun toPrev() { target = (--count).let { Position.values()[count % 4] }.ticks }
@@ -69,9 +69,9 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     override fun periodic() {
         telemetry.addData("lift pos", position)
-        telemetry.addData("lift target pos", target)
-        telemetry.addData("lift cleared", cleared)
-        telemetry.addData("lift powers", motors.map { it.power }.joinToString(", ") { it.toString() })
+//        telemetry.addData("lift target pos", target)
+//        telemetry.addData("lift cleared", cleared)
+//        telemetry.addData("lift powers", motors.map { it.power }.joinToString(", ") { it.toString() })
 
         position = abs(left.currentPosition)
 
@@ -82,6 +82,7 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     enum class Position(val ticks: Int) {
         ZERO(0),
+        INTAKE(50),
         CLEAR(200),
         LOW(300),
         MID(500),

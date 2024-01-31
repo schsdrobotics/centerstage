@@ -36,7 +36,7 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
                     }
 
                     //
-                    lift.position <= 30 && target == Lift.Position.ZERO -> {
+                    target == Lift.Position.ZERO && spatula.state == Spatula.State.TRANSFER -> {
 //                    condition = ("lift.position <= 30 && target == ZERO")
 //                    logged = target.toString()
 
@@ -50,7 +50,7 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
                     // restorative case: target is zero
                     // ensure lift is high enough before dropping
                     // align, wait 300ms, (go + transfer)
-                    target == Lift.Position.ZERO -> {
+                    target == Lift.Position.ZERO && spatula.state == Spatula.State.SCORE -> {
 //                    condition = ("target == ZERO")
 //                    logged = target.toString()
 

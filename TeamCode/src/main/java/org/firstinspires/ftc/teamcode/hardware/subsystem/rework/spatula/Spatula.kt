@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import kotlin.math.abs
@@ -22,7 +23,12 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
     val up get() = abs(angle - State.SCORE.angle) <= 3
     val down get() = abs(angle - State.TRANSFER.angle) <= 3
 
+    var adjustment = 0.0
+        set(value) { field = Range.clip(value, LOWER_ADJUSTMENT, UPPER_ADJUSTMENT)  }
+
     fun to(state: State) { this.state = state }
+
+    fun adjust(amount: Double) { adjustment += amount }
 
     override fun periodic() {
         telemetry.addData("spatula state", state.toString())
@@ -30,15 +36,20 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
 
         spatula.position = when (state) {
             State.SCORE -> if (true) State.SCORE.position else State.ALIGN.position
-            else -> state.position
+            else -> state.position + adjustment
         }
     }
 
     enum class State(val position: Double, val angle: Double) {
         SCORE(0.55, 205.0),
-        TRANSFER(0.193, 85.0),
+        TRANSFER(0.19, 85.0),
         ALIGN(0.18, 80.0),
         HOUSE(0.17, 60.0),
         AUTO(0.3, 115.0),
+    }
+
+    companion object {
+        const val LOWER_ADJUSTMENT = -0.02
+        const val UPPER_ADJUSTMENT = 0.02
     }
 }

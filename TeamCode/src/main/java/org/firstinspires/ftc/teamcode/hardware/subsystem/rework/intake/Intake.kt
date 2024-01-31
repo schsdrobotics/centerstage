@@ -43,9 +43,9 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     override fun periodic() { chads.forEach { it.position = target } }
 
     companion object {
-        const val STEPS = 7.0
+        const val STEPS = 5.0
         const val UP = 0.97
-        const val DOWN = UP - 0.16
+        const val DOWN = UP - 0.15
 
         const val SLICE = (0.87 - DOWN) / STEPS
     }

@@ -36,6 +36,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherDropCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.SpatulaAdjustCommand
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
@@ -56,8 +57,8 @@ class DriverControlled : CommandOpMode() {
         GamepadButton(gamepad, Button.Y).whenPressed(LiftTo(MID, lift, spatula))
         GamepadButton(gamepad, Button.B).whenPressed(LiftTo(HIGH, lift, spatula))
 
-        GamepadButton(gamepad, Button.DPAD_UP).whenPressed(IntakeToCommand(Intake.UP, intake))
-        GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(IntakeToCommand(Intake.DOWN, intake))
+        GamepadButton(gamepad, Button.DPAD_UP).whenPressed(SpatulaAdjustCommand(0.005, spatula))
+        GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(SpatulaAdjustCommand(-0.005, spatula))
 
         GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustCommand(-50, lift))
         GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(AdjustCommand(50, lift))
@@ -74,37 +75,45 @@ class DriverControlled : CommandOpMode() {
 
         Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
                 .whileActiveContinuous(
-                    ParallelCommandGroup(
-                        ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
-                        PuncherDropCommand(puncher),
-//                        FlipToCommand(Spatula.State.HOUSE, spatula)
-                    )
+                        if (spatula.state != Spatula.State.SCORE) {
+                            ParallelCommandGroup(
+                                    ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
+                                    PuncherDropCommand(puncher),
+                                    TargetGoCommand(50, lift)
+                            )
+                        } else InstantCommand()
                 )
                 .whenInactive(
-                    ParallelCommandGroup(
-                        IntakeStopCommand(intake),
-                        FlipToCommand(Spatula.State.TRANSFER, spatula)
-                    )
+                        ParallelCommandGroup(
+                                IntakeStopCommand(intake),
+                                FlipToCommand(Spatula.State.TRANSFER, spatula),
+                                TargetGoCommand(0, lift)
+                        )
                 )
 
         Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.LEFT_TRIGGER).isDown }
                 .whileActiveContinuous(
-                    ParallelCommandGroup(
-                        ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
-                        PuncherDropCommand(puncher),
-//                        FlipToCommand(Spatula.State.HOUSE, spatula)
-                    )
+                        if (spatula.state != Spatula.State.SCORE) {
+                            ParallelCommandGroup(
+                                    ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
+                                    PuncherDropCommand(puncher),
+                                    TargetGoCommand(50, lift)
+                            )
+                        } else InstantCommand()
                 )
                 .whenInactive(
-                    ParallelCommandGroup(
-                        IntakeStopCommand(intake),
-                        FlipToCommand(Spatula.State.TRANSFER, spatula)
-                    )
+                        ParallelCommandGroup(
+                                IntakeStopCommand(intake),
+                                FlipToCommand(Spatula.State.TRANSFER, spatula),
+                                TargetGoCommand(0, lift)
+                        )
                 )
 
         register(led)
 
-        while(opModeInInit()) { CommandScheduler.getInstance().run() }
+        while (opModeInInit()) {
+            CommandScheduler.getInstance().run()
+        }
     }
 
     override fun run() {
@@ -117,6 +126,7 @@ class DriverControlled : CommandOpMode() {
 
         telemetry.addData("loop time (hZ)", 1.0 / time)
         telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
+        telemetry.addData("adjustment", spatula.adjustment)
         telemetry.update()
     }
 }
