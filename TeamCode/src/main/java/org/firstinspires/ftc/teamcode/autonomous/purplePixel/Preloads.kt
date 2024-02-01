@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.autonomous.purplePixel
 
-import com.acmerobotics.roadrunner.NullAction
 import com.acmerobotics.roadrunner.Vector2d
 import com.arcrobotics.ftclib.command.CommandScheduler
+import com.arcrobotics.ftclib.command.ParallelDeadlineGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.Subsystem
 import com.arcrobotics.ftclib.command.WaitCommand
@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.Blue
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
 import org.firstinspires.ftc.teamcode.autonomous.framework.Close
+import org.firstinspires.ftc.teamcode.autonomous.framework.Far
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.DriveAdjustCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
@@ -30,18 +31,19 @@ import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.Pr
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
+import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 import org.firstinspires.ftc.vision.VisionPortal
 
 
 // TODO: refactor this whole system to individualize actions like purple pixel and place on backdrop to their own thingso
-abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : OpMode() {
+abstract class Preloads(val side: AutonomousSide, val close: Boolean) : OpMode() {
     val puncher by lazy { Puncher(hardwareMap, telemetry, spatula, Puncher.State.TWO) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val intake by lazy { Intake(hardwareMap) }
 
     // TODO: refactor when mirror logic exists to remove this redundancy
-    val start = Close.start
+    val start = if (close) Close.start else Far.start
 
     val gamepad by lazy { GamepadEx(gamepad1) }
 
@@ -50,12 +52,22 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
 
     // TODO: implement path mirroring logic for when you flip colors
     val path: AutoActions by lazy {
-        when (recordedPropPosition) {
-            Left -> Close(drive, builder).left
-            Middle -> Close(drive, builder).middle
-            Right -> Close(drive, builder).right
+        if (close) {
+            when (recordedPropPosition) {
+                Left -> Close(drive, builder).left
+                Middle -> Close(drive, builder).middle
+                Right -> Close(drive, builder).right
 
-            Unfound -> AutoActions(NullAction(), NullAction())
+                Unfound -> Close(drive, builder).left
+            }
+        } else {
+            when (recordedPropPosition) {
+                Left -> Far(drive, builder).left
+                Middle -> Far(drive, builder).middle
+                Right -> Far(drive, builder).right
+
+                Unfound -> Far(drive, builder).right
+            }
         }
     }
 
@@ -78,8 +90,6 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
         CommandScheduler.getInstance().reset()
 
         drive
-
-        spatula.spatula.position = Spatula.State.SCORE.position
     }
 
     override fun init_loop() {
@@ -99,27 +109,31 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
             portal.stopStreaming()
         }
 
-        recordedPropPosition = Right
+        recordedPropPosition = getPropPositions()
+
 
         CommandScheduler.getInstance().schedule(SequentialCommandGroup(
             TargetGoCommand(200, lift)
                 .andThen(FlipToCommand(Spatula.State.AUTO, spatula))
                 .andThen(TargetGoCommand(100, lift)),
             ActionCommand(path.purple),
+            WaitCommand(500),
             PuncherOneCommand(puncher),
+            WaitCommand(500),
             TargetGoCommand(150, lift),
             FlipToCommand(Spatula.State.TRANSFER, spatula),
             ActionCommand(path.yellow),
             FlipToCommand(Spatula.State.SCORE, spatula),
             WaitCommand(500),
             TargetGoCommand(125, lift),
-            DriveAdjustCommand(Vector2d(-0.15, 0.0), 0.0, { puncher.distance == 0.0 || puncher.distance <= 14.0 }, drive),
-//            DriveAdjustCommand(Vector2d(-0.2, 0.0), 0.0, { puncher.distance == 0.0 || puncher.distance >= 7.0 }, drive),
+            DriveAdjustCommand(Vector2d(-0.25, 0.0), 0.0, { currentDraw >= 2.5 }, drive),
             WaitCommand(250),
             PuncherDropCommand(puncher),
+            DriveAdjustCommand(Vector2d(0.15, 0.0), 0.0, { false }, drive),
             WaitCommand(500),
             FlipToCommand(Spatula.State.TRANSFER, spatula),
             TargetGoCommand(0, lift),
+            DriveAdjustCommand(Vector2d(0.0, 0.0), 0.0, { true }, drive),
         ))
     }
 
@@ -134,7 +148,7 @@ abstract class Preloads(val side: AutonomousSide, val close: Boolean = true) : O
     private fun getPropPositions(): PropPositions {
         val recorded = processor.recordedPropPosition
 
-        return if (recorded == Unfound) Left else recorded
+        return if (recorded == Unfound) Middle else recorded
     }
 
     companion object {

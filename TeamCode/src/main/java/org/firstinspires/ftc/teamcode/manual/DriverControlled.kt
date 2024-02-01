@@ -5,16 +5,13 @@ import com.arcrobotics.ftclib.command.CommandOpMode
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
-import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.button.GamepadButton
 import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button
 import com.arcrobotics.ftclib.gamepad.TriggerReader
-import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
@@ -22,7 +19,6 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ForwardCo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeNextCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeStopCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeToCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ReverseCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.Launcher
@@ -37,6 +33,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherD
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.SpatulaAdjustCommand
+import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
@@ -125,7 +122,7 @@ class DriverControlled : CommandOpMode() {
         val time = end - start
 
         telemetry.addData("loop time (hZ)", 1.0 / time)
-        telemetry.addData("current", hardwareMap.getAll(LynxModule::class.java).fold(0.0) { acc, it -> acc + it.getCurrent(CurrentUnit.AMPS) })
+        telemetry.addData("current", currentDraw)
         telemetry.addData("adjustment", spatula.adjustment)
         telemetry.update()
     }

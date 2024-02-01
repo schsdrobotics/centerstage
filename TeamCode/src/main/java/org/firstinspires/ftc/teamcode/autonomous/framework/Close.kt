@@ -15,10 +15,10 @@ class Close(drive: MecanumDrive, builder: TrajectoryActionBuilder) : Auto(drive,
                 .splineTo(Vector2d(8.0, -42.0), 135.deg)
                 .endTrajectory()
 
-        val yellow = drive.actionBuilder(Pose2d(Vector2d(8.0, -41.0), 315.deg))
+        val yellow = drive.actionBuilder(Pose2d(Vector2d(8.0, -42.0), 315.deg))
                 .setReversed(true)
                 .setTangent(tan(11.5 / 41.5))
-                .lineToXLinearHeading(49.5, Rotation2d.fromDouble(180.deg))
+                .lineToXLinearHeading(49.5, Rotation2d.exp(180.deg))
                 .endTrajectory()
 
         AutoActions(purple.build(), yellow.build())
@@ -32,6 +32,7 @@ class Close(drive: MecanumDrive, builder: TrajectoryActionBuilder) : Auto(drive,
 
         val yellow = drive.actionBuilder(Pose2d(Vector2d(12.0, -(25.0 + HEIGHT / 2.0) - 1.5), 270.deg))
                 .setReversed(true)
+                .setTangent(0.deg)
                 .splineToLinearHeading(Pose2d(49.5, -37.0, 180.deg), 0.deg)
                 .endTrajectory()
 
@@ -46,6 +47,7 @@ class Close(drive: MecanumDrive, builder: TrajectoryActionBuilder) : Auto(drive,
 
         val yellow = drive.actionBuilder(Pose2d(Vector2d(22.5, -44.0), 270.deg))
                 .setReversed(true)
+                .setTangent(0.deg)
                 .splineToLinearHeading(Pose2d(49.5, -44.0, 180.deg), 0.deg)
                 .endTrajectory()
 
