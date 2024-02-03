@@ -11,6 +11,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button
 import com.arcrobotics.ftclib.gamepad.TriggerReader
+import com.qualcomm.hardware.lynx.LynxModule
+import com.qualcomm.hardware.lynx.commands.standard.LynxSetModuleLEDColorCommand
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
@@ -76,7 +78,7 @@ class DriverControlled : CommandOpMode() {
                             ParallelCommandGroup(
                                     ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
                                     PuncherDropCommand(puncher),
-                                    TargetGoCommand(50, lift)
+                                    TargetGoCommand(25, lift)
                             )
                         } else InstantCommand()
                 )
@@ -94,7 +96,7 @@ class DriverControlled : CommandOpMode() {
                             ParallelCommandGroup(
                                     ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
                                     PuncherDropCommand(puncher),
-                                    TargetGoCommand(50, lift)
+                                    TargetGoCommand(25, lift)
                             )
                         } else InstantCommand()
                 )
@@ -107,6 +109,8 @@ class DriverControlled : CommandOpMode() {
                 )
 
         register(led)
+
+        hardwareMap.getAll(LynxModule::class.java).forEach { it.sendCommand(LynxSetModuleLEDColorCommand(it, 155.toByte(), 0, 155.toByte())) }
 
         while (opModeInInit()) {
             CommandScheduler.getInstance().run()
@@ -124,6 +128,7 @@ class DriverControlled : CommandOpMode() {
         telemetry.addData("loop time (hZ)", 1.0 / time)
         telemetry.addData("current", currentDraw)
         telemetry.addData("adjustment", spatula.adjustment)
+        telemetry.addData("intake state", intake.target)
         telemetry.update()
     }
 }

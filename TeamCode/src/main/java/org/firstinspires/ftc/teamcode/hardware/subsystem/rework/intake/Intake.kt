@@ -31,22 +31,19 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     fun down() = to(DOWN)
 
     fun next() {
-        if (count % STEPS == 0.0) {
-            this.target = UP
-        } else {
-            this.target = (DOWN + SLICE * (count % STEPS + 1))
-        }
+        if (count % 2 == 0) up() else down()
 
         count++
     }
 
-    override fun periodic() { chads.forEach { it.position = target } }
+    override fun periodic() {
+        chads.forEach { it.position = target }
+
+
+    }
 
     companion object {
-        const val STEPS = 5.0
         const val UP = 0.97
-        const val DOWN = UP - 0.15
-
-        const val SLICE = (0.87 - DOWN) / STEPS
+        const val DOWN = UP - 0.197
     }
 }
