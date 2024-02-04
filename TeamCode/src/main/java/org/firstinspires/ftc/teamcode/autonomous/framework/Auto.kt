@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.autonomous.framework
 
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
+import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 
-abstract class Auto(val drive: MecanumDrive, val builder: TrajectoryActionBuilder) {
+abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
     abstract val left: AutoActions
     abstract val middle: AutoActions
     abstract val right: AutoActions

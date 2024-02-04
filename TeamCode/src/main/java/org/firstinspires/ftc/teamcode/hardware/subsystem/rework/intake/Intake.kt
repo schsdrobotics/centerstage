@@ -17,7 +17,6 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     var count = 0
 
     init {
-        motor.direction = DcMotorSimple.Direction.REVERSE
         motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
     }
 

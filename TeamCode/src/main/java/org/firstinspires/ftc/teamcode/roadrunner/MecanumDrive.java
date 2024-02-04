@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumEncodersMessage;
@@ -74,8 +75,8 @@ public final class MecanumDrive {
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
-        public double minProfileAccel = -10;
-        public double maxProfileAccel = 30;
+        public double minProfileAccel = -15;
+        public double maxProfileAccel = 40;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI / 3.0; // shared with path
@@ -472,10 +473,6 @@ public final class MecanumDrive {
     }
 
     public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
-        return actionBuilder(beginPose, false);
-    }
-
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose, boolean blue) {
         return new TrajectoryActionBuilder(
                 TurnAction::new,
                 FollowTrajectoryAction::new,
@@ -483,7 +480,19 @@ public final class MecanumDrive {
                 defaultTurnConstraints,
                 defaultVelConstraint, defaultAccelConstraint,
                 0.25, 0.1,
-                pose -> blue
+                pose -> pose
+        );
+    }
+
+    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose, AutonomousSide side) {
+        return new TrajectoryActionBuilder(
+                TurnAction::new,
+                FollowTrajectoryAction::new,
+                beginPose, 1e-6, 0.0,
+                defaultTurnConstraints,
+                defaultVelConstraint, defaultAccelConstraint,
+                0.25, 0.1,
+                pose -> side == AutonomousSide.Blue
                       ? new Pose2dDual<>(pose.position.x, pose.position.y.unaryMinus(), pose.heading.inverse())
                       : new Pose2dDual<>(pose.position.x, pose.position.y, pose.heading)
         );

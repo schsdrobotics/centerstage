@@ -45,7 +45,7 @@ class Spatula(val hw: HardwareMap, val telemetry: Telemetry, val lift: Lift, var
         TRANSFER(0.19, 85.0),
         ALIGN(0.18, 80.0),
         HOUSE(0.17, 60.0),
-        AUTO(0.3, 115.0),
+        AUTO(0.53, 195.0),
     }
 
     companion object {
