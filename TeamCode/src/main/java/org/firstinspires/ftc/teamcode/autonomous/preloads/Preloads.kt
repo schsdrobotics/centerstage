@@ -53,10 +53,7 @@ abstract class Preloads(val side: AutonomousSide, val position: AutonomousPositi
     val led by lazy { Led(hardwareMap) }
 
     // TODO: refactor when mirror logic exists to remove this redundancy
-    val start = when (side) {
-        Red ->  Pose2d(position.start.position.x, position.start.position.y, position.start.heading.toDouble())
-        Blue -> Pose2d(position.start.position.x, -position.start.position.y, position.start.heading.inverse().toDouble())
-    }
+    val start = Pose2d(0.0, 0.0, 0.0)
 
     val gamepad by lazy { GamepadEx(gamepad1) }
 
@@ -133,7 +130,6 @@ abstract class Preloads(val side: AutonomousSide, val position: AutonomousPositi
 
             if (position == AutonomousPosition.Stacks) {
                 SequentialCommandGroup(
-                    ActionCommand(path.cycle),
                     TargetGoCommand(100, lift),
                     IntakeToCommand(UP - (0.197 / 1.45), intake),
                     ForwardCommand(intake) { 1.0 },
@@ -144,7 +140,6 @@ abstract class Preloads(val side: AutonomousSide, val position: AutonomousPositi
                 )
             } else InstantCommand({ }),
 
-            ActionCommand(path.white),
             TargetGoCommand(175, lift),
             FlipToCommand(Spatula.State.AUTO, spatula),
             TargetGoCommand(125, lift),

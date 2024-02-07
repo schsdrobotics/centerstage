@@ -4,10 +4,12 @@ import com.acmerobotics.roadrunner.Action
 import com.acmerobotics.roadrunner.NullAction
 import com.acmerobotics.roadrunner.SequentialAction
 
+val NullAutoActions = AutoActions(NullAction(), NullAction(), NullAction(), NullAction(), NullAction())
+
 data class AutoActions(
     val purple: Action,
     val yellow: Action,
-    val cycle: Action = NullAction(),
-    val park: Action = NullAction(),
-    val white: Action = NullAction()
+    val backdrop: Action,
+    val stacks: Action,
+    val park: Action,
 )
