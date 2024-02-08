@@ -5,7 +5,6 @@ import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Rotation2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.Vector2d
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 
 abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
@@ -29,5 +28,15 @@ abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
     companion object {
         const val HEIGHT = 16.0
         const val WIDTH = 11.0
+
+        const val APOTHEM = HEIGHT / 2.0
+
+        const val MAX_WHEEL_VEL = 50.0
+        const val PROFILE_DECEL = -15.0
+        const val PROFILE_ACCEL = 40.0
+
+        const val MAX_ANGULAR_VEL = Math.PI / 3.0
+
+        const val MAX_ANGULAR_ACCEL = Math.PI / 3.0
     }
 }

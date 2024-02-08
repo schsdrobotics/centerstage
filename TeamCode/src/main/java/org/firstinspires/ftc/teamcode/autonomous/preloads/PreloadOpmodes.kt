@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.autonomous.preloads
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousPosition
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
 
 @Autonomous(group = "Preloads")
 class RedClosePreloads : Preloads(AutonomousSide.Red, AutonomousPosition.Backstage)

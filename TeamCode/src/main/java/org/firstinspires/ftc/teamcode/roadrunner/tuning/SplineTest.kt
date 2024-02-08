@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.roadrunner.tuning
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import org.firstinspires.ftc.teamcode.autonomous.framework.Close
+import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 
 class SplineTest : LinearOpMode() {

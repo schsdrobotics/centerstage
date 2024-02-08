@@ -1,14 +1,16 @@
-package org.firstinspires.ftc.teamcode.autonomous.framework
+package org.firstinspires.ftc.teamcode.autonomous.implementations
 
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.Vector2d
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.NoAuto
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
 class Far(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
-    override val start = Pose2d(-36.0, -63.0, 270.deg)
+    override val start = Pose2d(-36.0, -64.0, 270.deg)
 
     override val left = run {
         val purple = drive.actionBuilder(start)
@@ -16,26 +18,26 @@ class Far(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
                 .splineTo(Vector2d(-40.0, -42.5), 135.deg)
                 .endTrajectory()
 
-        NullAutoActions
+        NoAuto
     }
 
     override val middle = run {
-        val purple = drive.actionBuilder(start, color)
+        val purple = drive.actionBuilder(start)
                 .setReversed(true)
-                .lineToY(-(25.0 + HEIGHT / 2.0) + 1.0)
+                .lineToY(-(25.0 + APOTHEM) + 1.0)
                 .endTrajectory()
 
 
-        NullAutoActions
+        NoAuto
     }
 
     override val right = run {
-        val purple = drive.actionBuilder(start, color)
+        val purple = drive.actionBuilder(start)
                 .setReversed(true)
                 .splineTo(Vector2d(-30.0, -40.0), 45.deg)
                 .endTrajectory()
 
-        NullAutoActions
+        NoAuto
     }
 
 
@@ -49,5 +51,9 @@ class Far(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
             .setTangent(0.deg)
             .lineToXConstantHeading(60.0)
             .build()
+    }
+
+    companion object {
+        val start = Pose2d(-36.0, -64.0, 270.deg)
     }
 }

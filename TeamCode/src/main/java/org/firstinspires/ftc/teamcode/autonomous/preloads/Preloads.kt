@@ -10,19 +10,17 @@ import com.arcrobotics.ftclib.command.WaitCommand
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousPosition
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide.*
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide.*
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
-import org.firstinspires.ftc.teamcode.autonomous.framework.Close
-import org.firstinspires.ftc.teamcode.autonomous.framework.Far
+import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
+import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.DriveAdjustCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ForwardCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake.Companion.DOWN
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake.Companion.UP
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeNextCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeStopCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeToCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
@@ -58,7 +56,7 @@ abstract class Preloads(val side: AutonomousSide, val position: AutonomousPositi
     val gamepad by lazy { GamepadEx(gamepad1) }
 
     val drive by lazy { MecanumDrive(hardwareMap, start) }
-    val builder by lazy { drive.actionBuilder(start, side) }
+    val builder by lazy { drive.actionBuilder(start) }
 
     // TODO: implement path mirroring logic for when you flip colors
     val path: AutoActions by lazy {

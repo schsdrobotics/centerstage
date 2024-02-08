@@ -1,47 +1,51 @@
-package org.firstinspires.ftc.teamcode.autonomous.framework
+package org.firstinspires.ftc.teamcode.autonomous.implementations
 
 import com.acmerobotics.roadrunner.Pose2d
-import com.acmerobotics.roadrunner.Rotation2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.Vector2d
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
+import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.NoAuto
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
-import kotlin.math.tan
 
 class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
-    override val start = Pose2d(12.0, -63.0, 270.deg)
+    override val start = Companion.start
 
     override val left = run {
-        val purple = drive.actionBuilder(start, color)
+        val purple = drive.actionBuilder(start)
                 .setReversed(true)
-                .splineTo(Vector2d(8.0, -42.0), 135.deg)
+                .splineTo(point(8.0, -42.0), 135.deg)
                 .endTrajectory()
 
-        NullAutoActions
+        NoAuto
     }
 
     override val middle = run {
-        val purple = drive.actionBuilder(start, color)
+        val purple = drive.actionBuilder(start)
                 .setReversed(true)
-                .splineTo(Vector2d(12.0, -(25.0 + HEIGHT / 2.0) - 1.5), 90.deg) // purple pixel
+                .splineTo(Vector2d(12.0, -(25.0 + APOTHEM) - 1.5), 90.deg) // purple pixel
                 .endTrajectory()
 
-        NullAutoActions
+        NoAuto
     }
 
     override val right = run {
-        val purple = drive.actionBuilder(start, color)
+        val purple = drive.actionBuilder(start)
                 .setReversed(true)
                 .splineTo(Vector2d(19.0, -43.0), 60.deg)
                 .endTrajectory()
 
-        NullAutoActions
+        NoAuto
     }
 
     override val park = {
         builder: TrajectoryActionBuilder -> builder
             .splineToConstantHeading(Vector2d(60.0, -60.0), 0.0)
             .build()
+    }
+
+    companion object {
+        val start = Pose2d(12.0, -64.0, 270.deg)
     }
 }

@@ -1,0 +1,2 @@
+- make the preloads class just an auto runner
+- make adjustable auto menu

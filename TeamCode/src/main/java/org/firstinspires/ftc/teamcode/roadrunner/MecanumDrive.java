@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
+import static org.firstinspires.ftc.teamcode.autonomous.framework.Auto.MAX_ANGULAR_ACCEL;
+import static org.firstinspires.ftc.teamcode.autonomous.framework.Auto.MAX_ANGULAR_VEL;
+import static org.firstinspires.ftc.teamcode.autonomous.framework.Auto.MAX_WHEEL_VEL;
+import static org.firstinspires.ftc.teamcode.autonomous.framework.Auto.PROFILE_ACCEL;
+import static org.firstinspires.ftc.teamcode.autonomous.framework.Auto.PROFILE_DECEL;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -40,7 +46,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.autonomous.AutonomousSide;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumEncodersMessage;
@@ -55,8 +60,6 @@ import java.util.List;
 public final class MecanumDrive {
     public static class Params {
         // IMU orientation
-        // TODO: fill in these values based on
-        //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
@@ -74,13 +77,13 @@ public final class MecanumDrive {
         public double kA = 0.00003;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
-        public double minProfileAccel = -15;
-        public double maxProfileAccel = 40;
+        public double maxWheelVel = MAX_WHEEL_VEL;
+        public double minProfileAccel = PROFILE_DECEL;
+        public double maxProfileAccel = PROFILE_ACCEL;
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI / 3.0; // shared with path
-        public double maxAngAccel = Math.PI / 3.0;
+        public double maxAngVel = MAX_ANGULAR_VEL; // shared with path
+        public double maxAngAccel = MAX_ANGULAR_ACCEL;
 
         // path controller gains
         public double axialGain = 8.0;
@@ -134,9 +137,6 @@ public final class MecanumDrive {
             leftBack = new OverflowEncoder(new RawEncoder(MecanumDrive.this.leftBack));
             rightBack = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightBack));
             rightFront = new OverflowEncoder(new RawEncoder(MecanumDrive.this.rightFront));
-
-            // TODO: reverse encoders if needed
-            //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
             lastLeftFrontPos = leftFront.getPositionAndVelocity().position;
             lastLeftBackPos = leftBack.getPositionAndVelocity().position;
@@ -212,10 +212,7 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
-        //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
@@ -481,20 +478,6 @@ public final class MecanumDrive {
                 defaultVelConstraint, defaultAccelConstraint,
                 0.25, 0.1,
                 pose -> pose
-        );
-    }
-
-    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose, AutonomousSide side) {
-        return new TrajectoryActionBuilder(
-                TurnAction::new,
-                FollowTrajectoryAction::new,
-                beginPose, 1e-6, 0.0,
-                defaultTurnConstraints,
-                defaultVelConstraint, defaultAccelConstraint,
-                0.25, 0.1,
-                pose -> side == AutonomousSide.Blue
-                      ? new Pose2dDual<>(pose.position.x, pose.position.y.unaryMinus(), pose.heading.inverse())
-                      : new Pose2dDual<>(pose.position.x, pose.position.y, pose.heading)
         );
     }
 }
