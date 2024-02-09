@@ -22,7 +22,7 @@ abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
     }
     fun pose(x: Double, y: Double, heading: Double): Pose2d = when (color) {
         AutonomousSide.Red -> Pose2d(x, y, heading)
-        AutonomousSide.Blue -> Pose2d(x, -y, Rotation2d.fromDouble(heading).inverse().toDouble())
+        AutonomousSide.Blue -> Pose2d(x, -y, Rotation2d.exp(heading).inverse().log())
     }
 
     companion object {
@@ -31,9 +31,9 @@ abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
 
         const val APOTHEM = HEIGHT / 2.0
 
-        const val MAX_WHEEL_VEL = 50.0
-        const val PROFILE_DECEL = -15.0
-        const val PROFILE_ACCEL = 40.0
+        const val MAX_WHEEL_VEL = 70.0
+        const val PROFILE_DECEL = -40.0
+        const val PROFILE_ACCEL = 70.0
 
         const val MAX_ANGULAR_VEL = Math.PI / 3.0
 
