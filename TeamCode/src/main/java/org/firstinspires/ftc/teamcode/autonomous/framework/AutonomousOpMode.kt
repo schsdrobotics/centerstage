@@ -68,7 +68,7 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
 
     val portal by lazy {
         VisionPortal.Builder()
-                .setCamera(hardwareMap["back"] as WebcamName)
+                .setCamera(hardwareMap["front"] as WebcamName)
                 .addProcessor(processor)
                 .build()
     }
@@ -97,6 +97,9 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
         CommandScheduler.getInstance().run()
     }
 
+    abstract fun first(): Unit
+
+
     abstract fun actions(): Command
 
     override fun start() {
@@ -106,6 +109,8 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
         }
 
         recordedPropPosition = getPropPositions()
+
+        first()
 
         CommandScheduler.getInstance().schedule(actions())
     }

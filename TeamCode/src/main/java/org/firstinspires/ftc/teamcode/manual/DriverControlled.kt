@@ -17,11 +17,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ForwardCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeNextCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeStopCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.ReverseCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.StopIntake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeOut
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.Launcher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
@@ -76,7 +76,7 @@ class DriverControlled : CommandOpMode() {
                 .whileActiveContinuous(
                         if (spatula.state != Spatula.State.SCORE) {
                             ParallelCommandGroup(
-                                    ForwardCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
+                                    IntakeIn(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
                                     PuncherDropCommand(puncher),
                                     TargetGoCommand(25, lift)
                             )
@@ -84,7 +84,7 @@ class DriverControlled : CommandOpMode() {
                 )
                 .whenInactive(
                         ParallelCommandGroup(
-                                IntakeStopCommand(intake),
+                                StopIntake(intake),
                                 FlipToCommand(Spatula.State.TRANSFER, spatula),
                                 TargetGoCommand(0, lift)
                         )
@@ -94,7 +94,7 @@ class DriverControlled : CommandOpMode() {
                 .whileActiveContinuous(
                         if (spatula.state != Spatula.State.SCORE) {
                             ParallelCommandGroup(
-                                    ReverseCommand(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
+                                    IntakeOut(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
                                     PuncherDropCommand(puncher),
                                     TargetGoCommand(25, lift)
                             )
@@ -102,7 +102,7 @@ class DriverControlled : CommandOpMode() {
                 )
                 .whenInactive(
                         ParallelCommandGroup(
-                                IntakeStopCommand(intake),
+                                StopIntake(intake),
                                 FlipToCommand(Spatula.State.TRANSFER, spatula),
                                 TargetGoCommand(0, lift)
                         )

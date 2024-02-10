@@ -17,7 +17,7 @@ class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
     override val start = Pose2d(12.0, -64.0, Math.toRadians(89.995))
 
     private fun cycleGenerator(begin: Pose2d, first: Boolean = true): Pair<Cycle, Pose2d> {
-        val stackX = -69.0 + HEIGHT - 3.5
+        val stackX = -69.0 + HEIGHT - 4.5
 
         val stack = if (!first) {
             drive.actionBuilder(begin)
@@ -27,15 +27,15 @@ class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
         } else {
             drive.actionBuilder(begin)
                     .setTangent(110.deg)
-                    .splineToLinearHeading(pose(stackX, -11.5, 180.deg), 180.deg)
+                    .splineToLinearHeading(pose(stackX, -9.0, 180.deg), 180.deg)
                     .endTrajectory()
         }
 
-        val backstage = drive.actionBuilder(pose(stackX, -11.5, 180.deg))
+        val backstage = drive.actionBuilder(pose(stackX, -9.0, 180.deg))
                 .setTangent(0.deg)
                 .lineToXConstantHeading(47.5)
 
-        val end = pose(47.5, -11.5, 180.deg)
+        val end = pose(47.5, -9.0, 180.deg)
 
         return Pair(Cycle(stack.build(), backstage.build()), end)
     }
