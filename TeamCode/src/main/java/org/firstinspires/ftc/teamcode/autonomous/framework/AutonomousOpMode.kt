@@ -15,18 +15,21 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Left
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Middle
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.vision.VisionPortal
 
-abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition, val cycles: Int = 0) : OpMode() {
+abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
     val puncher by lazy { Puncher(hardwareMap, telemetry, spatula, Puncher.State.TWO) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val intake by lazy { Intake(hardwareMap) }
     val led by lazy { Led(hardwareMap) }
 
-    val start: Pose2d by lazy { auto.start }
+    var start = Pose2d(0.0, 0.0, 0.0)
 
     val gamepad by lazy { GamepadEx(gamepad1) }
 
@@ -50,7 +53,7 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
         when (position) {
             AutonomousPosition.Backstage -> Close(drive, side)
             AutonomousPosition.Stacks -> Far(drive, side)
-        }
+        }.also { drive.pose = it.start }
     }
 
     val path: AutoActions by lazy {
@@ -81,11 +84,15 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
     }
 
     override fun init_loop() {
+        drive.pose = auto.start
+
         telemetry.addData("recorded prop position", processor.recordedPropPosition)
         telemetry.addData("largest detected contour area", processor.largestContourArea)
         telemetry.addData("detected mass center", "x: " + processor.largestContourX + ", y: " + processor.largestContourY)
         telemetry.addData("camera state", portal.cameraState)
+        drive.updatePoseEstimate()
         telemetry.addData("drive pose", drive.pose.position.toString())
+
 
         CommandScheduler.getInstance().run()
     }

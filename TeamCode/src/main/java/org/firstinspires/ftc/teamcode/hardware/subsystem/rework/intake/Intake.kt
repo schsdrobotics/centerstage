@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake
 
 import com.arcrobotics.ftclib.command.SubsystemBase
 import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
 
 class Intake(val hw: HardwareMap) : SubsystemBase() {
     private val rightChad by lazy { hw["rightChad"] as Servo }
-    private val leftChad by lazy { hw["leftChad"] as Servo }
-    private val chads by lazy { listOf(leftChad, rightChad) }
+    private val chads by lazy { listOf(rightChad) }
 
     private val motor by lazy { hw["perp"] as DcMotor }
 

@@ -82,11 +82,11 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     enum class Position(val ticks: Int) {
         ZERO(0),
-        INTAKE(50),
-        CLEAR(200),
-        LOW(300),
-        MID(500),
-        HIGH(700)
+        INTAKE(125),
+        CLEAR((200 * 2.5).toInt()),
+        LOW((300 * 2.5).toInt()),
+        MID((500 * 2.5).toInt()),
+        HIGH((700 * 2.5).toInt())
     }
 
 }
