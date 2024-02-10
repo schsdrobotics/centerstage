@@ -7,7 +7,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.commands.FlipSpatula
 
 @TeleOp(group = "!")
 class SpatulaTest : CommandOpMode() {
@@ -17,8 +17,8 @@ class SpatulaTest : CommandOpMode() {
     val gamepad by lazy { GamepadEx(gamepad1) }
 
     override fun initialize() {
-        GamepadButton(gamepad, GamepadKeys.Button.DPAD_UP).whenPressed(FlipToCommand(Spatula.State.SCORE, spatula))
-        GamepadButton(gamepad, GamepadKeys.Button.DPAD_DOWN).whenPressed(FlipToCommand(Spatula.State.ALIGN, spatula))
+        GamepadButton(gamepad, GamepadKeys.Button.DPAD_UP).whenPressed(FlipSpatula(Spatula.State.SCORE, spatula))
+        GamepadButton(gamepad, GamepadKeys.Button.DPAD_DOWN).whenPressed(FlipSpatula(Spatula.State.ALIGN, spatula))
     }
 
     override fun run() {

@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.TargetGoCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.commands.FlipSpatula
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 
 class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCommand({ to(position, lift, spatula).schedule() }) {
@@ -18,9 +18,9 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
 //                    condition = ("lift.atZero && target != ZERO")
 //                    logged = target.toString()
                         SequentialCommandGroup(
-                                FlipToCommand(Spatula.State.ALIGN, spatula),
+                                FlipSpatula(Spatula.State.ALIGN, spatula),
                                 TargetGoCommand(target, lift),
-                                FlipToCommand(Spatula.State.SCORE, spatula),
+                                FlipSpatula(Spatula.State.SCORE, spatula),
                         )
                     }
 
@@ -31,7 +31,7 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
 //                    logged = target.toString()
                         SequentialCommandGroup(
                                 TargetGoCommand(target, lift),
-                                FlipToCommand(Spatula.State.SCORE, spatula),
+                                FlipSpatula(Spatula.State.SCORE, spatula),
                         )
                     }
 
@@ -41,9 +41,9 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
 //                    logged = target.toString()
 
                         SequentialCommandGroup(
-                                FlipToCommand(Spatula.State.ALIGN, spatula),
+                                FlipSpatula(Spatula.State.ALIGN, spatula),
                                 TargetGoCommand(Lift.Position.ZERO, lift),
-                                FlipToCommand(Spatula.State.TRANSFER, spatula),
+                                FlipSpatula(Spatula.State.TRANSFER, spatula),
                         )
                     }
 
@@ -56,10 +56,10 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
 
                         SequentialCommandGroup(
                                 if (!lift.cleared) TargetGoCommand(300, lift) else InstantCommand(),
-                                FlipToCommand(Spatula.State.ALIGN, spatula),
+                                FlipSpatula(Spatula.State.ALIGN, spatula),
                                 ParallelCommandGroup(
                                         TargetGoCommand(Lift.Position.ZERO, lift),
-                                        FlipToCommand(Spatula.State.TRANSFER, spatula)
+                                        FlipSpatula(Spatula.State.TRANSFER, spatula)
                                 )
                         )
                     }
@@ -71,7 +71,7 @@ class LiftTo(position: Lift.Position, lift: Lift, spatula: Spatula) : InstantCom
 
                         SequentialCommandGroup(
                                 TargetGoCommand(target, lift),
-                                FlipToCommand(Spatula.State.SCORE, spatula),
+                                FlipSpatula(Spatula.State.SCORE, spatula),
                         )
                     }
                 }

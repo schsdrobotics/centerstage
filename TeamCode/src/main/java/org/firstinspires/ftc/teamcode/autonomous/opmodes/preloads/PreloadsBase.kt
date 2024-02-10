@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 
 open class PreloadsBase(side: AutonomousSide, position: AutonomousPosition) : AutonomousOpMode(side, position) {
+    override fun first() = Unit
+
     override fun actions() = SequentialCommandGroup(
         ActionCommand(path.purple),
         ActionCommand(path.yellow)

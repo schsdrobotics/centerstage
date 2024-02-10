@@ -17,24 +17,27 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeNextCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.StopIntake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.IntakeOut
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.LaunchCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeCycle
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.Launcher
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.AdjustCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.HIGH
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.LOW
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.MID
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.ZERO
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.TargetGoCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherNextCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherDropCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherNextCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.FlipToCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.SpatulaAdjustCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.commands.AdjustSpatula
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.commands.FlipSpatula
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 @TeleOp(group = "!")
@@ -56,19 +59,19 @@ class DriverControlled : CommandOpMode() {
         GamepadButton(gamepad, Button.Y).whenPressed(LiftTo(MID, lift, spatula))
         GamepadButton(gamepad, Button.B).whenPressed(LiftTo(HIGH, lift, spatula))
 
-        GamepadButton(gamepad, Button.DPAD_UP).whenPressed(SpatulaAdjustCommand(0.005, spatula))
-        GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(SpatulaAdjustCommand(-0.005, spatula))
+        GamepadButton(gamepad, Button.DPAD_UP).whenPressed(AdjustSpatula(0.005, spatula))
+        GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(AdjustSpatula(-0.005, spatula))
 
         GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustCommand(-50, lift))
         GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(AdjustCommand(50, lift))
 
         GamepadButton(gamepad, Button.LEFT_STICK_BUTTON).whenPressed(ResetYawCommand(drive))
 
-        GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeNextCommand(intake))
+        GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeCycle(intake))
 
         GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(PuncherNextCommand(puncher))
-        GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(FlipToCommand(Spatula.State.SCORE, spatula))
-        GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(FlipToCommand(Spatula.State.ALIGN, spatula))
+        GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(FlipSpatula(Spatula.State.SCORE, spatula))
+        GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(FlipSpatula(Spatula.State.ALIGN, spatula))
 
         GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
 
@@ -85,7 +88,7 @@ class DriverControlled : CommandOpMode() {
                 .whenInactive(
                         ParallelCommandGroup(
                                 StopIntake(intake),
-                                FlipToCommand(Spatula.State.TRANSFER, spatula),
+                                FlipSpatula(Spatula.State.TRANSFER, spatula),
                                 TargetGoCommand(0, lift)
                         )
                 )
@@ -103,7 +106,7 @@ class DriverControlled : CommandOpMode() {
                 .whenInactive(
                         ParallelCommandGroup(
                                 StopIntake(intake),
-                                FlipToCommand(Spatula.State.TRANSFER, spatula),
+                                FlipSpatula(Spatula.State.TRANSFER, spatula),
                                 TargetGoCommand(0, lift)
                         )
                 )
