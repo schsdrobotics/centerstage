@@ -5,16 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.util.SlewRateLimiter
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     val right by lazy { hw["rightLift"] as DcMotorEx }
     val left by lazy { hw["leftLift"] as DcMotorEx }
-
-    val slewer = SlewRateLimiter(0.6, -0.6, 0.0)
 
     val motors by lazy { listOf(left, right) }
 
@@ -30,9 +28,6 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     val cleared
         get() = position >= Position.CLEAR.ticks
 
-    var count = 0
-        set(value) { field = max(0, value) }
-
     init { reset() }
 
     fun reset() {
@@ -42,23 +37,17 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         motors.forEach { it.targetPosition = 0 }
         motors.forEach { it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER }
         motors.forEach { it.mode = DcMotor.RunMode.RUN_TO_POSITION }
-        slewer.reset(0.0)
     }
+
+    fun targetInches(height: Double) = target(height * TICKS_PER_INCH * sqrt(2.0))
 
     fun adjust(ticks: Int) { this.target = max(0, min(this.target + ticks, Position.HIGH.ticks)) }
 
     fun target(ticks: Int) { this.target = ticks; }
-
-//    fun toNext() { target = (++count).let { Position.values()[count % 4] }.ticks }
-//    fun toPrev() { target = (--count).let { Position.values()[count % 4] }.ticks }
-//
-//    fun next() = (++count).let { Position.values()[it % 4] }
-//    fun prev() = (--count).let { Position.values()[it % 4] }
-
+    fun target(ticks: Double) = target(ticks.toInt())
 
     fun stop() {
         motors.forEach { it.power = 0.0 }
-        slewer.reset(0.0)
     }
 
     fun go() {
@@ -69,13 +58,8 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     override fun periodic() {
         telemetry.addData("lift pos", position)
-//        telemetry.addData("lift target pos", target)
-//        telemetry.addData("lift cleared", cleared)
-//        telemetry.addData("lift powers", motors.map { it.power }.joinToString(", ") { it.toString() })
 
         position = abs(left.currentPosition)
-
-        if (abs(left.targetPosition - left.currentPosition) <= 2) slewer.reset(0.0)
 
         go()
     }
@@ -89,4 +73,7 @@ class Lift(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         HIGH((700 * 2.5).toInt())
     }
 
+    companion object {
+        const val TICKS_PER_INCH = 1.0
+    }
 }

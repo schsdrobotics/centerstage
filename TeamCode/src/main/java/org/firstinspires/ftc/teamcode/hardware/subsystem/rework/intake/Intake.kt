@@ -1,22 +1,19 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake
 
 import com.arcrobotics.ftclib.command.SubsystemBase
+import com.arcrobotics.ftclib.hardware.SimpleServo
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
+import kotlin.math.asin
 
 class Intake(val hw: HardwareMap) : SubsystemBase() {
-    private val rightChad by lazy { hw["rightChad"] as Servo }
-    private val chads by lazy { listOf(rightChad) }
-
+    private val arm by lazy { SimpleServo(hw, "arm", DOWN_ANGLE, UP_ANGLE) }
     private val motor by lazy { hw["perp"] as DcMotor }
 
     var target = UP
     var count = 0
 
-    init {
-        motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-    }
+    init { motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
 
     fun forward(speed: Double) { motor.power = speed }
     fun reverse(speed: Double) { motor.power = -speed }
@@ -33,14 +30,22 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
         count++
     }
 
-    override fun periodic() {
-        chads.forEach { it.position = target }
+    override fun periodic() { arm.position = target }
 
+    // height: inches
+    fun angleForHeight(height: Double) = Math.toDegrees(asin(height / RADIUS))
 
-    }
+    fun angle(angle: Double) { arm.turnToAngle(angle) }
 
     companion object {
-        const val UP = 0.97
-        const val DOWN = UP - 0.197
+        const val UP_ANGLE = 95.0 // degrees
+        const val DOWN_ANGLE = 0.0 // degrees
+
+        const val CORRECTIVE = (1.0 / 0.97)
+        const val UP = 0.97 * CORRECTIVE
+        const val DOWN = (UP - 0.197) * CORRECTIVE
+
+        const val RADIUS = 6.0 // in
+
     }
 }
