@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import kotlin.math.asin
 
-class Intake(val hw: HardwareMap) : SubsystemBase() {
-    private val arm by lazy { SimpleServo(hw, "arm", DOWN_ANGLE, UP_ANGLE) }
+class Intake
+(val hw: HardwareMap) : SubsystemBase() {
     private val motor by lazy { hw["perp"] as DcMotor }
+    val arm by lazy { SimpleServo(hw, "arm", DOWN_ANGLE, RANGE) }
 
-    var target = UP
-    var count = 0
+    var target = UP_ANGLE
 
     init { motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
 
@@ -19,18 +19,9 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     fun reverse(speed: Double) { motor.power = -speed }
     fun stop() { motor.power = 0.0 }
 
-    fun to(position: Double) { target = position }
+    fun target(angle: Double) { target = angle }
 
-    fun up() = to(UP)
-    fun down() = to(DOWN)
-
-    fun next() {
-        if (count % 2 == 0) up() else down()
-
-        count++
-    }
-
-    override fun periodic() { arm.position = target }
+    override fun periodic() { angle(target) }
 
     // height: inches
     fun angleForHeight(height: Double) = Math.toDegrees(asin(height / RADIUS))
@@ -38,14 +29,11 @@ class Intake(val hw: HardwareMap) : SubsystemBase() {
     fun angle(angle: Double) { arm.turnToAngle(angle) }
 
     companion object {
-        const val UP_ANGLE = 95.0 // degrees
+        const val UP_ANGLE = 75.0 // degrees
         const val DOWN_ANGLE = 0.0 // degrees
 
-        const val CORRECTIVE = (1.0 / 0.97)
-        const val UP = 0.97 * CORRECTIVE
-        const val DOWN = (UP - 0.197) * CORRECTIVE
+        const val RANGE = 300.0 // degrees
 
         const val RADIUS = 6.0 // in
-
     }
 }

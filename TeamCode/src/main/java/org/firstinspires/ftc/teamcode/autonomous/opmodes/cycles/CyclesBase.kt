@@ -7,14 +7,14 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.DropIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.DropIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.RaiseIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 
 open class CyclesBase(side: AutonomousSide, position: AutonomousPosition) : AutonomousOpMode(side, position) {
-    override fun first() { intake.target = Intake.DOWN; intake.periodic() }
+    override fun first() { intake.target = Intake.DOWN_ANGLE; intake.periodic() }
 
     override fun actions() = SequentialCommandGroup(
             DropIntake(intake),

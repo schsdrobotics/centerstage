@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.Cycles
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
+
 class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
     override val start = Pose2d(12.0, -64.0, Math.toRadians(89.995))
 

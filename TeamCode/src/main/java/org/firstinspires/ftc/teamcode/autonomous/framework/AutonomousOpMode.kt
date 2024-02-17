@@ -15,15 +15,12 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Left
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Middle
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Right
-import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.Unfound
+import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.vision.VisionPortal
 
 abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
-    val puncher by lazy { Puncher(hardwareMap, telemetry, spatula, Puncher.State.TWO) }
+    val puncher by lazy { Puncher(hardwareMap, telemetry, Puncher.State.TWO) }
     val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
     val lift by lazy { Lift(hardwareMap, telemetry) }
     val intake by lazy { Intake(hardwareMap) }

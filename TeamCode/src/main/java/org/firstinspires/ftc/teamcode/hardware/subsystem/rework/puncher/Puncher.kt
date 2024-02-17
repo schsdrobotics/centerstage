@@ -1,57 +1,27 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher
 
 import com.arcrobotics.ftclib.command.SubsystemBase
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor
-import com.qualcomm.robotcore.hardware.DistanceSensor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
-import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.*
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.NONE
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.ONE
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.TWO
 
-class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var spatula: Spatula, var state: State = NONE) : SubsystemBase() {
-    private val pacer by lazy { hw["distance"] as Rev2mDistanceSensor }
-    private val timer: ElapsedTime
+class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = NONE) : SubsystemBase() {
+    private val puncher by lazy { hw["puncher"] as Servo }
 
-    private val puncher by lazy {
-        val it = hw["puncher"] as Servo
-        it.direction = Servo.Direction.REVERSE
-        it
-    }
-
-    init {
-        this.puncher.position = state.position
-        timer = ElapsedTime()
-    }
-
-    var distance = 0.0
-
-    fun update() { distance = pacer.getDistance(DistanceUnit.CM) }
+    init { this.puncher.position = state.position }
 
     fun to(state: State) { this.state = state }
 
     fun next() { this.state = when (this.state) { TWO -> ONE; ONE -> NONE; NONE -> TWO } }
 
-    override fun periodic() {
-        puncher.position = state.position
-
-        if (spatula.state == Spatula.State.SCORE && timer.milliseconds() > 500) {
-            update()
-
-            timer.reset()
-        } else {
-            distance = 0.0
-        }
-
-//        telemetry.addData("puncher state", state.toString())
-        telemetry.addData("puncher distance", distance)
-    }
+    override fun periodic() { puncher.position = this.state.position }
 
     enum class State(val position: Double) {
-        TWO(1.0),
-        ONE(0.24),
-        NONE(0.0),
+        TWO(0.75),
+        ONE(0.88),
+        NONE(1.0),
     }
 }
