@@ -30,8 +30,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.TargetGoCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherDropCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.PuncherNextCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.CyclePuncher
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 @TeleOp(group = "!")
@@ -65,14 +65,14 @@ class DriverControlled : CommandOpMode() {
 
 		GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeCycle(intake))
 
-		GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(PuncherNextCommand(puncher))
+		GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(CyclePuncher(puncher))
 		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
 
 		Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
 			.whileActiveContinuous(
 				ParallelCommandGroup(
 					IntakeIn(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
-					PuncherDropCommand(puncher),
+					DropPixels(puncher),
 					TargetGoCommand(25, lift)
 				)
 			)
@@ -88,7 +88,7 @@ class DriverControlled : CommandOpMode() {
 			.whileActiveContinuous(
 				ParallelCommandGroup(
 					IntakeOut(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
-					PuncherDropCommand(puncher),
+					DropPixels(puncher),
 					TargetGoCommand(25, lift)
 				)
 			)
