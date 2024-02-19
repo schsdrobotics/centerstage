@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.UnlockDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 
@@ -19,6 +20,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			// align, go, score
 			lift.atZero && target != Lift.Position.ZERO -> {
 				SequentialCommandGroup(
+					UnlockDeposit(deposit),
 					AlignDeposit(deposit),
 					MoveLiftTo(target, lift),
 					ScoreDeposit(deposit)
@@ -37,6 +39,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			// target is zero, and aligned
 			target == Lift.Position.ZERO && deposit.state.vertical == ALIGN_ANGLE -> {
 				SequentialCommandGroup(
+					UnlockDeposit(deposit),
 					AlignDeposit(deposit),
 					MoveLiftTo(Lift.Position.ZERO, lift),
 					TransferDeposit(deposit)
@@ -49,6 +52,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			target == Lift.Position.ZERO && deposit.state.vertical == SCORE_ANGLE -> {
 				SequentialCommandGroup(
 					if (!lift.cleared) MoveLiftTo(Lift.Position.LOW, lift) else InstantCommand(),
+					UnlockDeposit(deposit),
 					AlignDeposit(deposit),
 					ParallelCommandGroup(
 						MoveLiftTo(Lift.Position.ZERO, lift),

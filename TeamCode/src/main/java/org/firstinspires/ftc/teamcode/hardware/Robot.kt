@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.Hubs.hubs
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.DOWN_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.RANGE
 import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.Configuration.HOLD
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
@@ -39,39 +40,65 @@ object Robot {
 	lateinit var secondary: GamepadEx
 	lateinit var hw: HardwareMap
 
-	val subsystems by lazy { listOf(drive, deposit, lift, launcher, puncher, intake, led) }
+	lateinit var hardwares: List<IHardware>
 
-	val drive by lazy { Drive(telemetry, gamepad) }
-	val deposit by lazy { Deposit(telemetry, lift) }
-	val lift by lazy { Lift(telemetry) }
-	val launcher by lazy { Launcher() }
-	val puncher by lazy { Puncher() }
-	val intake by lazy { Intake() }
-	val led by lazy { Led() }
+	lateinit var subsystems: List<EfficientSubsystem>
+
+	lateinit var drive: Drive
+	lateinit var deposit: Deposit
+	lateinit var lift: Lift
+	lateinit var launcher: Launcher
+	lateinit var puncher: Puncher
+	lateinit var intake: Intake
+	lateinit var led: Led
 
 	var count = 0
 
 	fun initialize(hw: HardwareMap, telemetry: Telemetry, gamepad: Gamepad, secondary: Gamepad) {
-		CommandScheduler.getInstance().reset()
-
 		this.hw = hw
-		this.gamepad = GamepadEx(gamepad)
-		this.secondary = GamepadEx(secondary)
 		this.telemetry = telemetry
 
-		Hubs.initialize()
+		this.gamepad = GamepadEx(gamepad)
+		this.secondary = GamepadEx(secondary)
 
+		hardwares = listOf(
+			Hubs, DriveHardware, DepositHardware, IntakeHardware,
+			LiftHardware, PuncherHardware, LauncherHardware, LedHardware
+		)
+
+		hardwares.forEach { it.initialize() }
+
+		drive = Drive(Robot.telemetry, Robot.gamepad)
+		lift = Lift(Robot.telemetry)
+		deposit = Deposit(Robot.telemetry, lift)
+		launcher = Launcher()
+		puncher = Puncher(telemetry = telemetry)
+		intake = Intake()
+		led = Led()
+
+		subsystems = listOf(drive, deposit, lift, launcher, puncher, intake, led)
+
+		subsystems.forEach { it.reset() }
+
+		CommandScheduler.getInstance().reset()
 
 		subsystems.forEach { CommandScheduler.getInstance().registerSubsystem(it) }
+
+
+		deposit.default()
+
+		count = 0
 	}
 
-	object Hubs {
+	object Hubs : IHardware {
 		lateinit var CONTROL: LynxModule
 		lateinit var EXTENSION: LynxModule
 
-		val hubs by lazy { listOf(CONTROL, EXTENSION) }
+		lateinit var hubs: List<LynxModule>
 
-		fun initialize() {
+		override fun initialize() {
+
+
 			for (m in hw.getAll(LynxModule::class.java)) {
 				m.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL
 
@@ -82,12 +109,14 @@ object Robot {
 				}
 			}
 
+			hubs = listOf(CONTROL, EXTENSION)
+
 			hubs.forEach { it.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL }
 			hubs.forEach { it.sendCommand(LynxSetModuleLEDColorCommand(it, 155.toByte(), 0, 155.toByte())) }
 		}
 	}
 
-	object DriveHardware {
+	object DriveHardware : IHardware {
 		val frontLeft by lazy { Motor(hw, "frontLeft") }
 		val frontRight by lazy { Motor(hw, "frontRight") }
 		val backLeft by lazy { Motor(hw, "backLeft") }
@@ -99,7 +128,7 @@ object Robot {
 
 		var angle = 0.0
 
-		init {
+		override fun initialize() {
 			frontLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
 			frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
 			backLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
@@ -113,10 +142,18 @@ object Robot {
 		}
 	}
 
-	object DepositHardware {
-		val right by lazy { SimpleServo(hw, "deposit.right", 0.0, SERVO_RANGE).also { it.inverted = true } }
-		val left by lazy { SimpleServo(hw, "deposit.left", 0.0, SERVO_RANGE) }
-		val angles = DepositAngles(hw)
+	object DepositHardware : IHardware {
+		lateinit var right: SimpleServo
+		lateinit var left: SimpleServo
+
+		lateinit var angles: DepositAngles
+
+		override fun initialize() {
+			right = SimpleServo(hw, "deposit.right", 0.0, SERVO_RANGE).also { it.inverted = true }
+			left = SimpleServo(hw, "deposit.left", 0.0, SERVO_RANGE)
+
+			angles = DepositAngles(hw)
+		}
 
 		object Configuration {
 			const val SERVO_RANGE = 355.0 // degrees
@@ -124,17 +161,17 @@ object Robot {
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
 			const val ALIGN_ANGLE = 0.0 // degrees
-			const val TRANSFER_ANGLE = 0.0 // degrees
+			const val TRANSFER_ANGLE = 17.0 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			const val HORIZONTAL_OFFSET = 3.0 // degrees
+			const val HORIZONTAL_OFFSET = 4.0 // degrees
 			const val VERTICAL_OFFSET = 0.0 // degrees
 		}
 	}
 
-	object IntakeHardware {
-		val arm by lazy { SimpleServo(hw, "arm", DOWN_ANGLE, RANGE) }
-		val motor by lazy { (hw["perp"] as DcMotorEx).also { it.zeroPowerBehavior = BRAKE } }
+	object IntakeHardware : IHardware {
+		lateinit var arm: SimpleServo
+		lateinit var motor: DcMotorEx
 
 		object Configuration {
 			const val RANGE = 300.0 // degrees
@@ -145,24 +182,47 @@ object Robot {
 			const val PIXEL_THICKNESS = 0.25
 			const val RADIUS = 3.0 // in
 		}
+
+		override fun initialize() {
+			arm = SimpleServo(hw, "arm", DOWN_ANGLE, RANGE)
+			motor = (hw["perp"] as DcMotorEx).also { it.zeroPowerBehavior = BRAKE }
+		}
+
 	}
 
-	object LiftHardware {
-		val right by lazy { hw["rightLift"] as DcMotorEx }
-		val left by lazy { hw["leftLift"] as DcMotorEx }
+	object LiftHardware : IHardware {
+		lateinit var right: DcMotorEx
+		lateinit var left: DcMotorEx
 
-		val motors by lazy { listOf(left, right) }
+		lateinit var motors: List<DcMotorEx>
+
+		override fun initialize() {
+			right = hw["rightLift"] as DcMotorEx
+			left = hw["leftLift"] as DcMotorEx
+
+			motors = listOf(left, right)
+		}
 	}
 
-	object PuncherHardware { val servo by lazy { hw["puncher"] as Servo } }
+	object PuncherHardware : IHardware {
+		lateinit var servo: Servo
 
-	object LauncherHardware {
-		val servo by lazy {
-			val it = hw["launcher"] as Servo
+		override fun initialize() {
+			servo = hw["puncher"] as Servo
+		}
+	}
 
-			it.direction = Servo.Direction.REVERSE
-			it.position = HOLD
-			it
+	object LauncherHardware : IHardware {
+		lateinit var servo: Servo
+
+		override fun initialize() {
+			servo = run {
+				val it = hw["launcher"] as Servo
+
+				it.direction = Servo.Direction.REVERSE
+				it.position = HOLD
+				it
+			}
 		}
 
 		object Configuration {
@@ -171,20 +231,37 @@ object Robot {
 		}
 	}
 
-	object LedHardware { val led by lazy { hw["led"] as DcMotor } }
+	object LedHardware : IHardware {
+		val led by lazy { hw["led"] as DcMotor }
+		override fun initialize() {}
+	}
 
 	fun read() {
 		subsystems.forEach { it.read() }
 
 		if (count % 2 == 0) {
-			drive.updateHeading() }
+			drive.updateHeading()
+		}
 	}
 
-	fun write() { subsystems.forEach { it.write() } }
+	fun write() {
+		subsystems.forEach { it.write() }
+	}
 
-	fun periodic() { subsystems.forEach { it.periodic() } }
+	fun periodic() {
+		subsystems.forEach { it.periodic() }
+	}
 
-	fun reset() { subsystems.forEach { it.reset() } }
+	fun reset() {
+		subsystems.forEach { it.reset() }
+	}
 
-	fun clearBulkCache() { hubs.forEach { it.clearBulkCache() } }
+	fun clearBulkCache() {
+		telemetry.clearAll()
+		hubs.forEach { it.clearBulkCache() }
+	}
+
+	interface IHardware {
+		fun initialize()
+	}
 }

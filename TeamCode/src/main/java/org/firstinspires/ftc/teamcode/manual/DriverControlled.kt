@@ -42,6 +42,8 @@ class DriverControlled : CommandOpMode() {
 
 	override fun initialize() {
 		Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2)
+		Robot.reset()
+		Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2)
 
 		GamepadButton(gamepad, Button.A).whenPressed(LiftTo(ZERO, lift, deposit))
 		GamepadButton(gamepad, Button.X).whenPressed(LiftTo(LOW, lift, deposit))
@@ -103,7 +105,7 @@ class DriverControlled : CommandOpMode() {
 
 		Robot.clearBulkCache()
 		Robot.read()
-//		Robot.periodic()
+		Robot.periodic()
 		Robot.write()
 
 		val end = now()

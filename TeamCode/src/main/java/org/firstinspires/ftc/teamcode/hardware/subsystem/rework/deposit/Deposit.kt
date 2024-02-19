@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configurati
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.HORIZONTAL_BOUND
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.HORIZONTAL_OFFSET
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.SCORE_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.TRANSFER_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.VERTICAL_OFFSET
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.angles
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.left
@@ -15,7 +16,6 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.right
 import org.firstinspires.ftc.teamcode.hardware.Robot.DriveHardware.angle
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
-import org.firstinspires.ftc.teamcode.util.extensions.deg
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -23,7 +23,9 @@ import kotlin.math.round
 class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     private fun heading() = angle + 180
 
-    var state = State(0.deg, 0.deg)
+    private var happy = false
+
+    var state = State(0.0, TRANSFER_ANGLE)
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
 
     var targets = Kinematics.inverse(state)
@@ -37,10 +39,18 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     // TODO: add bounds checks
     fun to(vertical: Double, horizontal: Double) { state = State(vertical, horizontal) }
 
+    fun default() {
+
+    }
+
+    fun sad() { happy = false }
+
     override fun periodic() {
         val locked = Kinematics.lock(heading(), 0.0)
 
-        targets = if (lift.cleared) {
+        if (!lift.cleared) happy = true
+
+        targets = if (lift.cleared && happy) {
             Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 10) state.horizontal else -locked))
         } else {
             Kinematics.inverse(state)
