@@ -1,19 +1,33 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit
 
-import com.arcrobotics.ftclib.command.SubsystemBase
-import com.arcrobotics.ftclib.hardware.SimpleServo
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.ALIGN_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.HORIZONTAL_BOUND
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.HORIZONTAL_OFFSET
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.SCORE_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.VERTICAL_OFFSET
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.angles
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.left
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.right
+import org.firstinspires.ftc.teamcode.hardware.Robot.DriveHardware.angle
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.util.extensions.deg
+import kotlin.math.abs
 import kotlin.math.round
 
-class Deposit(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
-    val right by lazy { SimpleServo(hw, "deposit.right", 0.0, SERVO_RANGE).also { it.inverted = true } }
-    val left by lazy  { SimpleServo(hw, "deposit.left", 0.0, SERVO_RANGE) }
+
+class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
+    private fun heading() = angle + 180
+
     var state = State(0.deg, 0.deg)
-    val angles = Angles(hw)
+        set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
+
+    var targets = Kinematics.inverse(state)
+
 
     fun flip(omega: Double) = to(omega, state.horizontal)
     fun turn(theta: Double) = to(state.vertical, theta)
@@ -24,32 +38,49 @@ class Deposit(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     fun to(vertical: Double, horizontal: Double) { state = State(vertical, horizontal) }
 
     override fun periodic() {
-        val targets = Kinematics.inverse(state)
+        val locked = Kinematics.lock(heading(), 0.0)
 
-        right.turnToAngle(targets.right)
-        left.turnToAngle(targets.left)
+        targets = if (lift.cleared) {
+            Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 10) state.horizontal else -locked))
+        } else {
+            Kinematics.inverse(state)
+        }
 
         telemetry.addData("left angle", angles.left)
         telemetry.addData("right angle", angles.right)
+        telemetry.addData("target state", state)
+        telemetry.addData("locked angle", locked)
     }
+
+    override fun read() {
+        angles.read()
+    }
+
+    override fun write() {
+        right.turnToAngle(targets.right)
+        left.turnToAngle(targets.left)
+    }
+
+    override fun reset() = Unit
 
     data class State(val vertical: Double, val horizontal: Double)
     data class Offset(val left: Double, val right: Double) {
         operator fun plus(x: Offset) = Offset(left + x.left, right + x.right)
     }
 
-    inner class Angles(hw: HardwareMap) {
+    class Angles(hw: HardwareMap) {
         val rightReader by lazy { hw["deposit.right.pot"] as AnalogInput }
         val leftReader by lazy { hw["deposit.left.pot"] as AnalogInput }
 
-        // invert + offset
-        val right: Double
-            get() = (360.0 - round(rightReader.voltage / 3.3 * 360)) - 15.0
+        var right = 0.0
+        var left = 0.0
 
-
-        // offset
-        val left: Double
-            get() = round(leftReader.voltage / 3.3 * 360) - 18.0
+        fun read() {
+            // invert + offset
+            right = 360.0 - ((360.0 - round(rightReader.voltage / 3.3 * 360)) - 20.0) + 45.0 - 90.0 - 11.0 + 22.0
+            // offset
+            left = 360.0 - (round(leftReader.voltage / 3.3 * 360) - 15.0) + 45.0 - 90.0 - 9.0 + 16.0
+        }
     }
 
     object Kinematics {
@@ -58,15 +89,19 @@ class Deposit(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         fun horizontal(angle: Double) = Range.clip(angle, -HORIZONTAL_BOUND, HORIZONTAL_BOUND).let { Offset(it, -it) }
 
         fun inverse(state: State) = vertical(state.vertical) + horizontal(state.horizontal)
-    }
 
-    companion object {
-        const val SERVO_RANGE = 355.0 // degrees
+        fun lock(heading: Double, target: Double) = findShortestDistance(heading, target)
 
-        const val HORIZONTAL_BOUND = 65.0 // +/- degrees
+        fun findShortestDistance(a: Double, b: Double): Double {
+            val difference: Double = a - b
 
-        const val ALIGN_ANGLE = 0.0 // degrees
-        const val TRANSFER_ANGLE = 25.0 // degrees
-        const val SCORE_ANGLE = 160.0 // degrees
+            if (difference > 180) {
+                return -360 + difference
+            } else if (difference < -180) {
+                return 360 + difference
+            }
+
+            return difference
+        }
     }
 }

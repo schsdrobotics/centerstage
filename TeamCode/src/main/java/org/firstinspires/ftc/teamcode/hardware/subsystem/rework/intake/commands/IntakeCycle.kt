@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands
 
 import com.arcrobotics.ftclib.command.CommandBase
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.DOWN_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.UP_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 
 class IntakeCycle(private val intake: Intake) : CommandBase() {
@@ -8,9 +10,9 @@ class IntakeCycle(private val intake: Intake) : CommandBase() {
 
     override fun initialize() {
         intake.target = when (intake.target) {
-            Intake.UP_ANGLE -> Intake.DOWN_ANGLE
-            Intake.DOWN_ANGLE -> Intake.UP_ANGLE
-            else -> (Intake.UP_ANGLE + Intake.DOWN_ANGLE) / 2.0
+            UP_ANGLE -> DOWN_ANGLE
+            DOWN_ANGLE -> UP_ANGLE
+            else -> (UP_ANGLE + DOWN_ANGLE) / 2.0
         }
     }
 

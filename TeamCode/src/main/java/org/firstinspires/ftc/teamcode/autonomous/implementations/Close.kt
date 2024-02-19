@@ -28,11 +28,11 @@ class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
         } else {
             drive.actionBuilder(begin)
                     .setTangent(110.deg)
-                    .splineToLinearHeading(pose(stackX, -9.0, 180.deg), 180.deg)
+                    .splineToLinearHeading(pose(stackX, -7.5, 180.deg), 180.deg)
                     .endTrajectory()
         }
 
-        val backstage = drive.actionBuilder(pose(stackX, -9.0, 180.deg))
+        val backstage = drive.actionBuilder(pose(stackX, -7.5, 180.deg))
                 .setTangent(0.deg)
                 .lineToXConstantHeading(47.5)
 

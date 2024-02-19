@@ -1,39 +1,41 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake
 
-import com.arcrobotics.ftclib.command.SubsystemBase
-import com.arcrobotics.ftclib.hardware.SimpleServo
-import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.HardwareMap
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.RADIUS
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.UP_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.arm
+import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.motor
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
+import kotlin.math.abs
 import kotlin.math.asin
 
-class Intake
-(val hw: HardwareMap) : SubsystemBase() {
-    private val motor by lazy { hw["perp"] as DcMotor }
-    val arm by lazy { SimpleServo(hw, "arm", DOWN_ANGLE, RANGE) }
-
+class Intake : EfficientSubsystem() {
     var target = UP_ANGLE
+    var actual = 0.0
+    var ideal = 0.0
 
-    init { motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
+    override fun read() { }
 
-    fun forward(speed: Double) { motor.power = speed }
-    fun reverse(speed: Double) { motor.power = -speed }
-    fun stop() { motor.power = 0.0 }
+    override fun write() {
+        if (arm.angle != target) arm.turnToAngle(target)
 
-    fun target(angle: Double) { target = angle }
+        if (abs(ideal - actual) > 0.5) {
+            motor.power = ideal
+            actual = ideal
+        }
+    }
 
-    override fun periodic() { angle(target) }
+    override fun reset() { motor.power = 0.0; arm.turnToAngle(UP_ANGLE) }
 
-    // height: inches
+    override fun periodic() { }
+
+    fun forward(speed: Double) { ideal = speed }
+
+    fun reverse(speed: Double) { ideal = -speed }
+
+    fun stop() { ideal = 0.0 }
+
+
     fun angleForHeight(height: Double) = Math.toDegrees(asin(height / RADIUS))
 
-    fun angle(angle: Double) { arm.turnToAngle(angle) }
-
-    companion object {
-        const val UP_ANGLE = 75.0 // degrees
-        const val DOWN_ANGLE = 0.0 // degrees
-
-        const val RANGE = 300.0 // degrees
-
-        const val RADIUS = 6.0 // in
-    }
+    fun target(angle: Double) { target = angle }
 }

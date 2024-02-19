@@ -20,6 +20,7 @@ abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
         AutonomousSide.Red -> Vector2d(x, y)
         AutonomousSide.Blue -> Vector2d(x, -y)
     }
+
     fun pose(x: Double, y: Double, heading: Double): Pose2d = when (color) {
         AutonomousSide.Red -> Pose2d(x, y, heading)
         AutonomousSide.Blue -> Pose2d(x, -y, Rotation2d.exp(heading).inverse().log())

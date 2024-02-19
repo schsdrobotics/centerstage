@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift
+package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import kotlin.math.abs
 
-class TargetGoCommand(ticks: Int, val lift: Lift) : SequentialCommandGroup() {
+class MoveLiftTo(ticks: Int, val lift: Lift) : SequentialCommandGroup() {
     constructor(position: Lift.Position, lift: Lift) : this(position.ticks, lift)
 
     init {

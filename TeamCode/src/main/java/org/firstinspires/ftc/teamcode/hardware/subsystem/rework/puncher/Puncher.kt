@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher
 
-import com.arcrobotics.ftclib.command.SubsystemBase
-import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
-import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.NONE
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.ONE
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.TWO
+import org.firstinspires.ftc.teamcode.hardware.Robot.PuncherHardware.servo
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher.State.*
 
-class Puncher(val hw: HardwareMap, val telemetry: Telemetry, var state: State = NONE) : SubsystemBase() {
-    private val puncher by lazy { hw["puncher"] as Servo }
+class Puncher(var state: State = NONE) : EfficientSubsystem() {
+    init { servo.position = state.position }
 
-    init { this.puncher.position = state.position }
+    fun next() { state = when (state) { TWO -> ONE; ONE -> NONE; NONE -> TWO } }
+    fun to(state: State) {
+        this.state = state
+        servo.position = state.position
+    }
 
-    fun to(state: State) { this.state = state }
+    override fun periodic() {  }
+    override fun read() { }
+    override fun write() { servo.position = state.position }
 
-    fun next() { this.state = when (this.state) { TWO -> ONE; ONE -> NONE; NONE -> TWO } }
-
-    override fun periodic() { puncher.position = this.state.position }
+    override fun reset() { servo.position = NONE.position }
 
     enum class State(val position: Double) {
         TWO(0.75),

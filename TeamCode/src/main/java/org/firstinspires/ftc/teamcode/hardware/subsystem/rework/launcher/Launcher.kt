@@ -1,26 +1,18 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher
 
-import com.arcrobotics.ftclib.command.SubsystemBase
-import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
+import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.Configuration.HOLD
+import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.Configuration.RELEASE
+import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.servo
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
 
-class Launcher(val hw: HardwareMap) : SubsystemBase() {
-    private val servo by lazy {
-        val x = hw["launcher"] as Servo
+class Launcher : EfficientSubsystem() {
+    fun launch() { servo.position = RELEASE }
+    fun hold() { servo.position = HOLD }
 
-        x.direction = Servo.Direction.REVERSE
-        x.position = target
-        x
-    }
-    var target = HOLD
+    override fun periodic() { }
+    override fun read() {}
 
-    fun launch() { target = RELEASE }
-    fun hold() { target = HOLD }
+    override fun write() {}
 
-    override fun periodic() { servo.position = target }
-
-    companion object {
-        const val HOLD = 0.35
-        const val RELEASE = 1.0
-    }
+    override fun reset() {}
 }

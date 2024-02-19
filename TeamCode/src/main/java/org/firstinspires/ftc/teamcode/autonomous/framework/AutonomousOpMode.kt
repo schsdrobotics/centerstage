@@ -8,11 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.spatula.Spatula
+import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
@@ -20,11 +16,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.vision.VisionPortal
 
 abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
-    val puncher by lazy { Puncher(hardwareMap, telemetry, Puncher.State.TWO) }
-    val spatula by lazy { Spatula(hardwareMap, telemetry, lift) }
-    val lift by lazy { Lift(hardwareMap, telemetry) }
-    val intake by lazy { Intake(hardwareMap) }
-    val led by lazy { Led(hardwareMap) }
+    init { Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2) }
 
     var start = Pose2d(0.0, 0.0, 0.0)
 
@@ -74,8 +66,6 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
 
     override fun init() {
         CommandScheduler.getInstance().reset()
-
-        CommandScheduler.getInstance().registerSubsystem(led)
 
         drive
     }

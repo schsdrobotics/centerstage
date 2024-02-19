@@ -2,60 +2,55 @@ package org.firstinspires.ftc.teamcode.manual
 
 import com.acmerobotics.roadrunner.now
 import com.arcrobotics.ftclib.command.CommandOpMode
-import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.button.GamepadButton
 import com.arcrobotics.ftclib.command.button.Trigger
-import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button
 import com.arcrobotics.ftclib.gamepad.TriggerReader
-import com.qualcomm.hardware.lynx.LynxModule
-import com.qualcomm.hardware.lynx.commands.standard.LynxSetModuleLEDColorCommand
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.teamcode.hardware.Robot
+import org.firstinspires.ftc.teamcode.hardware.Robot.deposit
+import org.firstinspires.ftc.teamcode.hardware.Robot.drive
+import org.firstinspires.ftc.teamcode.hardware.Robot.gamepad
+import org.firstinspires.ftc.teamcode.hardware.Robot.intake
+import org.firstinspires.ftc.teamcode.hardware.Robot.launcher
+import org.firstinspires.ftc.teamcode.hardware.Robot.lift
+import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
+import org.firstinspires.ftc.teamcode.hardware.Robot.secondary
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeCycle
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.Launcher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.LaunchCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.led.Led
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.AdjustCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.TargetGoCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.AdjustCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.CyclePuncher
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
+import kotlin.math.roundToInt
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
-	val drive by lazy { Drive(hardwareMap, telemetry, gamepad) }
-	val deposit by lazy { Deposit(hardwareMap, telemetry) }
-	val puncher by lazy { Puncher(hardwareMap, telemetry) }
-	val lift by lazy { Lift(hardwareMap, telemetry) }
-	val launcher by lazy { Launcher(hardwareMap) }
-	val intake by lazy { Intake(hardwareMap) }
-	val led by lazy { Led(hardwareMap) }
-
-	val secondary by lazy { GamepadEx(gamepad2) }
-	val gamepad by lazy { GamepadEx(gamepad1) }
+	val times = mutableListOf<Double>()
 
 	override fun initialize() {
+		Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2)
+
 		GamepadButton(gamepad, Button.A).whenPressed(LiftTo(ZERO, lift, deposit))
 		GamepadButton(gamepad, Button.X).whenPressed(LiftTo(LOW, lift, deposit))
 		GamepadButton(gamepad, Button.Y).whenPressed(LiftTo(MID, lift, deposit))
 		GamepadButton(gamepad, Button.B).whenPressed(LiftTo(HIGH, lift, deposit))
 
-//		GamepadButton(gamepad, Button.X).whenPressed(AlignDeposit(deposit))
-//		GamepadButton(gamepad, Button.Y).whenPressed(TransferDeposit(deposit))
-//		GamepadButton(gamepad, Button.B).whenPressed(ScoreDeposit(deposit))
+		GamepadButton(secondary, Button.X).whenPressed(AlignDeposit(deposit))
+		GamepadButton(secondary, Button.Y).whenPressed(TransferDeposit(deposit))
+		GamepadButton(secondary, Button.B).whenPressed(ScoreDeposit(deposit))
 
 
 		GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustCommand(-50, lift))
@@ -73,14 +68,14 @@ class DriverControlled : CommandOpMode() {
 				ParallelCommandGroup(
 					IntakeIn(intake) { gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) },
 					DropPixels(puncher),
-					TargetGoCommand(25, lift)
+					MoveLiftTo(INTAKE, lift)
 				)
 			)
 			.whenInactive(
 				ParallelCommandGroup(
 					StopIntake(intake),
-//                                FlipSpatula(Spatula.State.TRANSFER, spatula),
-					TargetGoCommand(0, lift)
+					TransferDeposit(deposit),
+					MoveLiftTo(0, lift)
 				)
 			)
 
@@ -89,24 +84,16 @@ class DriverControlled : CommandOpMode() {
 				ParallelCommandGroup(
 					IntakeOut(intake) { gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) },
 					DropPixels(puncher),
-					TargetGoCommand(25, lift)
+					MoveLiftTo(INTAKE, lift)
 				)
 			)
 			.whenInactive(
 				ParallelCommandGroup(
 					StopIntake(intake),
-//                                FlipSpatula(Spatula.State.TRANSFER, spatula),
-					TargetGoCommand(0, lift)
+					TransferDeposit(deposit),
+					MoveLiftTo(0, lift)
 				)
 			)
-
-		register(led)
-
-		hardwareMap.getAll(LynxModule::class.java).forEach { it.sendCommand(LynxSetModuleLEDColorCommand(it, 155.toByte(), 0, 155.toByte())) }
-
-		while (opModeInInit()) {
-			CommandScheduler.getInstance().run()
-		}
 	}
 
 	override fun run() {
@@ -114,10 +101,17 @@ class DriverControlled : CommandOpMode() {
 
 		super.run()
 
+		Robot.clearBulkCache()
+		Robot.read()
+//		Robot.periodic()
+		Robot.write()
+
 		val end = now()
 		val time = end - start
 
-		telemetry.addData("loop time (hZ)", 1.0 / time)
+		times.add(1.0 / time)
+
+		telemetry.addData("average cycles/s (hZ)", times.average().roundToInt())
 		telemetry.addData("current", currentDraw)
 		telemetry.update()
 	}
