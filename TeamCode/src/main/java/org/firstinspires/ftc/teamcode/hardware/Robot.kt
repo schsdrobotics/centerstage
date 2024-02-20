@@ -52,31 +52,46 @@ object Robot {
 	lateinit var intake: Intake
 	lateinit var led: Led
 
+	var auto = false
 	var count = 0
 
-	fun initialize(hw: HardwareMap, telemetry: Telemetry, gamepad: Gamepad, secondary: Gamepad) {
+	fun initialize(hw: HardwareMap, telemetry: Telemetry, gamepad: Gamepad, secondary: Gamepad, auto: Boolean = false) {
 		this.hw = hw
 		this.telemetry = telemetry
 
 		this.gamepad = GamepadEx(gamepad)
 		this.secondary = GamepadEx(secondary)
 
-		hardwares = listOf(
-			Hubs, DriveHardware, DepositHardware, IntakeHardware,
-			LiftHardware, PuncherHardware, LauncherHardware, LedHardware
-		)
+		this.auto = auto
+
+		hardwares = if (auto) {
+			listOf(
+				Hubs, DepositHardware, IntakeHardware, LiftHardware,
+				PuncherHardware, LauncherHardware, LedHardware
+			)
+		} else {
+			listOf(
+				Hubs, DriveHardware, DepositHardware, IntakeHardware,
+				LiftHardware, PuncherHardware, LauncherHardware, LedHardware
+			)
+		}
 
 		hardwares.forEach { it.initialize() }
 
-		drive = Drive(Robot.telemetry, Robot.gamepad)
+		if (!auto) drive = Drive(Robot.telemetry, Robot.gamepad)
+
 		lift = Lift(Robot.telemetry)
 		deposit = Deposit(Robot.telemetry, lift)
 		launcher = Launcher()
-		puncher = Puncher(telemetry = telemetry)
+		puncher = Puncher(telemetry = telemetry, state = if (auto) Puncher.State.TWO else Puncher.State.NONE)
 		intake = Intake()
 		led = Led()
 
-		subsystems = listOf(drive, deposit, lift, launcher, puncher, intake, led)
+		subsystems = if (auto) {
+			listOf(deposit, lift, launcher, puncher, intake, led)
+		} else {
+			listOf(drive, deposit, lift, launcher, puncher, intake, led)
+		}
 
 		subsystems.forEach { it.reset() }
 
@@ -97,11 +112,7 @@ object Robot {
 		lateinit var hubs: List<LynxModule>
 
 		override fun initialize() {
-
-
 			for (m in hw.getAll(LynxModule::class.java)) {
-				m.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL
-
 				if (m.isParent && LynxConstants.isEmbeddedSerialNumber(m.serialNumber)) {
 					CONTROL = m
 				} else {
@@ -111,7 +122,12 @@ object Robot {
 
 			hubs = listOf(CONTROL, EXTENSION)
 
-			hubs.forEach { it.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL }
+			if (!auto) {
+				hubs.forEach { it.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL }
+			} else {
+				hubs.forEach { it.bulkCachingMode = LynxModule.BulkCachingMode.OFF }
+			}
+
 			hubs.forEach { it.sendCommand(LynxSetModuleLEDColorCommand(it, 155.toByte(), 0, 155.toByte())) }
 		}
 	}
@@ -239,7 +255,7 @@ object Robot {
 	fun read() {
 		subsystems.forEach { it.read() }
 
-		if (count % 2 == 0) {
+		if (!auto && count % 2 == 0) {
 			drive.updateHeading()
 		}
 	}

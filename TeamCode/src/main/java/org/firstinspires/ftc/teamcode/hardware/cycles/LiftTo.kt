@@ -44,6 +44,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 					MoveLiftTo(Lift.Position.ZERO, lift),
 					TransferDeposit(deposit)
 				)
+
 			}
 
 			// restorative case: target is zero

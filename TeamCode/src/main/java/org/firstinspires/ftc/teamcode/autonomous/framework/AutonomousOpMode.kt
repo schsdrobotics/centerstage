@@ -16,8 +16,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.vision.VisionPortal
 
 abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
-    init { Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2) }
-
     var start = Pose2d(0.0, 0.0, 0.0)
 
     val gamepad by lazy { GamepadEx(gamepad1) }
@@ -65,6 +63,7 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
     var recordedPropPosition = Unfound
 
     override fun init() {
+        Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2, true)
         CommandScheduler.getInstance().reset()
 
         drive
@@ -84,7 +83,7 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
         CommandScheduler.getInstance().run()
     }
 
-    abstract fun first(): Unit
+    abstract fun first()
 
 
     abstract fun actions(): Command
@@ -103,6 +102,12 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
     }
 
     override fun loop() {
+        Robot.clearBulkCache()
+        Robot.read()
+        Robot.periodic()
+        drive.updatePoseEstimate()
+        Robot.write()
+
         telemetry.addData("drive pose", drive.pose.position.toString())
         telemetry.addData("detected", recordedPropPosition)
 
