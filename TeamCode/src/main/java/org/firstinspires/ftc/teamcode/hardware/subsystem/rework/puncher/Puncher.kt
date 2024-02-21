@@ -27,8 +27,8 @@ class Puncher(var state: State = NONE, val telemetry: Telemetry? = null) : Effic
     override fun reset() { servo.position = NONE.position }
 
     enum class State(val position: Double) {
-        TWO(0.75),
-        ONE(0.88),
-        NONE(1.0),
+        TWO(0.5),
+        ONE(0.25),
+        NONE(0.11),
     }
 }

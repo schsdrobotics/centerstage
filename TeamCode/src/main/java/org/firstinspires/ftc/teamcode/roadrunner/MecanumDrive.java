@@ -469,6 +469,23 @@ public final class MecanumDrive {
         c.strokeLine(p1.x, p1.y, p2.x, p2.y);
     }
 
+    public TrajectoryActionBuilder customActionBuilder(
+            Pose2d beginPose,
+            VelConstraint velConstraint,
+            AccelConstraint accelConstraint,
+            TurnConstraints turnConstraints
+    ) {
+        return new TrajectoryActionBuilder(
+                TurnAction::new,
+                FollowTrajectoryAction::new,
+                beginPose, 1e-6, 0.0,
+                turnConstraints,
+                velConstraint, accelConstraint,
+                0.25, 0.1,
+                pose -> pose
+        );
+    }
+
     public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
         return new TrajectoryActionBuilder(
                 TurnAction::new,

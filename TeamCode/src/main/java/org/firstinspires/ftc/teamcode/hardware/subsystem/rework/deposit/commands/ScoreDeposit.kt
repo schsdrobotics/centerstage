@@ -3,4 +3,5 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.command
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.SCORE_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 
-class ScoreDeposit(deposit: Deposit) : FlipDeposit(SCORE_ANGLE, deposit)
+class ScoreDeposit(deposit: Deposit, shouldCheck: Boolean
+= true) : FlipDeposit(SCORE_ANGLE, deposit, shouldCheck)

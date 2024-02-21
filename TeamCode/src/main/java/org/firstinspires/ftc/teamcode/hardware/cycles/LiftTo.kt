@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.hardware.cycles
 import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
-import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.ALIGN_ANGLE
-import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.SCORE_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.TRANSFER_ANGLE
+import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.VERTICAL_OFFSET
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.UnlockDeposit
@@ -21,7 +20,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			lift.atZero && target != Lift.Position.ZERO -> {
 				SequentialCommandGroup(
 					UnlockDeposit(deposit),
-					AlignDeposit(deposit),
+					TransferDeposit(deposit, false),
 					MoveLiftTo(target, lift),
 					ScoreDeposit(deposit)
 				)
@@ -37,24 +36,24 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			}
 
 			// target is zero, and aligned
-			target == Lift.Position.ZERO && deposit.state.vertical == ALIGN_ANGLE -> {
+			target == Lift.Position.ZERO && deposit.state.vertical == (TRANSFER_ANGLE + VERTICAL_OFFSET) -> {
 				SequentialCommandGroup(
 					UnlockDeposit(deposit),
-					AlignDeposit(deposit),
-					MoveLiftTo(Lift.Position.ZERO, lift),
-					TransferDeposit(deposit)
+					ParallelCommandGroup(
+						TransferDeposit(deposit),
+						MoveLiftTo(Lift.Position.ZERO, lift),
+					)
 				)
-
 			}
 
 			// restorative case: target is zero
 			// ensure lift is high enough before dropping
 			// align, wait 300ms, (go + transfer)
-			target == Lift.Position.ZERO && deposit.state.vertical == SCORE_ANGLE -> {
+			target == Lift.Position.ZERO -> {
 				SequentialCommandGroup(
 					if (!lift.cleared) MoveLiftTo(Lift.Position.LOW, lift) else InstantCommand(),
 					UnlockDeposit(deposit),
-					AlignDeposit(deposit),
+					TransferDeposit(deposit),
 					ParallelCommandGroup(
 						MoveLiftTo(Lift.Position.ZERO, lift),
 						TransferDeposit(deposit)

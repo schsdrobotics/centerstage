@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
 import org.firstinspires.ftc.teamcode.hardware.Robot
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
+import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 import org.firstinspires.ftc.vision.VisionPortal
 
 abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
@@ -104,14 +106,18 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
     override fun loop() {
         Robot.clearBulkCache()
         Robot.read()
+
+        Robot.DriveHardware.angle = drive.imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
+
         Robot.periodic()
         drive.updatePoseEstimate()
         Robot.write()
 
+        CommandScheduler.getInstance().run()
+
         telemetry.addData("drive pose", drive.pose.position.toString())
         telemetry.addData("detected", recordedPropPosition)
-
-        CommandScheduler.getInstance().run()
+        telemetry.addData("current", currentDraw)
     }
 
     override fun stop() {

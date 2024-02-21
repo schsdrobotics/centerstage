@@ -165,8 +165,8 @@ object Robot {
 		lateinit var angles: DepositAngles
 
 		override fun initialize() {
-			right = SimpleServo(hw, "deposit.right", 0.0, SERVO_RANGE).also { it.inverted = true }
-			left = SimpleServo(hw, "deposit.left", 0.0, SERVO_RANGE)
+			right = SimpleServo(hw, "deposit.left", 0.0, SERVO_RANGE)
+			left = SimpleServo(hw, "deposit.right", 0.0, SERVO_RANGE).also { it.inverted = true }
 
 			angles = DepositAngles(hw)
 		}
@@ -177,13 +177,14 @@ object Robot {
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
 			const val ALIGN_ANGLE = 0.0 // degrees
-			const val TRANSFER_ANGLE = 17.0 // degrees
+			const val TRANSFER_ANGLE = 19.0 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			const val HORIZONTAL_OFFSET = 4.0 // degrees
-			const val VERTICAL_OFFSET = 0.0 // degrees
+			const val HORIZONTAL_OFFSET = 3.0 // degrees, + is ccw
+			const val VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
 		}
 	}
+
 
 	object IntakeHardware : IHardware {
 		lateinit var arm: SimpleServo

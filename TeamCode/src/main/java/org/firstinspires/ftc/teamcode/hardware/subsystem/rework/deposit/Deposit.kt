@@ -25,7 +25,9 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
     private var happy = false
 
-    var state = State(0.0, TRANSFER_ANGLE)
+    val align = State(VERTICAL_OFFSET, TRANSFER_ANGLE + HORIZONTAL_OFFSET)
+
+    var state = align
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
 
     var targets = Kinematics.inverse(state)
@@ -46,7 +48,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     fun sad() { happy = false }
 
     override fun periodic() {
-        val locked = Kinematics.lock(heading(), 0.0)
+        val locked = Kinematics.lock(heading(), 270.0)
 
         if (!lift.cleared) happy = true
 
@@ -58,8 +60,10 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
         telemetry.addData("left angle", angles.left)
         telemetry.addData("right angle", angles.right)
+        telemetry.addData("target angles", Kinematics.inverse(state))
         telemetry.addData("target state", state)
         telemetry.addData("locked angle", locked)
+        telemetry.addData("happy", happy)
     }
 
     override fun read() {
@@ -67,8 +71,14 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     }
 
     override fun write() {
-        right.turnToAngle(targets.right)
-        left.turnToAngle(targets.left)
+        if (state.vertical > 25 && !lift.cleared) {
+            val output = Kinematics.inverse(align)
+            right.turnToAngle(output.right)
+            left.turnToAngle(output.left)
+        } else {
+            right.turnToAngle(targets.right)
+            left.turnToAngle(targets.left)
+        }
     }
 
     override fun reset() = Unit
@@ -86,17 +96,15 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
         var left = 0.0
 
         fun read() {
-            // invert + offset
-            right = 360.0 - ((360.0 - round(rightReader.voltage / 3.3 * 360)) - 20.0) + 45.0 - 90.0 - 11.0 + 22.0
-            // offset
-            left = 360.0 - (round(leftReader.voltage / 3.3 * 360) - 15.0) + 45.0 - 90.0 - 9.0 + 16.0
+            right = (360.0 - round(rightReader.voltage / 3.3 * 360)) - 14.0 - 6.0 + 2.0
+            left = (round(leftReader.voltage / 3.3 * 360)) - 40 + 26.0
         }
     }
 
     object Kinematics {
         fun vertical(angle: Double) = Range.clip(angle, ALIGN_ANGLE, SCORE_ANGLE).let { Offset(it, it) }
 
-        fun horizontal(angle: Double) = Range.clip(angle, -HORIZONTAL_BOUND, HORIZONTAL_BOUND).let { Offset(it, -it) }
+        fun horizontal(angle: Double) = Range.clip(angle, -HORIZONTAL_BOUND, HORIZONTAL_BOUND).let { Offset(-it, it) }
 
         fun inverse(state: State) = vertical(state.vertical) + horizontal(state.horizontal)
 

@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.autonomous.implementations
 
 import com.acmerobotics.roadrunner.Action
+import com.acmerobotics.roadrunner.MinMax
 import com.acmerobotics.roadrunner.NullAction
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
+import com.acmerobotics.roadrunner.TurnConstraints
+import com.acmerobotics.roadrunner.Twist2d
 import com.acmerobotics.roadrunner.Vector2d
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
@@ -12,42 +15,49 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.Cycle
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycles
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
+import kotlin.math.PI
 
 
 class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
     override val start = Pose2d(12.0, -64.0, Math.toRadians(89.995))
 
     private fun cycleGenerator(begin: Pose2d, first: Boolean = true): Pair<Cycle, Pose2d> {
-        val stackX = -69.0 + HEIGHT - 4.5
+        val stackX = -(69.0 - HEIGHT + 4.5)
+        val stackTangent = if (first) 110.deg else 170.deg
+        val stackPose = pose(stackX, -11.5, 180.deg)
 
-        val stack = if (!first) {
-            drive.actionBuilder(begin)
-                    .setTangent(0.deg)
-                    .lineToXConstantHeading(stackX)
-                    .endTrajectory()
-        } else {
-            drive.actionBuilder(begin)
-                    .setTangent(110.deg)
-                    .splineToLinearHeading(pose(stackX, -7.5, 180.deg), 180.deg)
-                    .endTrajectory()
-        }
+        val stack = drive.actionBuilder(begin)
+            .setTangent(stackTangent)
+            .splineToSplineHeading(stackPose, 180.deg)
+            .endTrajectory()
 
-        val backstage = drive.actionBuilder(pose(stackX, -7.5, 180.deg))
-                .setTangent(0.deg)
-                .lineToXConstantHeading(47.5)
+        val intermediate = pose(47.0, -16.25, (-60).deg)
 
-        val end = pose(47.5, -9.0, 180.deg)
+        val backstageTangent = (0).deg
 
-        return Pair(Cycle(stack.build(), backstage.build()), end)
+        val backstage = drive.actionBuilder(stackPose)
+            .setTangent(backstageTangent)
+            .splineTo(intermediate.position, intermediate.heading)
+
+        val end = intermediate + Twist2d(point(0.0, 0.0), 180.deg)
+
+        return Pair(Cycle(backstage = backstage.build(), stacks = stack.build()), end)
     }
 
     private fun yellowGenerator(begin: Pose2d, y: Double): Pair<Action, Pose2d> {
         val end = pose(47.5, y, 180.deg)
 
-        val yellow = drive.actionBuilder(begin)
-                .setTangent(0.deg)
-                .splineToLinearHeading(end, 0.deg)
-                .endTrajectory()
+        val builder = drive.customActionBuilder(
+            begin,
+            { _, _, _, -> 80.0 },
+            { _, _, _, -> MinMax(-30.0, 80.0) },
+            TurnConstraints(PI, -PI, PI)
+        )
+
+        val yellow = builder
+            .setTangent(0.deg)
+            .splineToLinearHeading(end, 0.deg)
+            .endTrajectory()
 
         return Pair(yellow.build(), end)
     }
