@@ -28,7 +28,7 @@ class Puncher(var state: State = NONE, val telemetry: Telemetry? = null) : Effic
 
     enum class State(val position: Double) {
         TWO(0.5),
-        ONE(0.25),
+        ONE(0.26),
         NONE(0.11),
     }
 }

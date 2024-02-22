@@ -99,9 +99,6 @@ object Robot {
 
 		subsystems.forEach { CommandScheduler.getInstance().registerSubsystem(it) }
 
-
-		deposit.default()
-
 		count = 0
 	}
 
@@ -177,11 +174,11 @@ object Robot {
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
 			const val ALIGN_ANGLE = 0.0 // degrees
-			const val TRANSFER_ANGLE = 19.0 // degrees
+			const val TRANSFER_ANGLE = 21.0 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			const val HORIZONTAL_OFFSET = 3.0 // degrees, + is ccw
-			const val VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
+			const val HORIZONTAL_OFFSET = 3.5 // degrees, + is ccw
+			var VERTICAL_OFFSET = 4.0 // degrees, + is towards scoring
 		}
 	}
 

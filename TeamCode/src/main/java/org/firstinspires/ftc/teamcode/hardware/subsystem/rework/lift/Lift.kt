@@ -71,10 +71,10 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
     enum class Position(val ticks: Int) {
         ZERO(0),
         INTAKE(125),
-        CLEAR(500),
-        LOW(750),
-        MID(1250),
-        HIGH(1750)
+        CLEAR(350),
+        LOW(400),
+        MID(1100),
+        HIGH(1600)
     }
 
     companion object {

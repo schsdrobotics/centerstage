@@ -27,11 +27,12 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
     val align = State(VERTICAL_OFFSET, TRANSFER_ANGLE + HORIZONTAL_OFFSET)
 
+    var verticalAdjustment = 0.0
+
     var state = align
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
 
     var targets = Kinematics.inverse(state)
-
 
     fun flip(omega: Double) = to(omega, state.horizontal)
     fun turn(theta: Double) = to(state.vertical, theta)
@@ -41,11 +42,9 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     // TODO: add bounds checks
     fun to(vertical: Double, horizontal: Double) { state = State(vertical, horizontal) }
 
-    fun default() {
-
-    }
-
     fun sad() { happy = false }
+
+    fun verticallyAdjust(angle: Double) { VERTICAL_OFFSET = Range.clip(VERTICAL_OFFSET + angle, -2.0, 7.0) }
 
     override fun periodic() {
         val locked = Kinematics.lock(heading(), 270.0)
@@ -53,7 +52,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
         if (!lift.cleared) happy = true
 
         targets = if (lift.cleared && happy) {
-            Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 10) state.horizontal else -locked))
+            Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 20) state.horizontal else -locked))
         } else {
             Kinematics.inverse(state)
         }
@@ -71,7 +70,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     }
 
     override fun write() {
-        if (state.vertical > 25 && !lift.cleared) {
+        if (state.vertical > 50 && !lift.cleared) {
             val output = Kinematics.inverse(align)
             right.turnToAngle(output.right)
             left.turnToAngle(output.left)

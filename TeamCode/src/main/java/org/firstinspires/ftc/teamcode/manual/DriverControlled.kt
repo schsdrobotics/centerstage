@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.lift
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
 import org.firstinspires.ftc.teamcode.hardware.Robot.secondary
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AdjustDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
@@ -54,6 +55,8 @@ class DriverControlled : CommandOpMode() {
 		GamepadButton(secondary, Button.Y).whenPressed(TransferDeposit(deposit))
 		GamepadButton(secondary, Button.B).whenPressed(ScoreDeposit(deposit))
 
+		GamepadButton(gamepad, Button.DPAD_UP).whenPressed(AdjustDeposit(1.0, deposit))
+		GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(AdjustDeposit(-1.0, deposit))
 
 		GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustCommand(-50, lift))
 		GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(AdjustCommand(50, lift))
