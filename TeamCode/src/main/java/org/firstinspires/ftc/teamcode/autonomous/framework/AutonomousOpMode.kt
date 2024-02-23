@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.autonomous.framework
 
 import com.acmerobotics.roadrunner.Pose2d
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandScheduler
-import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
@@ -16,17 +16,16 @@ import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.Pr
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 import org.firstinspires.ftc.vision.VisionPortal
+import kotlin.math.roundToInt
 
-abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode() {
+abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode() {
     var start = Pose2d(0.0, 0.0, 0.0)
 
-    val gamepad by lazy { GamepadEx(gamepad1) }
-
+    val builder: TrajectoryActionBuilder by lazy { drive.actionBuilder(start) }
     val drive by lazy { MecanumDrive(hardwareMap, start) }
-    val builder by lazy { drive.actionBuilder(start) }
 
     val mirrored by lazy {
-        when (side) {
+        when (alliance) {
             Alliance.Red -> recordedPropPosition
             Alliance.Blue -> when (recordedPropPosition) {
                 Left -> Right
@@ -39,9 +38,9 @@ abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode
     }
 
     val auto by lazy {
-        when (position) {
-            Side.Backstage -> Close(drive, side)
-            Side.Stacks -> Far(drive, side)
+        when (side) {
+            Side.Backstage -> Close(drive, alliance)
+            Side.Stacks -> Far(drive, alliance)
         }.also { drive.pose = it.start }
     }
 
@@ -53,7 +52,7 @@ abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode
         }
     }
 
-    val processor by lazy { ColourMassDetectionProcessor(side.lower, side.upper, { MINIMUM_MASS }, { 426.0 }) }
+    val processor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
 
     val portal by lazy {
         VisionPortal.Builder()
@@ -73,14 +72,14 @@ abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode
 
     override fun init_loop() {
         drive.pose = auto.start
+        drive.updatePoseEstimate()
 
         telemetry.addData("recorded prop position", processor.recordedPropPosition)
-        telemetry.addData("largest detected contour area", processor.largestContourArea)
-        telemetry.addData("detected mass center", "x: " + processor.largestContourX + ", y: " + processor.largestContourY)
+        telemetry.addData("largest detected contour area", "${processor.largestContourArea} pixels")
+        telemetry.addData("detected mass center", "(${processor.largestContourX.roundToInt()}, y: ${processor.largestContourY.roundToInt()})")
         telemetry.addData("camera state", portal.cameraState)
-        drive.updatePoseEstimate()
-        telemetry.addData("drive pose", drive.pose.position.toString())
 
+        telemetry.addData("drive pose", drive.pose.position.toString())
 
         CommandScheduler.getInstance().run()
     }
@@ -109,8 +108,8 @@ abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode
 
         Robot.DriveHardware.angle = drive.imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
 
-        Robot.periodic()
         drive.updatePoseEstimate()
+        Robot.periodic()
         Robot.write()
 
         CommandScheduler.getInstance().run()
@@ -132,8 +131,5 @@ abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode
 
     companion object {
         const val MINIMUM_MASS = 7000.0
-
-        const val HEIGHT = 16.0
-        const val WIDTH = 11.0
     }
 }

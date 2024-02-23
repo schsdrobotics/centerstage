@@ -21,7 +21,7 @@ abstract class Auto(val drive: MecanumDrive, val color: Alliance) {
     }
     fun pose(x: Double, y: Double, heading: Double): Pose2d = when (color) {
         Alliance.Red -> Pose2d(x, y, heading)
-        Alliance.Blue -> Pose2d(x, -y, Rotation2d.exp(heading).inverse().log())
+        Alliance.Blue -> Pose2d(x, -y, Rotation2d.fromDouble(heading).inverse().log())
     }
 
     companion object {
@@ -30,7 +30,6 @@ abstract class Auto(val drive: MecanumDrive, val color: Alliance) {
 
         const val MAJOR_APOTHEM = HEIGHT / 2.0
         const val MINOR_APOTHEM = WIDTH / 2.0
-
 
         const val MAX_WHEEL_VEL = 75.0
         const val PROFILE_DECEL = -30.0
