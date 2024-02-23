@@ -57,6 +57,7 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
     fun targetInches(height: Double) = target(height * TICKS_PER_INCH * sqrt(2.0))
 
     fun adjust(ticks: Int) { target = max(0, min(target + ticks, Position.HIGH.ticks)) }
+    fun forcefulAdjust(ticks: Int) { target += ticks }
 
     fun target(ticks: Double) = target(ticks.toInt())
     fun target(ticks: Int) { target = ticks; go() }

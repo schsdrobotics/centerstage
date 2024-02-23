@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.manual
 
 import com.acmerobotics.roadrunner.now
 import com.arcrobotics.ftclib.command.CommandOpMode
+import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.button.GamepadButton
 import com.arcrobotics.ftclib.command.button.Trigger
@@ -17,12 +18,12 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.intake
 import org.firstinspires.ftc.teamcode.hardware.Robot.launcher
 import org.firstinspires.ftc.teamcode.hardware.Robot.lift
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
+import org.firstinspires.ftc.teamcode.hardware.Robot.relayer
 import org.firstinspires.ftc.teamcode.hardware.Robot.secondary
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.Relayer
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AdjustDeposit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.ResetYawCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeCycle
@@ -31,12 +32,11 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.AdjustCommand
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.ForcefulLiftAdjustment
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.CyclePuncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
-import kotlin.math.roundToInt
 
 @TeleOp(group = "!")
 class DriverControlled : CommandOpMode() {
@@ -52,22 +52,11 @@ class DriverControlled : CommandOpMode() {
 		GamepadButton(gamepad, Button.Y).whenPressed(LiftTo(MID, lift, deposit))
 		GamepadButton(gamepad, Button.B).whenPressed(LiftTo(HIGH, lift, deposit))
 
-		GamepadButton(secondary, Button.X).whenPressed(AlignDeposit(deposit))
-		GamepadButton(secondary, Button.Y).whenPressed(TransferDeposit(deposit))
-		GamepadButton(secondary, Button.B).whenPressed(ScoreDeposit(deposit))
-
-		GamepadButton(gamepad, Button.DPAD_UP).whenPressed(AdjustDeposit(1.0, deposit))
-		GamepadButton(gamepad, Button.DPAD_DOWN).whenPressed(AdjustDeposit(-1.0, deposit))
-
-		GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustCommand(-50, lift))
-		GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(AdjustCommand(50, lift))
-
 		GamepadButton(gamepad, Button.LEFT_STICK_BUTTON).whenPressed(ResetYawCommand(drive))
 
 		GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeCycle(intake))
 
 		GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(CyclePuncher(puncher))
-		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
 
 		Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
 			.whileActiveContinuous(
@@ -101,6 +90,30 @@ class DriverControlled : CommandOpMode() {
 				)
 			)
 
+		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
+
+		GamepadButton(secondary, Button.LEFT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Expansion }))
+		GamepadButton(secondary, Button.RIGHT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
+
+		GamepadButton(secondary, Button.START).whenPressed(InstantCommand({ lift.reset() }))
+
+		GamepadButton(secondary, Button.DPAD_DOWN).whenPressed(ForcefulLiftAdjustment(-10, lift))
+		GamepadButton(secondary, Button.DPAD_UP).whenPressed(ForcefulLiftAdjustment(10, lift))
+
+		GamepadButton(secondary, Button.DPAD_LEFT).whenPressed(AdjustDeposit(-1.0, deposit))
+		GamepadButton(secondary, Button.DPAD_RIGHT).whenPressed(AdjustDeposit(1.0, deposit))
+
+		GamepadButton(secondary, Button.X).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Purple) }))
+		GamepadButton(secondary, Button.Y).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Green) }))
+		GamepadButton(secondary, Button.A).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.White) }))
+		GamepadButton(secondary, Button.B).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Yellow) }))
+
+		Trigger { TriggerReader(secondary, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
+			.whenActive(InstantCommand({ launcher.up() }))
+
+		Trigger { TriggerReader(secondary, GamepadKeys.Trigger.LEFT_TRIGGER).isDown }
+			.whenActive(InstantCommand({ launcher.down() }))
+
 		Robot.DepositHardware.right.turnToAngle(Deposit.Kinematics.inverse(deposit.align).right)
 		Robot.DepositHardware.left.turnToAngle(Deposit.Kinematics.inverse(deposit.align).left)
 	}
@@ -120,7 +133,7 @@ class DriverControlled : CommandOpMode() {
 
 		times.add(1.0 / time)
 
-		telemetry.addData("average cycles/s (hZ)", times.average().roundToInt())
+//		telemetry.addData("average cycles/s (hZ)", times.average().roundToInt())
 		telemetry.addData("current", currentDraw)
 		telemetry.update()
 	}

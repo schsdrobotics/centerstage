@@ -25,8 +25,10 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configurati
 import org.firstinspires.ftc.teamcode.hardware.Robot.Hubs.hubs
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.DOWN_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.RANGE
+import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.Configuration.DOWN
 import org.firstinspires.ftc.teamcode.hardware.Robot.LauncherHardware.Configuration.HOLD
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.EfficientSubsystem
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.Relayer
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.Drive
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.Intake
@@ -47,12 +49,13 @@ object Robot {
 
 	lateinit var subsystems: List<EfficientSubsystem>
 
-	lateinit var drive: Drive
-	lateinit var deposit: Deposit
-	lateinit var lift: Lift
 	lateinit var launcher: Launcher
+	lateinit var deposit: Deposit
+	lateinit var relayer: Relayer
 	lateinit var puncher: Puncher
 	lateinit var intake: Intake
+	lateinit var drive: Drive
+	lateinit var lift: Lift
 	lateinit var led: Led
 
 	var auto = false
@@ -70,12 +73,12 @@ object Robot {
 		hardwares = if (auto) {
 			listOf(
 				Hubs, DepositHardware, IntakeHardware, LiftHardware,
-				PuncherHardware, LauncherHardware, LedHardware
+				PuncherHardware, LauncherHardware, LedHardware, RelayerHardware
 			)
 		} else {
 			listOf(
 				Hubs, DriveHardware, DepositHardware, IntakeHardware,
-				LiftHardware, PuncherHardware, LauncherHardware, LedHardware
+				LiftHardware, PuncherHardware, LauncherHardware, LedHardware, RelayerHardware
 			)
 		}
 
@@ -91,9 +94,9 @@ object Robot {
 		led = Led()
 
 		subsystems = if (auto) {
-			listOf(deposit, lift, launcher, puncher, intake, led)
+			listOf(deposit, lift, launcher, puncher, intake, led, relayer)
 		} else {
-			listOf(drive, deposit, lift, launcher, puncher, intake, led)
+			listOf(drive, deposit, lift, launcher, puncher, intake, led, relayer)
 		}
 
 		subsystems.forEach { it.reset() }
@@ -103,6 +106,10 @@ object Robot {
 		subsystems.forEach { CommandScheduler.getInstance().registerSubsystem(it) }
 
 		count = 0
+	}
+
+	object RelayerHardware : IHardware {
+		override fun initialize() { }
 	}
 
 	object Hubs : IHardware {
@@ -182,7 +189,7 @@ object Robot {
 			const val TRANSFER_ANGLE = 40.0 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			const val HORIZONTAL_OFFSET = 3.5 // degrees, + is ccw
+			var HORIZONTAL_OFFSET = 3.5 // degrees, + is ccw
 			var VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
 		}
 	}
@@ -234,14 +241,21 @@ object Robot {
 	}
 
 	object LauncherHardware : IHardware {
-		lateinit var servo: Servo
+		lateinit var pitch: Servo
+		lateinit var trigger: Servo
 
 		override fun initialize() {
-			servo = run {
+			trigger = run {
 				val it = hw["launcher"] as Servo
 
 				it.direction = Servo.Direction.REVERSE
 				it.position = HOLD
+				it
+			}
+
+			pitch = run {
+				val it = hw["pitch"] as Servo
+				it.position = DOWN
 				it
 			}
 		}
@@ -249,12 +263,17 @@ object Robot {
 		object Configuration {
 			const val HOLD = 0.35
 			const val RELEASE = 1.0
+
+			const val DOWN = 0.0
+			const val UP = 0.25
 		}
 	}
 
 	object LedHardware : IHardware {
 		val led by lazy { hw["led"] as DcMotor }
-		override fun initialize() {}
+		override fun initialize() {
+			led.power = 1.0
+		}
 	}
 
 	fun read() {
