@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
 import org.firstinspires.ftc.teamcode.hardware.Robot
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
@@ -55,7 +56,7 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
         }
     }
 
-    val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
+    val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 215.0 }) }
 
     val tagProcessor by lazy {
         AprilTagProcessor.Builder()
@@ -79,6 +80,8 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     override fun init() {
         Robot.initialize(hardwareMap, telemetry, gamepad1, gamepad2, true)
         CommandScheduler.getInstance().reset()
+
+        Robot.PuncherHardware.servo.position = Puncher.State.TWO.position
 
         drive
     }
@@ -143,6 +146,6 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     }
 
     companion object {
-        const val MINIMUM_MASS = 7000.0
+        const val MINIMUM_MASS = 13000.0
     }
 }

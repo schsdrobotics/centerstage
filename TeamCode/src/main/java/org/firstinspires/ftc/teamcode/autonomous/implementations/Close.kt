@@ -7,9 +7,9 @@ import com.acmerobotics.roadrunner.MinMax
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Pose2dDual
 import com.acmerobotics.roadrunner.VelConstraint
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
-import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycle
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycles
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
@@ -21,7 +21,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
     private fun cycleGenerator(begin: Pose2d, first: Boolean = true): Pair<Cycle, Pose2d> {
         val stackVelConstraint = VelConstraint { pose: Pose2dDual<Arclength>, _, _ ->
-            if (pose.position.y.value() < -12.5) {
+            if (pose.position.y.value() < signed(-12.5)) {
                 50.0
             } else {
                 MAX_WHEEL_VEL
@@ -29,7 +29,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         }
 
         val stackAccelConstraint = AccelConstraint { pose: Pose2dDual<Arclength>, _, _ ->
-            if (pose.position.y.value() < -12.5) {
+            if (pose.position.y.value() < signed(-12.5)) {
                 MinMax(-25.0, 30.0)
             } else {
                 MinMax(PROFILE_DECEL, PROFILE_ACCEL)
@@ -37,7 +37,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         }
 
         val stackX = -69.0 + HEIGHT - 5.8
-        val stackTangent = if (first) 90.deg else 150.deg
+        val stackTangent = if (first) 90.invertibleDeg else 150.invertibleDeg
 
         val stackPose = pose(stackX, -10.75, 180.deg)
 
@@ -52,36 +52,30 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
         val backstage = drive.actionBuilder(stackPose)
             .setTangent(backstageTangent)
-            .splineToLinearHeading(intermediate, (-40).deg)
+            .splineToLinearHeading(intermediate, (-40).invertibleDeg)
 
         return Pair(Cycle(backstage = backstage.build(), stacks = stack.build()), intermediate)
     }
 
     private fun yellowGenerator(begin: Pose2d, y: Double): Pair<Action, Pose2d> {
-        val end = pose(47.25, y, 180.deg)
-
-//        val builder = drive.customActionBuilder(
-//            begin,
-//            { _, _, _, -> 80.0 },
-//            { _, _, _, -> MinMax(-30.0, 80.0) },
-//            TurnConstraints(PI, -PI, PI)
-//        )
+        val end = pose(50.25, y, 180.deg)
 
         val yellow = drive.actionBuilder(begin)
-            .setTangent(0.deg)
-            .splineToLinearHeading(end, 0.deg)
+            .setTangent(0.invertibleDeg)
+            .splineToLinearHeading(end, 0.invertibleDeg)
             .endTrajectory()
 
         return Pair(yellow.build(), end)
     }
 
     override val left = run {
+        val purplePose = pose(12.0, -30.0, 180.deg)
+
         val purple = drive.actionBuilder(start)
-            .splineTo(point(8.0, -42.0), 135.deg)
+            .splineToLinearHeading(purplePose, 90.invertibleDeg)
             .endTrajectory()
 
-        val (yellow, end) = yellowGenerator(pose(8.0, -42.0, 135.deg), -29.5)
-
+        val (yellow, end) = yellowGenerator(purplePose, -30.5)
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
@@ -89,14 +83,15 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
     }
 
     override val middle = run {
-        val pixelY = -(25.0 + MAJOR_APOTHEM) - 1.5
+        val pixelY = -(25.0 + MAJOR_APOTHEM) - 3.0
+
+        val purplePose = pose(12.0, pixelY, 90.invertibleDeg)
 
         val purple = drive.actionBuilder(start)
-            .splineTo(point(12.0, pixelY), 90.deg) // purple pixel
+            .splineToLinearHeading(purplePose, 90.invertibleDeg) // purple pixel
             .endTrajectory()
 
-        val (yellow, end) = yellowGenerator(pose(12.0, pixelY, 90.deg), -35.5)
-
+        val (yellow, end) = yellowGenerator(purplePose, -35.5)
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
@@ -104,12 +99,13 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
     }
 
     override val right = run {
+        val purplePose = pose(23.0, -46.0, 90.deg)
+
         val purple = drive.actionBuilder(start)
-            .splineTo(point(19.0, -43.0), 60.deg)
+            .splineToLinearHeading(purplePose, 90.invertibleDeg)
             .endTrajectory()
 
-        val (yellow, end) = yellowGenerator(pose(19.0, -43.0, 60.deg), -42.5)
-
+        val (yellow, end) = yellowGenerator(purplePose, -42.5)
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
@@ -119,7 +115,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
     override fun park(target: Pose2d) =
         drive
             .actionBuilder(target)
-            .setTangent(0.deg)
-            .splineToSplineHeading(pose(60.0, -8.0, 90.deg), 0.deg)
+            .setTangent(0.invertibleDeg)
+            .splineToSplineHeading(pose(60.0, -7.0, 90.deg), 0.invertibleDeg, { _, _, _ -> 50.0 }, { _, _, _ -> MinMax(-25.0, 25.0) })
             .build()
 }

@@ -18,7 +18,7 @@ class Intake : EfficientSubsystem() {
     override fun write() {
         if (arm.angle != target) arm.turnToAngle(target)
 
-        if (abs(ideal - actual) > 0.5) {
+        if (abs(ideal - actual) > 0.3) {
             motor.power = ideal
             actual = ideal
         }
@@ -38,4 +38,13 @@ class Intake : EfficientSubsystem() {
     fun angleForHeight(height: Double) = Math.toDegrees(asin(height / RADIUS))
 
     fun target(angle: Double) { target = angle }
+
+    companion object {
+        // 33, 28, 20, 16, 10
+        const val FIVE = 33
+        const val FOUR = 28
+        const val THREE = 20
+        const val TWO = 16
+        const val ONE = 10
+    }
 }

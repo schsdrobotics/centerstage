@@ -25,6 +25,9 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
     val cleared
         get() = position >= Position.CLEAR.ticks
 
+    val intakeCleared
+        get() = position >= Position.INTAKE.ticks
+
     init { reset() }
 
     override fun read() {

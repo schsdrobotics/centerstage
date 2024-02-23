@@ -25,7 +25,7 @@ class IntakeCycle(intake: Intake, lift: Lift, height: Int, duration: Long) : Seq
 			),
 
 			SequentialCommandGroup(
-				IntakeToStackHeight(height - 0.75, Robot.intake),
+				IntakeToStackHeight(height - 1, Robot.intake),
 				WaitCommand(500)
 			),
 		),

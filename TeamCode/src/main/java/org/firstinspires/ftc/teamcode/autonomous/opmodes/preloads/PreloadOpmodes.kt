@@ -1,19 +1,20 @@
 package org.firstinspires.ftc.teamcode.autonomous.opmodes.preloads
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Backstage
-import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Stacks
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance.Blue
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance.Red
+import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Backstage
+import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Stacks
+import org.firstinspires.ftc.teamcode.autonomous.opmodes.preloads.close.ClosePreloadsBase
 
 @Autonomous(group = "Preloads")
-class RedClosePreloads : PreloadsBase(Red, Backstage)
+class RedClosePreloads : ClosePreloadsBase(Red, Backstage)
 
 @Autonomous(group = "Preloads")
-class RedFarPreloads : PreloadsBase(Red, Stacks)
+class RedFarPreloads : ClosePreloadsBase(Red, Stacks)
 
 @Autonomous(group = "Preloads")
-class BlueClosePreloads : PreloadsBase(Blue, Backstage)
+class BlueClosePreloads : ClosePreloadsBase(Blue, Backstage)
 
 @Autonomous(group = "Preloads")
-class BlueFarPreloads : PreloadsBase(Blue, Stacks)
+class BlueFarPreloads : ClosePreloadsBase(Blue, Stacks)

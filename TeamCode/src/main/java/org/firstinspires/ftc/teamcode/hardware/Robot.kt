@@ -16,8 +16,11 @@ import com.qualcomm.robotcore.hardware.Gamepad
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.IMU
 import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.robotcore.hardware.ServoControllerEx
+import com.qualcomm.robotcore.hardware.ServoImplEx
 import com.qualcomm.robotcore.hardware.configuration.LynxConstants
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.SERVO_RANGE
 import org.firstinspires.ftc.teamcode.hardware.Robot.Hubs.hubs
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.DOWN_ANGLE
@@ -83,7 +86,7 @@ object Robot {
 		lift = Lift(Robot.telemetry)
 		deposit = Deposit(Robot.telemetry, lift)
 		launcher = Launcher()
-		puncher = Puncher(telemetry = telemetry, state = if (auto) Puncher.State.TWO else Puncher.State.NONE)
+		puncher = Puncher(telemetry = telemetry)
 		intake = Intake()
 		led = Led()
 
@@ -104,7 +107,7 @@ object Robot {
 
 	object Hubs : IHardware {
 		lateinit var CONTROL: LynxModule
-		lateinit var EXTENSION: LynxModule
+		lateinit var EXPANSION: LynxModule
 
 		lateinit var hubs: List<LynxModule>
 
@@ -113,11 +116,11 @@ object Robot {
 				if (m.isParent && LynxConstants.isEmbeddedSerialNumber(m.serialNumber)) {
 					CONTROL = m
 				} else {
-					EXTENSION = m
+					EXPANSION = m
 				}
 			}
 
-			hubs = listOf(CONTROL, EXTENSION)
+			hubs = listOf(CONTROL, EXPANSION)
 
 			if (!auto) {
 				hubs.forEach { it.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL }
@@ -127,6 +130,8 @@ object Robot {
 
 			hubs.forEach { it.sendCommand(LynxSetModuleLEDColorCommand(it, 155.toByte(), 0, 155.toByte())) }
 		}
+
+		fun current() = CONTROL.getCurrent(CurrentUnit.AMPS) + EXPANSION.getCurrent(CurrentUnit.AMPS)
 	}
 
 	object DriveHardware : IHardware {
@@ -219,10 +224,12 @@ object Robot {
 	}
 
 	object PuncherHardware : IHardware {
-		lateinit var servo: Servo
+		lateinit var servo: ServoImplEx
+		lateinit var controller: ServoControllerEx
 
 		override fun initialize() {
-			servo = hw["puncher"] as Servo
+			servo = hw["puncher"] as ServoImplEx
+			controller = servo.controller as ServoControllerEx
 		}
 	}
 

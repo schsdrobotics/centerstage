@@ -11,14 +11,18 @@ data class Cycle(val backstage: Action, val stacks: Action)
 val Cycle.composite
     get() = SequentialAction(backstage, stacks)
 
+
 open class Cycles(val initial: Cycle, val rest: Cycle)
 class NoCycles : Cycles(Cycle(NullAction(), NullAction()), Cycle(NullAction(), NullAction()))
+
+class YellowPixel(val backdrop: Action, val intermediate: Action)
 
 open class AutoActions(
     val purple: Action,
     val yellow: Action,
     val cycles: Cycles,
     val park: Action,
+    val extra: Action = NullAction()
 )
 
 class PurpleAuto(purple: Action) : AutoActions(purple, NullAction(), NoCycles(), NullAction())

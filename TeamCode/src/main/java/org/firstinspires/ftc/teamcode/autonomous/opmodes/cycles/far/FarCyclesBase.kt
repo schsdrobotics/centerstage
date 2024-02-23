@@ -1,62 +1,77 @@
 package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.far
 
-import com.acmerobotics.roadrunner.PoseVelocity2d
-import com.acmerobotics.roadrunner.Vector2d
-import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side
-import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.hardware.Robot
-import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
+import org.firstinspires.ftc.teamcode.hardware.cycles.IntakeCycle
+import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
+import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeScore
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.drive.DriveAdjustCommand
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.DropIntake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeToStackHeight
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.RaiseIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.PunchPixels
-import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
-	override fun first() { Robot.intake.target = Robot.IntakeHardware.Configuration.DOWN_ANGLE; Robot.intake.periodic() }
+	override fun first() {
+		Robot.intake.target = 35.0; Robot.intake.periodic()
+		PunchPixels(Robot.puncher).initialize()
+	}
 
-	override fun actions() = SequentialCommandGroup(
-		DropIntake(Robot.intake),
-		ActionCommand(path.purple),
-		RaiseIntake(Robot.intake),
-
-		ActionCommand(path.cycles.initial.stacks),
-
-		IntakeToStackHeight(4.0, Robot.intake),
-
+	val preloads by lazy {
 		SequentialCommandGroup(
-			MoveLiftTo(Lift.Position.INTAKE.ticks + 25, Robot.lift),
-			IntakeIn(Robot.intake) { 1.0 },
-			WaitCommand(750)
-		),
+			IntakeTo(20.0, Robot.intake),
 
-		ParallelCommandGroup(
-			ActionCommand(path.cycles.initial.backstage),
-			SequentialCommandGroup(
-				WaitCommand(500),
-				StopIntake(Robot.intake),
-				ParallelCommandGroup(
-					RaiseIntake(Robot.intake),
+			ActionCommand(path.purple),
+			IntakeOut(Robot.intake) { 0.65 },
+			WaitCommand(750),
+			StopIntake(Robot.intake),
+
+			ParallelCommandGroup(
+				SequentialCommandGroup(
+					TransferDeposit(Robot.deposit, false),
 					PunchPixels(Robot.puncher)
 				)
+			)
+		)
+	}
+
+	override fun actions() = SequentialCommandGroup(
+		preloads,
+
+		SequentialCommandGroup(
+			ActionCommand(path.cycles.initial.stacks)
+				.alongWith(UnsafeLiftZero(Robot.lift)),
+
+			IntakeCycle(Robot.intake, Robot.lift, 6, 500),
+
+			ParallelCommandGroup(
+				ActionCommand(path.cycles.initial.backstage),
+
+				SequentialCommandGroup(
+					WaitCommand(750),
+					StopIntake(Robot.intake)
+						.andThen(RaiseIntake(Robot.intake))
+						.alongWith(SequentialCommandGroup(
+							MoveLiftTo(Lift.Position.ZERO, Robot.lift),
+							PunchPixels(Robot.puncher)
+						))
+				),
 			),
-		),
 
-		LiftTo(Lift.Position.MID, Robot.lift, Robot.deposit),
+			UnsafeScore(Robot.lift, Lift.Position.MID, drive),
 
-		DriveAdjustCommand(Vector2d(0.0, -0.1), 0.0, { currentDraw > 2.5 }, drive),
+			UnsafeLiftZero(Robot.lift),
 
-		InstantCommand({ drive.setDrivePowers(PoseVelocity2d(Vector2d(0.0, 0.0), 0.0)) })
+			ActionCommand(path.extra)
+		)
 	)
 }
