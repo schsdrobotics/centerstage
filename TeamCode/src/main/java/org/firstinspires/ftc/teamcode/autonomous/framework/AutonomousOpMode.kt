@@ -52,12 +52,12 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
         }
     }
 
-    val processor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
+    val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
 
     val portal by lazy {
         VisionPortal.Builder()
                 .setCamera(hardwareMap["front"] as WebcamName)
-                .addProcessor(processor)
+                .addProcessor(propProcessor)
                 .build()
     }
 
@@ -74,9 +74,9 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
         drive.pose = auto.start
         drive.updatePoseEstimate()
 
-        telemetry.addData("recorded prop position", processor.recordedPropPosition)
-        telemetry.addData("largest detected contour area", "${processor.largestContourArea} pixels")
-        telemetry.addData("detected mass center", "(${processor.largestContourX.roundToInt()}, y: ${processor.largestContourY.roundToInt()})")
+        telemetry.addData("recorded prop position", propProcessor.recordedPropPosition)
+        telemetry.addData("largest detected contour area", "${propProcessor.largestContourArea} pixels")
+        telemetry.addData("detected mass center", "(${propProcessor.largestContourX.roundToInt()}, y: ${propProcessor.largestContourY.roundToInt()})")
         telemetry.addData("camera state", portal.cameraState)
 
         telemetry.addData("drive pose", drive.pose.position.toString())
@@ -124,7 +124,7 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     }
 
     private fun getPropPositions(): PropPositions {
-        val recorded = processor.recordedPropPosition
+        val recorded = propProcessor.recordedPropPosition
 
         return if (recorded == Unfound) Middle else recorded
     }
