@@ -1,4 +1,50 @@
-- make the preloads class just an auto runner
-- make adjustable auto menu
-- lift heights
-- intake heights
+start: 9:45am | end: 7:45am | duration: 10 hours
+estimated: 605 minutes (~10.1 hours) | buffer: none, taken out of testing
+
+- set-up [1 hour]
+  - intaking pixels [30 min]
+    - determine the angle for each pixel on the stack empirically [20 min]
+    - ramp slowly downwards [10 min]
+
+  - aligning with stacks [30 min]
+    - utilize april tags [10 min]
+    - pid to center [20 min]
+
+- testing for all : (close, far) * (red, blue) [3 hours]
+  - 30 min of testing per
+  - 4 types of tests
+  - 3 stages of opmodes
+
+- 2+0 [1.25 hours]
+  - purple pixel [30 minutes]
+    - create meepmeep path for each mark [15 minutes]
+    - intake purple pixel out [15 minutes]
+
+  - yellow pixel [30 minutes]
+    - rely on odometry to just go to the right spot
+
+  - test for all
+
+  - constrain under 5 seconds [15 min]
+
+- 2+2 / 2+3 [55 min]
+  - intake 2 from stacks [20 min]
+
+  - score the 2 onto the backdrop [20 min]
+    - sidegame
+    - strafe with sidegame to drop them nicely
+    - current detection?
+
+  - test for all
+ 
+  - constrain under 12 seconds [15 min]
+
+- 2+4 / 2+5 [55 min]
+  - go back to original stack, intake 2 more [20 min]
+  - score these two [20 min]
+  
+  - test for all
+  
+  - should be constrained to exactly 30 seconds [15 min]
+    - preloads + cycle + cycle + park = 30s
+    -    5s    +  12s  +  12s  +  1s  = 30s
