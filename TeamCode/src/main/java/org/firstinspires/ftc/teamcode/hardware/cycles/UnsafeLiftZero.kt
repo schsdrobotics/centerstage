@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 
-class UnsafeLiftZero : SequentialCommandGroup(
+class UnsafeLiftZero(lift: Lift) : SequentialCommandGroup(
 	TransferDeposit(Robot.deposit, false),
 	WaitCommand(250),
-	MoveLiftTo(Lift.Position.ZERO, Robot.lift),
+	MoveLiftTo(Lift.Position.ZERO, lift),
 )

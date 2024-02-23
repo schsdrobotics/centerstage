@@ -86,13 +86,14 @@ public final class MecanumDrive {
         public double maxAngAccel = MAX_ANGULAR_ACCEL;
 
         // path controller gains
-        public double axialGain = 8.0;
-        public double lateralGain = 4.0;
-        public double headingGain = 8.0; // shared with turn
+        public double axialGain = 14.0 - 2.0;
+        public double lateralGain = 6.0 - 1.0;
+        public double headingGain = 14.0 - 2.0; // shared with turn
 
-        public double axialVelGain = 1.5;
-        public double lateralVelGain = 0.2;
-        public double headingVelGain = 0.25; // shared with turn, was formerly 1.0
+        public double axialVelGain = 2.0 - 1.0
+                ;
+        public double lateralVelGain = 0.3;
+        public double headingVelGain = 1.25; // shared with turn, was formerly 1.0
     }
 
     public static Params PARAMS = new Params();
@@ -274,7 +275,14 @@ public final class MecanumDrive {
                 t = Actions.now() - beginTs;
             }
 
-            if (t >= timeTrajectory.duration) {
+            Pose2dDual<Time> txWorldTarget = timeTrajectory.get(t);
+            targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
+
+            PoseVelocity2d robotVelRobot = updatePoseEstimate();
+
+            boolean temporal = t >= timeTrajectory.duration;
+
+            if (temporal) {
                 leftFront.setPower(0);
                 leftBack.setPower(0);
                 rightBack.setPower(0);
@@ -282,11 +290,6 @@ public final class MecanumDrive {
 
                 return false;
             }
-
-            Pose2dDual<Time> txWorldTarget = timeTrajectory.get(t);
-            targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
-
-            PoseVelocity2d robotVelRobot = updatePoseEstimate();
 
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,

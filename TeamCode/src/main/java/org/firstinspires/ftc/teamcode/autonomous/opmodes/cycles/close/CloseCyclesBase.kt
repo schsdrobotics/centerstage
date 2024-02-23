@@ -2,15 +2,16 @@ package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.close
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
+import com.arcrobotics.ftclib.command.WaitCommand
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Cycle
 import org.firstinspires.ftc.teamcode.hardware.Robot.IntakeHardware.Configuration.DOWN_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.Robot.intake
 import org.firstinspires.ftc.teamcode.hardware.Robot.lift
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
 import org.firstinspires.ftc.teamcode.hardware.cycles.IntakeCycle
-import org.firstinspires.ftc.teamcode.hardware.cycles.SweepIntake
 import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
 import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeScore
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
@@ -26,66 +27,50 @@ open class CloseCyclesBase(side: AutonomousSide, position: AutonomousPosition) :
 		intake.target = DOWN_ANGLE; intake.periodic()
 	}
 
-	val preloads = SequentialCommandGroup(
-		DropIntake(intake),
-		ActionCommand(path.purple),
-		RaiseIntake(intake),
+	val preloads by lazy {
+		SequentialCommandGroup(
+			DropIntake(intake),
+			ActionCommand(path.purple),
+			RaiseIntake(intake),
 
-		ActionCommand(path.yellow),
-		UnsafeScore(Lift.Position.LOW)
-	)
+			ActionCommand(path.yellow),
+			UnsafeScore(lift, Lift.Position.LOW)
+		)
+	}
 
-	val initial = SequentialCommandGroup(
-		ActionCommand(path.cycles.initial.stacks)
-			.alongWith(UnsafeLiftZero()),
+	fun generate(cycle: Cycle, n: Int): SequentialCommandGroup {
+		return SequentialCommandGroup(
+			ActionCommand(cycle.stacks)
+				.alongWith(UnsafeLiftZero(lift)),
 
-		SweepIntake(6, 4) { 150 },
+			IntakeCycle(intake, lift, n, 500),
 
-		IntakeCycle(1500),
+			ParallelCommandGroup(
+				ActionCommand(cycle.backstage),
 
-		ParallelCommandGroup(
-			ActionCommand(path.cycles.initial.backstage),
-			SequentialCommandGroup(
-				StopIntake(intake),
-
-				RaiseIntake(intake)
-					.alongWith(PunchPixels(puncher)),
-
-				MoveLiftTo(Lift.Position.ZERO, lift)
+				SequentialCommandGroup(
+					WaitCommand(750),
+					StopIntake(intake)
+						.andThen(RaiseIntake(intake))
+						.alongWith(SequentialCommandGroup(
+							MoveLiftTo(Lift.Position.ZERO, lift),
+							PunchPixels(puncher)
+						))
+				),
 			),
-		),
 
-		UnsafeScore(Lift.Position.MID),
-		UnsafeLiftZero()
-	)
+			UnsafeScore(lift, Lift.Position.MID),
 
-	val rest = SequentialCommandGroup(
-		ActionCommand(path.cycles.rest.stacks)
-			.alongWith(UnsafeLiftZero()),
+			UnsafeLiftZero(lift)
+		)
+	}
 
-		SweepIntake(4, 2) { 150 },
-
-		IntakeCycle(1500),
-
-		ParallelCommandGroup(
-			ActionCommand(path.cycles.rest.backstage),
-			SequentialCommandGroup(
-				StopIntake(intake),
-
-				RaiseIntake(intake)
-					.alongWith(PunchPixels(puncher)),
-
-				MoveLiftTo(Lift.Position.ZERO, lift)
-			),
-		),
-
-		UnsafeScore(Lift.Position.MID),
-		UnsafeLiftZero()
-	)
+	val initial by lazy { generate(path.cycles.initial, 5) }
+	val rest by lazy { generate(path.cycles.rest, 3) }
 
 	override fun actions() =
 		preloads
 			.andThen(initial)
-			.andThen(rest)
-			.andThen(ActionCommand(path.park))
+//			.andThen(rest)
+//			.andThen(ActionCommand(path.park))
 }

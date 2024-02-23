@@ -25,14 +25,14 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
     private var happy = false
 
-    val align = State(VERTICAL_OFFSET, TRANSFER_ANGLE + HORIZONTAL_OFFSET)
+    val align = State(VERTICAL_OFFSET + TRANSFER_ANGLE, HORIZONTAL_OFFSET)
 
     var verticalAdjustment = 0.0
 
     var state = align
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
 
-    var targets = Kinematics.inverse(state)
+    var targets = Kinematics.inverse(align)
 
     fun flip(omega: Double) = to(omega, state.horizontal)
     fun turn(theta: Double) = to(state.vertical, theta)
@@ -55,6 +55,10 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
             Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 20) state.horizontal else -locked))
         } else {
             Kinematics.inverse(state)
+        }
+
+        if (!lift.cleared) {
+            targets = Kinematics.inverse(align)
         }
 
         telemetry.addData("left angle", angles.left)
@@ -95,8 +99,9 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
         var left = 0.0
 
         fun read() {
-            right = (360.0 - round(rightReader.voltage / 3.3 * 360)) - 14.0 - 6.0 + 2.0
-            left = (round(leftReader.voltage / 3.3 * 360)) - 40 + 26.0
+            // errors should be +/- 2
+            right = (360.0 - round(rightReader.voltage / 3.3 * 360)) - 1.0
+            left = (round(leftReader.voltage / 3.3 * 360)) - 4.0
         }
     }
 

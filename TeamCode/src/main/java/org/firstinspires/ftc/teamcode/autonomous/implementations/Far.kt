@@ -49,7 +49,7 @@ class Far(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
     }
 
     override val middle = run {
-        val pixelY = -(25.0 + APOTHEM) - 1.5
+        val pixelY = -(25.0 + MAJOR_APOTHEM) - 1.5
         val purplePose = pose(-36.0, pixelY, 90.deg)
 
         val purple = drive.actionBuilder(start)

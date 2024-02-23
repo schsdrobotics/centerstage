@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.lift
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
 import org.firstinspires.ftc.teamcode.hardware.Robot.secondary
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AdjustDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
@@ -99,6 +100,9 @@ class DriverControlled : CommandOpMode() {
 					MoveLiftTo(0, lift)
 				)
 			)
+
+		Robot.DepositHardware.right.turnToAngle(Deposit.Kinematics.inverse(deposit.align).right)
+		Robot.DepositHardware.left.turnToAngle(Deposit.Kinematics.inverse(deposit.align).left)
 	}
 
 	override fun run() {
