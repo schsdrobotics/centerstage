@@ -4,11 +4,11 @@ import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Side
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 
-open class CloseCyclesPathBase(side: AutonomousSide, position: AutonomousPosition) : AutonomousOpMode(side, position) {
+open class CloseCyclesPathBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
 	override fun first() {}
 
 	val preloads by lazy {

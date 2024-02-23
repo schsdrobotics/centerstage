@@ -7,8 +7,8 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Side
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.cycles.LiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.Mo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.PunchPixels
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
-open class FarCyclesBase(side: AutonomousSide, position: AutonomousPosition) : AutonomousOpMode(side, position) {
+open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
 	override fun first() { Robot.intake.target = Robot.IntakeHardware.Configuration.DOWN_ANGLE; Robot.intake.periodic() }
 
 	override fun actions() = SequentialCommandGroup(

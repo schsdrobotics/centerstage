@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 import org.firstinspires.ftc.vision.VisionPortal
 
-abstract class AutonomousOpMode(val side: AutonomousSide, val position: AutonomousPosition) : OpMode() {
+abstract class AutonomousOpMode(val side: Alliance, val position: Side) : OpMode() {
     var start = Pose2d(0.0, 0.0, 0.0)
 
     val gamepad by lazy { GamepadEx(gamepad1) }
@@ -27,8 +27,8 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
 
     val mirrored by lazy {
         when (side) {
-            AutonomousSide.Red -> recordedPropPosition
-            AutonomousSide.Blue -> when (recordedPropPosition) {
+            Alliance.Red -> recordedPropPosition
+            Alliance.Blue -> when (recordedPropPosition) {
                 Left -> Right
                 Right -> Left
                 Middle -> Middle
@@ -40,8 +40,8 @@ abstract class AutonomousOpMode(val side: AutonomousSide, val position: Autonomo
 
     val auto by lazy {
         when (position) {
-            AutonomousPosition.Backstage -> Close(drive, side)
-            AutonomousPosition.Stacks -> Far(drive, side)
+            Side.Backstage -> Close(drive, side)
+            Side.Stacks -> Far(drive, side)
         }.also { drive.pose = it.start }
     }
 

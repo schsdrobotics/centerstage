@@ -4,13 +4,13 @@ import com.acmerobotics.roadrunner.NullAction
 import com.acmerobotics.roadrunner.Pose2d
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycle
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycles
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
-class Far(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
+class Far(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
     override val start = pose(-36.0, -64.0, Math.toRadians(89.995))
 
     private fun cycleGenerator(begin: Pose2d, first: Boolean = true): Pair<Cycle, Pose2d> {

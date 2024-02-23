@@ -9,14 +9,14 @@ import com.acmerobotics.roadrunner.Pose2dDual
 import com.acmerobotics.roadrunner.VelConstraint
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutoActions
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycle
 import org.firstinspires.ftc.teamcode.autonomous.framework.Cycles
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
 
-class Close(drive: MecanumDrive, color: AutonomousSide) : Auto(drive, color) {
+class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
     override val start = pose(24.0 - MINOR_APOTHEM, -64.0, Math.toRadians(89.995))
 
     private fun cycleGenerator(begin: Pose2d, first: Boolean = true): Pair<Cycle, Pose2d> {

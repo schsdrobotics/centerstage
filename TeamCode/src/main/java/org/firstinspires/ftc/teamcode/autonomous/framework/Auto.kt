@@ -6,7 +6,7 @@ import com.acmerobotics.roadrunner.Rotation2d
 import com.acmerobotics.roadrunner.Vector2d
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 
-abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
+abstract class Auto(val drive: MecanumDrive, val color: Alliance) {
     abstract val start: Pose2d
 
     abstract val left: AutoActions
@@ -16,12 +16,12 @@ abstract class Auto(val drive: MecanumDrive, val color: AutonomousSide) {
     abstract fun park(target: Pose2d): Action
 
     fun point(x: Double, y: Double): Vector2d = when (color) {
-        AutonomousSide.Red -> Vector2d(x, y)
-        AutonomousSide.Blue -> Vector2d(x, -y)
+        Alliance.Red -> Vector2d(x, y)
+        Alliance.Blue -> Vector2d(x, -y)
     }
     fun pose(x: Double, y: Double, heading: Double): Pose2d = when (color) {
-        AutonomousSide.Red -> Pose2d(x, y, heading)
-        AutonomousSide.Blue -> Pose2d(x, -y, Rotation2d.exp(heading).inverse().log())
+        Alliance.Red -> Pose2d(x, y, heading)
+        Alliance.Blue -> Pose2d(x, -y, Rotation2d.exp(heading).inverse().log())
     }
 
     companion object {

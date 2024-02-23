@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousPosition
-import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousSide
+import org.firstinspires.ftc.teamcode.autonomous.framework.Side
+import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.close.CloseCyclesBase
 import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.close.CloseCyclesPathBase
 import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.far.FarCyclesBase
 
 @Autonomous(group = "Cycles")
-class RedCloseCyclesPath : CloseCyclesPathBase(AutonomousSide.Red, AutonomousPosition.Backstage)
+class RedCloseCyclesPath : CloseCyclesPathBase(Alliance.Red, Side.Backstage)
 
 @Autonomous(group = "Cycles")
-class RedCloseCycles : CloseCyclesBase(AutonomousSide.Red, AutonomousPosition.Backstage)
+class RedCloseCycles : CloseCyclesBase(Alliance.Red, Side.Backstage)
 
 @Autonomous(group = "Cycles")
-class RedFarCycles : FarCyclesBase(AutonomousSide.Red, AutonomousPosition.Stacks)
+class RedFarCycles : FarCyclesBase(Alliance.Red, Side.Stacks)
 
 @Autonomous(group = "Cycles")
-class BlueCloseCycles : CloseCyclesBase(AutonomousSide.Blue, AutonomousPosition.Backstage)
+class BlueCloseCycles : CloseCyclesBase(Alliance.Blue, Side.Backstage)
 
 @Autonomous(group = "Cycles")
-class BlueFarCycles : FarCyclesBase(AutonomousSide.Blue, AutonomousPosition.Stacks)
+class BlueFarCycles : FarCyclesBase(Alliance.Blue, Side.Stacks)
