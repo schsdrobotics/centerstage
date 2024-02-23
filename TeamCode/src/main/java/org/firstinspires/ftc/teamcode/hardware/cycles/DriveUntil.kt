@@ -6,7 +6,7 @@ import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandBase
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 
-class DriveIntoBackdrop(
+class DriveUntil(
 	private val linear: Vector2d,
 	private val angular: Double,
 	private val shouldFinish: () -> Boolean,

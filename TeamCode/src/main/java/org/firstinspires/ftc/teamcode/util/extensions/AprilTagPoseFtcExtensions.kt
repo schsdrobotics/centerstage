@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.extensions
 
+import com.acmerobotics.roadrunner.Vector2d
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc
 
 operator fun AprilTagPoseFtc.plus(other: AprilTagPoseFtc) = AprilTagPoseFtc(
@@ -69,3 +70,5 @@ fun AprilTagPoseFtc.reciprocal() = AprilTagPoseFtc(
         1.0 / bearing,
         1.0 / elevation,
 )
+
+fun AprilTagPoseFtc.toVector2d() = Vector2d(this.x, this.y)

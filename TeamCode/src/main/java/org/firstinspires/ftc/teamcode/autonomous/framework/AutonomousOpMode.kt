@@ -7,15 +7,18 @@ import com.arcrobotics.ftclib.command.CommandScheduler
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
 import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor.PropPositions.*
+import org.firstinspires.ftc.teamcode.processors.centerStageTagLibrary
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 import org.firstinspires.ftc.vision.VisionPortal
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.roundToInt
 
 abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode() {
@@ -53,6 +56,16 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     }
 
     val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
+
+    val tagProcessor by lazy {
+        AprilTagProcessor.Builder()
+            .setDrawTagID(true)
+            .setDrawCubeProjection(true)
+            .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+            .setNumThreads(2)
+            .setTagFamily(AprilTagProcessor.TagFamily.TAG_standard41h12)
+            .setTagLibrary(centerStageTagLibrary())
+    }
 
     val portal by lazy {
         VisionPortal.Builder()
