@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous.framework
 import com.acmerobotics.roadrunner.Action
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Rotation2d
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.Vector2d
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
@@ -14,7 +15,7 @@ abstract class Auto(val drive: MecanumDrive, val color: Alliance) {
     abstract val right: AutoActions
     abstract val middle: AutoActions
 
-    abstract fun park(target: Pose2d): Action
+    abstract fun getPark(): (TrajectoryActionBuilder) -> Action
 
     fun signed(y: Double) = when (color) {
         Alliance.Red -> y

@@ -14,6 +14,7 @@ val Cycle.composite
 
 open class Cycles(val initial: Cycle, val rest: Cycle)
 class NoCycles : Cycles(Cycle(NullAction(), NullAction()), Cycle(NullAction(), NullAction()))
+class SingleCycle(stacks: Action, backstage: Action) : Cycles(Cycle(stacks, backstage), Cycle(NullAction(), NullAction()))
 
 class YellowPixel(val backdrop: Action, val intermediate: Action)
 
