@@ -37,23 +37,26 @@ class Far(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         }
 
         val stackX = -(69.0 - HEIGHT + 6.5)
-        val stackPose = pose(stackX, -11.5, 180.deg)
+        val stackPose = pose(stackX, -11.5, 180.invertibleDeg)
         val stackTangent = 90.invertibleDeg
 
         val stack = drive.actionBuilder(begin)
-            .setTangent(stackTangent)
-            .splineToLinearHeading(stackPose, 180.invertibleDeg, stackVelConstraint, stackAccelConstraint)
+            .setTangent(0.deg)
+//            .splineToLinearHeading(stackPose, 180.invertibleDeg, stackVelConstraint, stackAccelConstraint)
+            .lineToXLinearHeading(begin.position.x + 1.0, 180.invertibleDeg)
             .endTrajectory()
 
         val backstageTangent = (0).deg
 
-        val end = pose(47.5, y, 180.deg)
+        val end = pose(49.75, y, 180.deg)
 
-        val backstage = drive.actionBuilder(stackPose)
-            .setTangent(backstageTangent)
-            .lineToXConstantHeading(end.position.x)
+        val backstage = drive.actionBuilder(pose(begin.position.x + 1.0, -11.5, 180.invertibleDeg))
+            .setTangent(0.invertibleDeg)
+            .lineToXConstantHeading(end.position.x - 10.0)
             .setTangent(90.invertibleDeg)
             .lineToYConstantHeading(end.position.y)
+            .setTangent(0.invertibleDeg)
+            .lineToXConstantHeading(end.position.x)
 
         val intermediate = pose(47.0, -16.25, 150.deg)
 

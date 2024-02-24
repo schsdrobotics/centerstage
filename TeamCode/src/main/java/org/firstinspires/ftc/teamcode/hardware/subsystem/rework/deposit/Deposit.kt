@@ -27,7 +27,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
     val align = State(VERTICAL_OFFSET + TRANSFER_ANGLE, HORIZONTAL_OFFSET)
 
-    var verticalAdjustment = 0.0
+    var headingTarget = 270.0
 
     var state = align
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
@@ -47,7 +47,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     fun verticallyAdjust(angle: Double) { VERTICAL_OFFSET = Range.clip(VERTICAL_OFFSET + angle, -2.0, 7.0) }
 
     override fun periodic() {
-        val locked = Kinematics.lock(heading(), 270.0)
+        val locked = Kinematics.lock(heading(), headingTarget)
 
         if (!lift.cleared) happy = true
 

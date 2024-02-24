@@ -92,10 +92,17 @@ class DriverControlled : CommandOpMode() {
 
 		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
 
-		GamepadButton(secondary, Button.LEFT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Expansion }))
-		GamepadButton(secondary, Button.RIGHT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
+		GamepadButton(secondary, Button.RIGHT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Expansion }))
+		GamepadButton(secondary, Button.LEFT_STICK_BUTTON).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
 
 		GamepadButton(secondary, Button.START).whenPressed(InstantCommand({ lift.reset() }))
+		GamepadButton(secondary, Button.BACK).whenPressed(InstantCommand({
+			deposit.headingTarget = when (deposit.headingTarget) {
+				90.0 -> 270.0
+				270.0 -> 90.0
+				else -> 270.0
+			}
+		}))
 
 		GamepadButton(secondary, Button.DPAD_DOWN).whenPressed(ForcefulLiftAdjustment(-10, lift))
 		GamepadButton(secondary, Button.DPAD_UP).whenPressed(ForcefulLiftAdjustment(10, lift))

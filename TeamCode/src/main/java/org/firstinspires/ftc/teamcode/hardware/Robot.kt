@@ -92,6 +92,7 @@ object Robot {
 		puncher = Puncher(telemetry = telemetry)
 		intake = Intake()
 		led = Led()
+		relayer = Relayer()
 
 		subsystems = if (auto) {
 			listOf(deposit, lift, launcher, puncher, intake, led, relayer)
@@ -186,10 +187,10 @@ object Robot {
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
 			const val ALIGN_ANGLE = 35.0 // degrees
-			const val TRANSFER_ANGLE = 40.0 // degrees
+			const val TRANSFER_ANGLE = 42.75 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			var HORIZONTAL_OFFSET = 3.5 // degrees, + is ccw
+			var HORIZONTAL_OFFSET = 4.5 // degrees, + is ccw
 			var VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
 		}
 	}
