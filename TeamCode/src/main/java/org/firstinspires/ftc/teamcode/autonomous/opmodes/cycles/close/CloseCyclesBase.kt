@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.close
 
+import com.acmerobotics.roadrunner.Vector2d
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
@@ -10,19 +11,19 @@ import org.firstinspires.ftc.teamcode.hardware.Robot.deposit
 import org.firstinspires.ftc.teamcode.hardware.Robot.intake
 import org.firstinspires.ftc.teamcode.hardware.Robot.lift
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
+import org.firstinspires.ftc.teamcode.hardware.cycles.DriveUntil
 import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.RaiseIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropOnePixel
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.PunchPixels
+import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 open class CloseCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
 	override fun first() {
@@ -31,35 +32,39 @@ open class CloseCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(si
 	}
 
 	override fun actions() = SequentialCommandGroup(
-		IntakeTo(20.0, intake),
+		ParallelCommandGroup(
+			SequentialCommandGroup(
+				ActionCommand(path.purple),
+				IntakeOut(intake) { 1.0 },
+				WaitCommand(750),
+				StopIntake(intake),
+				RaiseIntake(intake),
+			),
 
-		ActionCommand(path.purple),
-		IntakeOut(intake) { 0.7 },
-		WaitCommand(750),
-		StopIntake(intake),
-
-		TransferDeposit(deposit, false),
-		PunchPixels(puncher),
-
-		MoveLiftTo(Lift.Position.LOW, lift),
-		ScoreDeposit(deposit, false),
-		WaitCommand(150),
-		DropOnePixel(puncher),
+			SequentialCommandGroup(
+				MoveLiftTo(Lift.Position.LOW, lift),
+				ScoreDeposit(deposit, false),
+				WaitCommand(250),
+				MoveLiftTo(Lift.Position.CLEAR.ticks + 25, lift),
+			)
+		),
 
 		ActionCommand(path.yellow),
 
-		DropPixels(puncher)
+		DriveUntil(Vector2d(-0.2, 0.0), 0.0, { currentDraw >= 2.3 }, drive),
+		WaitCommand(250),
+		DropPixels(puncher),
+		WaitCommand(250),
+
+		SequentialCommandGroup(
+			MoveLiftTo(Lift.Position.LOW.ticks + 25, lift),
+			TransferDeposit(deposit, false),
+			WaitCommand(1000),
+			UnsafeLiftZero(lift)
+		),
+
+		ParallelCommandGroup(
+			ActionCommand(path.park),
+		),
 	)
-		.andThen(ParallelCommandGroup(
-			RaiseIntake(intake),
-
-			SequentialCommandGroup(
-				TransferDeposit(deposit, false),
-				WaitCommand(500),
-				UnsafeLiftZero(lift)
-			),
-
-			ActionCommand(path.park)
-		))
-
 }

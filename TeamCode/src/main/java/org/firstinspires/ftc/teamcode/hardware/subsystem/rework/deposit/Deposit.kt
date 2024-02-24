@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.util.Range
@@ -20,7 +21,7 @@ import kotlin.math.abs
 import kotlin.math.round
 
 
-class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
+class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? = null) : EfficientSubsystem() {
     private fun heading() = angle + 180
 
     private var happy = false
@@ -28,6 +29,8 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     val align = State(VERTICAL_OFFSET + TRANSFER_ANGLE, HORIZONTAL_OFFSET)
 
     var headingTarget = 270.0
+
+    var adjustment = State(0.0, 0.0)
 
     var state = align
         set(value) { field = State(value.vertical + VERTICAL_OFFSET, value.horizontal + HORIZONTAL_OFFSET) }
@@ -49,16 +52,22 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
     override fun periodic() {
         val locked = Kinematics.lock(heading(), headingTarget)
 
+        if (gamepad != null) {
+            if (gamepad.rightX != 0.0 || gamepad.rightY != 0.0) {
+                adjustment = State(-gamepad.rightY * 3.0, gamepad.rightX * 3.0)
+            }
+        }
+
         if (!lift.cleared) happy = true
 
         targets = if (lift.cleared && happy) {
             Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 20) state.horizontal else -locked))
         } else {
-            Kinematics.inverse(state)
+            Kinematics.inverse(state + adjustment)
         }
 
         if (!lift.cleared) {
-            targets = Kinematics.inverse(align)
+            targets = Kinematics.inverse(align + adjustment)
         }
 
         telemetry.addData("left angle", angles.left)
@@ -86,7 +95,9 @@ class Deposit(val telemetry: Telemetry, val lift: Lift) : EfficientSubsystem() {
 
     override fun reset() = Unit
 
-    data class State(val vertical: Double, val horizontal: Double)
+    data class State(val vertical: Double, val horizontal: Double) {
+        operator fun plus(x: State) = State(x.vertical + vertical, x.horizontal + horizontal)
+    }
     data class Offset(val left: Double, val right: Double) {
         operator fun plus(x: Offset) = Offset(left + x.left, right + x.right)
     }

@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.MinMax
 import com.acmerobotics.roadrunner.NullAction
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Pose2dDual
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.VelConstraint
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
@@ -115,7 +116,7 @@ class Far(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin, adjustment) = yellowGenerator(purplePose, -29.5)
         val (rest, end) = cycleGenerator(begin)
 
-        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), park(end), adjustment)
+        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), getPark()(drive.actionBuilder(end)), adjustment)
     }
 
     override val middle = run {
@@ -128,7 +129,7 @@ class Far(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin, adjustment) = yellowGenerator(purplePose, -35.5)
         val (rest, end) = cycleGenerator(begin)
 
-        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), park(end), adjustment)
+        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), getPark()(drive.actionBuilder(end)), adjustment)
     }
 
     override val right = run {
@@ -141,13 +142,18 @@ class Far(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin, adjustment) = yellowGenerator(purplePose, -42.5)
         val (rest, end) = cycleGenerator(begin)
 
-        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), park(end), adjustment)
+        AutoActions(purple.build(), NullAction(), Cycles(initial, rest), getPark()(drive.actionBuilder(end)), adjustment)
     }
 
-    override fun park(target: Pose2d) =
-        drive
-            .actionBuilder(target)
-            .setTangent(0.deg)
-            .splineToSplineHeading(pose(60.0, -7.0, 90.deg), 0.deg)
+    override fun getPark() = { builder: TrajectoryActionBuilder ->
+        builder
+            .setReversed(true)
+            .setTangent(0.invertibleDeg)
+            .lineToXConstantHeading(47.0)
+            .setTangent(90.invertibleDeg)
+            .lineToYLinearHeading(signed(-12.5), 90.invertibleDeg)
+            .setTangent(0.invertibleDeg)
+            .lineToXConstantHeading(60.0)
             .build()
+    }
 }

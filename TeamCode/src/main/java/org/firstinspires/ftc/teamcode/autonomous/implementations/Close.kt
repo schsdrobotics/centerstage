@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Arclength
 import com.acmerobotics.roadrunner.MinMax
 import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.Pose2dDual
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.acmerobotics.roadrunner.VelConstraint
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
@@ -79,7 +80,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
-        AutoActions(purple.build(), yellow, Cycles(initial, rest), park(last))
+        AutoActions(purple.build(), yellow, Cycles(initial, rest), getPark()(drive.actionBuilder(last)))
     }
 
     override val middle = run {
@@ -95,7 +96,7 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
-        AutoActions(purple.build(), yellow, Cycles(initial, rest), park(last))
+        AutoActions(purple.build(), yellow, Cycles(initial, rest), getPark()(drive.actionBuilder(last)))
     }
 
     override val right = run {
@@ -109,13 +110,12 @@ class Close(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
         val (initial, begin) = cycleGenerator(end)
         val (rest, last) = cycleGenerator(begin, first = false)
 
-        AutoActions(purple.build(), yellow, Cycles(initial, rest), park(last))
+        AutoActions(purple.build(), yellow, Cycles(initial, rest), getPark()(drive.actionBuilder(last)))
     }
 
-    override fun park(target: Pose2d) =
-        drive
-            .actionBuilder(target)
-            .setTangent(0.invertibleDeg)
-            .splineToSplineHeading(pose(60.0, -7.0, 90.deg), 0.invertibleDeg, { _, _, _ -> 50.0 }, { _, _, _ -> MinMax(-25.0, 25.0) })
+    override fun getPark() = { builder: TrajectoryActionBuilder ->
+        builder
+            .splineToLinearHeading(pose(60.0, -60.0, 90.deg), 0.0)
             .build()
+    }
 }

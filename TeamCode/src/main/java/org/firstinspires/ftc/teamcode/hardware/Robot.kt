@@ -87,7 +87,7 @@ object Robot {
 		if (!auto) drive = Drive(Robot.telemetry, Robot.gamepad)
 
 		lift = Lift(Robot.telemetry)
-		deposit = Deposit(Robot.telemetry, lift)
+		deposit = Deposit(Robot.telemetry, lift, Robot.secondary)
 		launcher = Launcher()
 		puncher = Puncher(telemetry = telemetry)
 		intake = Intake()
@@ -187,10 +187,10 @@ object Robot {
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
 			const val ALIGN_ANGLE = 35.0 // degrees
-			const val TRANSFER_ANGLE = 42.75 // degrees
-			const val SCORE_ANGLE = 160.0 // degrees
+			var TRANSFER_ANGLE = 46.5 + 41.0 // degrees
+			const val SCORE_ANGLE = 170.0 + 41.0 // degrees
 
-			var HORIZONTAL_OFFSET = 4.5 // degrees, + is ccw
+			var HORIZONTAL_OFFSET = 3.5 // degrees, + is ccw
 			var VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
 		}
 	}

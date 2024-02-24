@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.autonomous.implementations.Close
-import org.firstinspires.ftc.teamcode.autonomous.implementations.Far
+import org.firstinspires.ftc.teamcode.autonomous.implementations.OldClose
+import org.firstinspires.ftc.teamcode.autonomous.implementations.OldFar
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
@@ -43,8 +43,8 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
 
     val auto by lazy {
         when (side) {
-            Side.Backstage -> Close(drive, alliance)
-            Side.Stacks -> Far(drive, alliance)
+            Side.Backstage -> OldClose(drive, alliance)
+            Side.Stacks -> OldFar(drive, alliance)
         }.also { drive.pose = it.start }
     }
 
@@ -56,7 +56,7 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
         }
     }
 
-    val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 215.0 }) }
+    val propProcessor by lazy { ColourMassDetectionProcessor(alliance.lower, alliance.upper, { MINIMUM_MASS }, { 426.0 }) }
 
     val tagProcessor by lazy {
         AprilTagProcessor.Builder()
@@ -146,6 +146,6 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     }
 
     companion object {
-        const val MINIMUM_MASS = 13000.0
+        const val MINIMUM_MASS = 7000.0
     }
 }
