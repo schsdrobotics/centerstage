@@ -28,7 +28,7 @@ class Puncher(var state: State = TWO, val telemetry: Telemetry? = null) : Effici
 
     enum class State(val position: Double) {
         TWO(0.5),
-        ONE(0.3),
+        ONE(0.23),
         NONE(0.11),
     }
 }

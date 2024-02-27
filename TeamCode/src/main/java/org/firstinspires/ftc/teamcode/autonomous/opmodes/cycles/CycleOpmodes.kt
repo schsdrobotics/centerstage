@@ -3,8 +3,9 @@ package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
-import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.close.CloseCyclesBase
-import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.far.FarCyclesBase
+import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.bases.CloseCyclesBase
+import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.bases.FarCyclesBase
+
 @Autonomous(group = "Cycles")
 class RedCloseCycles : CloseCyclesBase(Alliance.Red, Side.Backstage)
 

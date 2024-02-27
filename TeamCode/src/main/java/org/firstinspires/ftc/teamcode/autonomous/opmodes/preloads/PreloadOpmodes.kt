@@ -5,16 +5,17 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance.Blue
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance.Red
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Backstage
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side.Stacks
-import org.firstinspires.ftc.teamcode.autonomous.opmodes.preloads.close.ClosePreloadsBase
+import org.firstinspires.ftc.teamcode.autonomous.opmodes.preloads.bases.ClosePreloadsBase
+import org.firstinspires.ftc.teamcode.autonomous.opmodes.preloads.bases.FarPreloadsBase
 
 @Autonomous(group = "Preloads")
 class RedClosePreloads : ClosePreloadsBase(Red, Backstage)
 
 @Autonomous(group = "Preloads")
-class RedFarPreloads : ClosePreloadsBase(Red, Stacks)
+class RedFarPreloads : FarPreloadsBase(Red, Stacks)
 
 @Autonomous(group = "Preloads")
 class BlueClosePreloads : ClosePreloadsBase(Blue, Backstage)
 
 @Autonomous(group = "Preloads")
-class BlueFarPreloads : ClosePreloadsBase(Blue, Stacks)
+class BlueFarPreloads : FarPreloadsBase(Blue, Stacks)

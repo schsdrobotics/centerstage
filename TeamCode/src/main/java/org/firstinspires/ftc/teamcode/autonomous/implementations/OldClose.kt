@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.autonomous.implementations
 
 import com.acmerobotics.roadrunner.Rotation2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
-import com.acmerobotics.roadrunner.Vector2d
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.Auto
 import org.firstinspires.ftc.teamcode.autonomous.framework.PreloadPark

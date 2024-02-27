@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx
+import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.util.Range
@@ -26,7 +27,8 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
 
     private var happy = false
 
-    val align = State(VERTICAL_OFFSET + TRANSFER_ANGLE, HORIZONTAL_OFFSET)
+    val align
+        get() = State(VERTICAL_OFFSET + TRANSFER_ANGLE, HORIZONTAL_OFFSET)
 
     var headingTarget = 270.0
 
@@ -53,14 +55,14 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
         val locked = Kinematics.lock(heading(), headingTarget)
 
         if (gamepad != null) {
-            if (gamepad.rightX != 0.0 || gamepad.rightY != 0.0) {
-                adjustment = State(-gamepad.rightY * 3.0, gamepad.rightX * 3.0)
+            if ((gamepad.rightX != 0.0 || gamepad.rightY != 0.0) && gamepad.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
+                adjustment = State(-gamepad.rightY * 10.0, gamepad.rightX * 10.0)
             }
         }
 
         if (!lift.cleared) happy = true
 
-        targets = if (lift.cleared && happy) {
+        targets = if (lift.cleared && happy && state.vertical == SCORE_ANGLE + VERTICAL_OFFSET) {
             Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 20) state.horizontal else -locked))
         } else {
             Kinematics.inverse(state + adjustment)
@@ -70,6 +72,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
             targets = Kinematics.inverse(align + adjustment)
         }
 
+        telemetry.addData("adjustment", adjustment)
         telemetry.addData("left angle", angles.left)
         telemetry.addData("right angle", angles.right)
         telemetry.addData("target angles", Kinematics.inverse(state))
@@ -84,7 +87,8 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
 
     override fun write() {
         if (state.vertical > 50 && !lift.cleared) {
-            val output = Kinematics.inverse(align)
+            val output = Kinematics.inverse(align + adjustment)
+            telemetry.addData("output", output)
             right.turnToAngle(output.right)
             left.turnToAngle(output.left)
         } else {

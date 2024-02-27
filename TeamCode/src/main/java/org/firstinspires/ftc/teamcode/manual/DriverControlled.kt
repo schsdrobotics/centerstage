@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.ForcefulLiftAdjustment
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.GoCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.CyclePuncher
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
@@ -55,8 +56,11 @@ class DriverControlled : CommandOpMode() {
 		GamepadButton(gamepad, Button.LEFT_STICK_BUTTON).whenPressed(ResetYawCommand(drive))
 
 		GamepadButton(gamepad, Button.RIGHT_BUMPER).whenPressed(IntakeCycle(intake))
-
-		GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(CyclePuncher(puncher))
+		GamepadButton(gamepad, Button.LEFT_BUMPER).whenPressed(ParallelCommandGroup(
+			CyclePuncher(puncher),
+			InstantCommand({ lift.target += 40 }),
+			GoCommand(lift)
+		))
 
 		Trigger { TriggerReader(gamepad, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
 			.whileActiveContinuous(
@@ -93,7 +97,7 @@ class DriverControlled : CommandOpMode() {
 		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
 
 		GamepadButton(secondary, Button.RIGHT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Expansion }))
-		GamepadButton(secondary, Button.LEFT_STICK_BUTTON).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
+		GamepadButton(secondary, Button.LEFT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
 
 		GamepadButton(secondary, Button.START).whenPressed(InstantCommand({ lift.reset() }))
 		GamepadButton(secondary, Button.BACK).whenPressed(InstantCommand({

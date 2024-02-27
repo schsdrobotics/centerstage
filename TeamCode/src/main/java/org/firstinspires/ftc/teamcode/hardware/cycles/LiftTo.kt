@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode.hardware.cycles
 import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
+import com.arcrobotics.ftclib.command.WaitCommand
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.TRANSFER_ANGLE
 import org.firstinspires.ftc.teamcode.hardware.Robot.DepositHardware.Configuration.VERTICAL_OFFSET
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.Deposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.AlignDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.UnlockDeposit
@@ -40,9 +42,11 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 				SequentialCommandGroup(
 					UnlockDeposit(deposit),
 					ParallelCommandGroup(
-						TransferDeposit(deposit),
+						AlignDeposit(deposit, false),
+						WaitCommand(250),
 						MoveLiftTo(Lift.Position.ZERO, lift),
-					)
+					),
+					TransferDeposit(deposit),
 				)
 			}
 
