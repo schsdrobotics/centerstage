@@ -42,12 +42,15 @@ open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(si
 		IntakeToStackHeight(5, intake),
 		IntakeIn(intake) { 0.7 },
 
+		WaitCommand(1000),
+
 		TransferDeposit(Robot.deposit, false),
 		PunchPixels(Robot.puncher),
 
 		ParallelCommandGroup(
 			ActionCommand(path.yellow),
 			SequentialCommandGroup(
+				StopIntake(intake),
 				RaiseIntake(intake),
 				WaitUntilCommand { drive.pose.position.x >= 8.0 },
 				MoveLiftTo(Lift.Position.LOW, Robot.lift),
