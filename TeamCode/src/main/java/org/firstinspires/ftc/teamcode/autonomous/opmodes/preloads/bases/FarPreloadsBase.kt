@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.Robot.intake
+import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
 import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
@@ -38,11 +39,13 @@ open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(si
 		WaitCommand(1500),
 		StopIntake(intake),
 
+		DropPixels(puncher),
+
 		ActionCommand(path.cycles.initial.stacks),
 		IntakeToStackHeight(5, intake),
 		IntakeIn(intake) { 0.7 },
 
-		WaitCommand(1000),
+		WaitCommand(2000),
 
 		TransferDeposit(Robot.deposit, false),
 		PunchPixels(Robot.puncher),
