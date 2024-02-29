@@ -45,9 +45,9 @@ abstract class Auto(val drive: MecanumDrive, val color: Alliance) {
         const val MAJOR_APOTHEM = HEIGHT / 2.0
         const val MINOR_APOTHEM = WIDTH / 2.0
 
-        const val MAX_WHEEL_VEL = 50.0
+        const val MAX_WHEEL_VEL = 60.0
         const val PROFILE_DECEL = -15.0
-        const val PROFILE_ACCEL = 40.0
+        const val PROFILE_ACCEL = 30.0
 
         const val MAX_ANGULAR_VEL = Math.PI / 2.0
 

@@ -31,6 +31,7 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
     init { reset() }
 
     override fun read() {
+
         position = abs(Robot.LiftHardware.left.currentPosition)
     }
 
@@ -46,7 +47,9 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
     }
 
     override fun reset() {
-        motors.forEach { it.targetPositionTolerance = 1 }
+        motors.forEach { it.power = 0.0 }
+        motors.forEach { it.targetPositionTolerance = 3 }
+        target = 0
         motors.forEach { it.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER }
         motors.forEach { it.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE }
         motors.forEach { it.targetPosition = 0 }

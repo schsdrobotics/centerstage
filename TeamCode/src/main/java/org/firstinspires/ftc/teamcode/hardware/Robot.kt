@@ -190,7 +190,7 @@ object Robot {
 			var TRANSFER_ANGLE = 28.0 // degrees
 			const val SCORE_ANGLE = 160.0 // degrees
 
-			var HORIZONTAL_OFFSET = 1.5 // degrees, + is ccw
+			var HORIZONTAL_OFFSET = 0.0 // degrees, + is ccw
 			var VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring
 		}
 	}
@@ -255,13 +255,14 @@ object Robot {
 
 			pitch = run {
 				val it = hw["pitch"] as Servo
+				it.direction = Servo.Direction.REVERSE
 				it.position = DOWN
 				it
 			}
 		}
 
 		object Configuration {
-			const val HOLD = 0.35
+			const val HOLD = 0.0
 			const val RELEASE = 1.0
 
 			const val DOWN = 0.0

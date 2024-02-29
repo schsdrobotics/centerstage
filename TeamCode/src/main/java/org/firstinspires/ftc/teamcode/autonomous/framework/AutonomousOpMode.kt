@@ -4,12 +4,13 @@ import com.acmerobotics.roadrunner.Pose2d
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder
 import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandScheduler
+import com.arcrobotics.ftclib.command.InstantCommand
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.autonomous.implementations.ClosePreloads
 import org.firstinspires.ftc.teamcode.autonomous.implementations.FarPreloads
-import org.firstinspires.ftc.teamcode.autonomous.implementations.OldClose
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
 import org.firstinspires.ftc.teamcode.processors.ColourMassDetectionProcessor
@@ -43,7 +44,7 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
 
     val auto by lazy {
         when (side) {
-            Side.Backstage -> OldClose(drive, alliance)
+            Side.Backstage -> ClosePreloads(drive, alliance)
             Side.Stacks -> FarPreloads(drive, alliance)
         }.also { drive.pose = it.start }
     }
@@ -116,7 +117,7 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
 
         first()
 
-        CommandScheduler.getInstance().schedule(actions())
+        CommandScheduler.getInstance().schedule(actions().andThen(InstantCommand({ requestOpModeStop() })))
     }
 
     override fun loop() {

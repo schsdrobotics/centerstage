@@ -30,8 +30,10 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.HoldCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.launcher.commands.LaunchCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift.Position.*
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.AdjustLift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.ForcefulLiftAdjustment
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.GoCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
@@ -94,8 +96,6 @@ class DriverControlled : CommandOpMode() {
 				)
 			)
 
-		GamepadButton(secondary, Button.LEFT_BUMPER).and(GamepadButton(secondary, Button.RIGHT_BUMPER)).whenActive(LaunchCommand(launcher))
-
 		GamepadButton(secondary, Button.RIGHT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Expansion }))
 		GamepadButton(secondary, Button.LEFT_BUMPER).whenActive(InstantCommand({ relayer.selected = Relayer.SelectedHub.Control }))
 
@@ -108,16 +108,29 @@ class DriverControlled : CommandOpMode() {
 			}
 		}))
 
-		GamepadButton(secondary, Button.DPAD_DOWN).whenPressed(ForcefulLiftAdjustment(-10, lift))
-		GamepadButton(secondary, Button.DPAD_UP).whenPressed(ForcefulLiftAdjustment(10, lift))
+		GamepadButton(gamepad, Button.DPAD_RIGHT).whenPressed(AdjustLift(100, lift).andThen(GoCommand(lift)))
+		GamepadButton(gamepad, Button.DPAD_LEFT).whenPressed(AdjustLift(-100, lift).andThen(GoCommand(lift)))
+
+		GamepadButton(secondary, Button.DPAD_DOWN).whenPressed(ForcefulLiftAdjustment(-25, lift).andThen(GoCommand(lift)))
+		GamepadButton(secondary, Button.DPAD_UP).whenPressed(ForcefulLiftAdjustment(25, lift).andThen(GoCommand(lift)))
 
 		GamepadButton(secondary, Button.DPAD_LEFT).whenPressed(AdjustDeposit(-1.0, deposit))
 		GamepadButton(secondary, Button.DPAD_RIGHT).whenPressed(AdjustDeposit(1.0, deposit))
 
-		GamepadButton(secondary, Button.X).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Purple) }))
-		GamepadButton(secondary, Button.Y).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Green) }))
-		GamepadButton(secondary, Button.A).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.White) }))
-		GamepadButton(secondary, Button.B).whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Yellow) }))
+		GamepadButton(secondary, Button.X)
+			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Purple) }))
+		GamepadButton(secondary, Button.Y)
+			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Green) }))
+		GamepadButton(secondary, Button.A)
+			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.White) }))
+		GamepadButton(secondary, Button.B)
+			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Yellow) }))
+
+		GamepadButton(secondary, Button.LEFT_BUMPER)
+			.whenActive(HoldCommand(launcher))
+
+		GamepadButton(secondary, Button.RIGHT_BUMPER)
+			.whenActive(LaunchCommand(launcher))
 
 		Trigger { TriggerReader(secondary, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
 			.whenActive(InstantCommand({ launcher.up() }))

@@ -68,10 +68,6 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
             Kinematics.inverse(state + adjustment)
         }
 
-        if (!lift.cleared) {
-            targets = Kinematics.inverse(align + adjustment)
-        }
-
         telemetry.addData("adjustment", adjustment)
         telemetry.addData("left angle", angles.left)
         telemetry.addData("right angle", angles.right)
@@ -86,15 +82,18 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
     }
 
     override fun write() {
-        if (state.vertical > 50 && !lift.cleared) {
-            val output = Kinematics.inverse(align + adjustment)
-            telemetry.addData("output", output)
-            right.turnToAngle(output.right)
-            left.turnToAngle(output.left)
-        } else {
-            right.turnToAngle(targets.right)
-            left.turnToAngle(targets.left)
-        }
+        right.turnToAngle(targets.right)
+        left.turnToAngle(targets.left)
+
+//        if (state.vertical > 50 && !lift.cleared) {
+//            val output = Kinematics.inverse(align + adjustment)
+//            telemetry.addData("output", output)
+//            right.turnToAngle(output.right)
+//            left.turnToAngle(output.left)
+//        } else {
+//            right.turnToAngle(targets.right)
+//            left.turnToAngle(targets.left)
+//        }
     }
 
     override fun reset() = Unit
