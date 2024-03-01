@@ -55,7 +55,7 @@ open class ClosePreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(
             )
         ),
 
-        ActionCommand(path.extra),
+        ActionCommand(path.extras.first()),
 
         MoveLiftTo(Lift.Position.LOW.ticks, Robot.lift),
         TransferDeposit(deposit, false),

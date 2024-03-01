@@ -23,7 +23,7 @@ open class AutoActions(
     val yellow: Action,
     val cycles: Cycles,
     val park: Action,
-    val extra: Action = NullAction()
+    val extras: List<Action> = emptyList()
 )
 
 class PurpleAuto(purple: Action) : AutoActions(purple, NullAction(), NoCycles(), NullAction())

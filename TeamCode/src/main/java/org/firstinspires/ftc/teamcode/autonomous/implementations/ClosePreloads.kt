@@ -53,7 +53,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.extra, 0.deg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extra = extra, park = getPark()(drive.actionBuilder(poses.extra)))
+		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extras = listOf(extra), park = getPark()(drive.actionBuilder(poses.extra)))
 	}
 
 	override val middle = run {
@@ -79,7 +79,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.extra, 0.deg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extra = extra, park = getPark()(drive.actionBuilder(poses.extra)))
+		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extras = listOf(extra), park = getPark()(drive.actionBuilder(poses.extra)))
 	}
 
 	override val right = run {
@@ -103,7 +103,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.extra, 0.deg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extra = extra, park = getPark()(drive.actionBuilder(poses.extra)))
+		AutoActions(purple, yellow, SingleCycle(stacks = NullAction(), backstage = NullAction()), extras = listOf(extra), park = getPark()(drive.actionBuilder(poses.extra)))
 	}
 
 	override fun getPark() = { builder: TrajectoryActionBuilder ->

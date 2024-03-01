@@ -130,7 +130,7 @@ class DriverControlled : CommandOpMode() {
 			.whenActive(HoldCommand(launcher))
 
 		GamepadButton(secondary, Button.RIGHT_BUMPER)
-			.whenActive(LaunchCommand(launcher))
+			.whenActive(LaunchCommand (launcher))
 
 		Trigger { TriggerReader(secondary, GamepadKeys.Trigger.RIGHT_TRIGGER).isDown }
 			.whenActive(InstantCommand({ launcher.up() }))

@@ -266,7 +266,7 @@ object Robot {
 			const val RELEASE = 1.0
 
 			const val DOWN = 0.0
-			const val UP = 0.25
+			const val UP = 0.1875
 		}
 	}
 

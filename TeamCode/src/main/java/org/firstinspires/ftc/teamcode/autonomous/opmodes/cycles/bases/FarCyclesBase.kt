@@ -1,68 +1,81 @@
 package org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.bases
 
-import com.acmerobotics.roadrunner.Vector2d
-import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.command.ParallelCommandGroup
 import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
+import com.arcrobotics.ftclib.command.WaitUntilCommand
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side
 import org.firstinspires.ftc.teamcode.hardware.Robot
+import org.firstinspires.ftc.teamcode.hardware.Robot.intake
 import org.firstinspires.ftc.teamcode.hardware.Robot.puncher
-import org.firstinspires.ftc.teamcode.hardware.cycles.DriveUntil
+import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.DropIntake
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
+import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.RaiseIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.StopIntake
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.Lift
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.MoveLiftTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.PunchPixels
-import org.firstinspires.ftc.teamcode.util.extensions.currentDraw
 
 open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
 	override fun first() {
-		Robot.intake.target = 35.0; Robot.intake.periodic()
+		intake.target = 20.0; intake.periodic()
 		PunchPixels(puncher).initialize()
 	}
 
 	override fun actions() = SequentialCommandGroup(
+		IntakeTo(20.0, intake),
+
 		ActionCommand(path.purple),
-		IntakeOut(Robot.intake) { 1.0 },
-		WaitCommand(750),
-		StopIntake(Robot.intake),
-		RaiseIntake(Robot.intake),
+		IntakeOut(intake) { 0.65 },
+		WaitCommand(1500),
+		StopIntake(intake),
+		RaiseIntake(intake),
 
-		ActionCommand(path.cycles.initial.backstage),
-		ActionCommand(path.cycles.initial.stacks),
-		ActionCommand(path.yellow),
-
-		SequentialCommandGroup(
-			MoveLiftTo(Lift.Position.LOW, Robot.lift),
-			ScoreDeposit(Robot.deposit, false),
-			WaitCommand(250),
-			MoveLiftTo(Lift.Position.CLEAR.ticks + 25, Robot.lift),
-		),
-
-		DriveUntil(Vector2d(-0.2, 0.0), 0.0, { currentDraw >= 2.0 }, drive),
-		WaitCommand(250),
 		DropPixels(puncher),
-		WaitCommand(250),
-		TransferDeposit(Robot.deposit, false),
-		WaitCommand(250),
+		MoveLiftTo(Lift.Position.INTAKE, Robot.lift),
 
-		SequentialCommandGroup(
-			MoveLiftTo(Lift.Position.LOW, Robot.lift),
-			TransferDeposit(Robot.deposit, false),
-			WaitCommand(1000),
-		),
+		ActionCommand(path.cycles.initial.stacks),
+		DropIntake(intake),
+		IntakeIn(intake) { 1.0 },
+
+		WaitCommand(2000),
+
+		MoveLiftTo(Lift.Position.ZERO, Robot.lift),
+
+		TransferDeposit(Robot.deposit, false),
+		PunchPixels(puncher),
 
 		ParallelCommandGroup(
-			ActionCommand(path.park),
-			InstantCommand({ requestOpModeStop() })
+			ActionCommand(path.yellow),
+			SequentialCommandGroup(
+				StopIntake(intake),
+				RaiseIntake(intake),
+				WaitUntilCommand { drive.pose.position.x >= 8.0 },
+				MoveLiftTo(Lift.Position.LOW, Robot.lift),
+				ScoreDeposit(Robot.deposit, false),
+				MoveLiftTo(200, Robot.lift),
+				WaitUntilCommand { drive.pose.position.x >= 53.0 },
+				WaitCommand(1000),
+				DropPixels(puncher),
+			)
 		),
+
+		ActionCommand(path.extras.first()),
+
+		MoveLiftTo(Lift.Position.LOW.ticks, Robot.lift),
+		TransferDeposit(Robot.deposit, false),
+		WaitCommand(250),
+		UnsafeLiftZero(Robot.lift),
+
+		ActionCommand(path.park)
 	)
 }

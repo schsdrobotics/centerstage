@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.SingleCycle
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
-class FarPreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
+class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 	override val start = pose(-36.0, -64.0, if (color == Alliance.Blue) 270.invertibleDeg else 90.invertibleDeg)
 
 	object StageConstraints {
