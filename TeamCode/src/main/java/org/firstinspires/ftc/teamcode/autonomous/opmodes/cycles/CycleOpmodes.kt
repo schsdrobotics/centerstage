@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.autonomous.opmodes.cycles.bases.FarCyclesB
 //class RedCloseCycles : CloseCyclesBase(Alliance.Red, Side.Backstage)
 
 @Autonomous(group = "Cycles")
-class RedFarCycles : FarCyclesBase(Alliance.Red, Side.Stacks)
+class RedFarCycles : FarCyclesBase(Alliance.Red, Side.Frontstage)
 
 //@Autonomous(group = "Cycles")
 //class BlueCloseCycles : CloseCyclesBase(Alliance.Blue, Side.Backstage)
 
 @Autonomous(group = "Cycles")
-class BlueFarCycles : FarCyclesBase(Alliance.Blue, Side.Stacks)
+class BlueFarCycles : FarCyclesBase(Alliance.Blue, Side.Frontstage)

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.autonomous.implementations.ClosePreloads
+import org.firstinspires.ftc.teamcode.autonomous.implementations.FarCycles
 import org.firstinspires.ftc.teamcode.autonomous.implementations.FarPreloads
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.Puncher
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.vision.VisionPortal
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.roundToInt
 
-abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode() {
+abstract class AutonomousOpMode(val alliance: Alliance, val side: Side, val nature: Nature) : OpMode() {
     var start = Pose2d(0.0, 0.0, 0.0)
 
     val builder: TrajectoryActionBuilder by lazy { drive.actionBuilder(start) }
@@ -43,10 +44,17 @@ abstract class AutonomousOpMode(val alliance: Alliance, val side: Side) : OpMode
     }
 
     val auto by lazy {
-        when (side) {
-            Side.Backstage -> ClosePreloads(drive, alliance)
-            Side.Stacks -> FarPreloads(drive, alliance)
-        }.also { drive.pose = it.start }
+        when (nature) {
+            Nature.Preloads -> when (side) {
+                Side.Backstage -> ClosePreloads(drive, alliance)
+                Side.Frontstage -> FarPreloads(drive, alliance)
+            }.also { drive.pose = it.start }
+
+            Nature.Cycles -> when (side) {
+                Side.Backstage -> throw Exception("oi you can't do that")
+                Side.Frontstage -> FarCycles(drive, alliance)
+            }.also { drive.pose = it.start }
+        }
     }
 
     val path: AutoActions by lazy {

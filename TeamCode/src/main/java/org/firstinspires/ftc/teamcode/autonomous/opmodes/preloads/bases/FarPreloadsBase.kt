@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.WaitCommand
 import com.arcrobotics.ftclib.command.WaitUntilCommand
 import org.firstinspires.ftc.teamcode.autonomous.framework.Alliance
 import org.firstinspires.ftc.teamcode.autonomous.framework.AutonomousOpMode
+import org.firstinspires.ftc.teamcode.autonomous.framework.Nature
 import org.firstinspires.ftc.teamcode.autonomous.framework.Side
 import org.firstinspires.ftc.teamcode.hardware.Robot
 import org.firstinspires.ftc.teamcode.hardware.Robot.intake
@@ -25,7 +26,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.lift.commands.Mo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.DropPixels
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands.PunchPixels
 
-open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(side, position) {
+open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(side, position, Nature.Preloads) {
 	override fun first() {
 		intake.target = 20.0; intake.periodic()
 		PunchPixels(puncher).initialize()

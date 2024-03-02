@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.autonomous.framework.SingleCycle
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.extensions.deg
 
-class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
+class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 	override val start = pose(-36.0, -64.0, if (color == Alliance.Blue) 270.invertibleDeg else 90.invertibleDeg)
 
 	object StageConstraints {
@@ -32,17 +32,13 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 		}
 	}
 
-	val Poses = object {
-//		val second = pose()
-	}
-
 	override val left = run {
 		val poses = object {
 			val purple = pose(-35.0, -32.0, 180.deg)
-			val stacks = pose(-55.0, -11.5, 180.deg)
+			val stacks = pose(-55.5, -12.0, 180.deg)
 			val yellow = pose(55.0, -29.0, 180.deg)
-			val extra = pose(47.5, -12.0, 180.deg)
-			val score = pose(47.5, -12.5, (-60).deg)
+			val extra = pose(24.0, -12.0, 180.deg)
+			val score = pose(52.0, -12.5, (-70 - 180).deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -61,11 +57,11 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 		val extra = drive.actionBuilder(poses.yellow)
 			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 0.deg)
+			.splineToLinearHeading(poses.extra, 180.deg)
 			.build()
 
-		val second = drive.actionBuilder(poses.yellow)
-			.setTangent(135.deg)
+		val second = drive.actionBuilder(poses.extra)
+			.setTangent(180.deg)
 			.splineToLinearHeading(poses.stacks, 180.deg)
 			.build()
 
@@ -78,14 +74,14 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 	}
 
 	override val middle = run {
-		val y = (-(25.0 + HEIGHT / 2.0) - 1.5 + 24.0)
+		val y = (-(25.0 + HEIGHT / 2.0) - 3.5 + 24.0)
 
 		val poses = object {
 			val purple = pose(-35.0, y, 270.deg)
-			val stacks = pose(-55.0, -11.5, 180.deg)
+			val stacks = pose(-55.5, -12.0, 180.deg)
 			val yellow = pose(55.0, -36.5, 180.deg)
-			val extra = pose(47.5, -12.0, 180.deg)
-			val score = pose(47.5, -12.5, (-60).deg)
+			val extra = pose(24.0, -12.0, 180.deg)
+			val score = pose(52.0, -13.5, (-70 - 180).deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -104,11 +100,11 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 		val extra = drive.actionBuilder(poses.yellow)
 			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 0.deg)
+			.splineToLinearHeading(poses.extra, 180.deg)
 			.build()
 
-		val second = drive.actionBuilder(poses.yellow)
-			.setTangent(135.deg)
+		val second = drive.actionBuilder(poses.extra)
+			.setTangent(180.deg)
 			.splineToLinearHeading(poses.stacks, 180.deg)
 			.build()
 
@@ -123,10 +119,10 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 	override val right = run {
 		val poses = object {
 			val purple = pose(-35.0, -32.0, 0.deg)
-			val stacks = pose(-55.0, -11.5, 180.deg)
+			val stacks = pose(-55.5, -12.0, 180.deg)
 			val yellow = pose(55.0, -41.0, 180.deg)
-			val extra = pose(47.5, -12.0, 180.deg)
-			val score = pose(47.5, -12.5, (-60).deg)
+			val extra = pose(24.0, -12.0, 180.deg)
+			val score = pose(52.0, -12.5, (-70 - 180).deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -134,7 +130,7 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.build()
 
 		val stacks = drive.actionBuilder(poses.purple)
-			.setTangent(75.invertibleDeg)
+			.setTangent(90.invertibleDeg)
 			.splineToLinearHeading(poses.stacks, 180.invertibleDeg)
 			.build()
 
@@ -145,11 +141,11 @@ class FarCycles	(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 		val extra = drive.actionBuilder(poses.yellow)
 			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 0.deg)
+			.splineToLinearHeading(poses.extra, 180.deg)
 			.build()
 
-		val second = drive.actionBuilder(poses.yellow)
-			.setTangent(135.deg)
+		val second = drive.actionBuilder(poses.extra)
+			.setTangent(180.deg)
 			.splineToLinearHeading(poses.stacks, 180.deg)
 			.build()
 
