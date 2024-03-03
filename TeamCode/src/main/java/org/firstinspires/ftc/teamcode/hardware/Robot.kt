@@ -186,9 +186,9 @@ object Robot {
 
 			const val HORIZONTAL_BOUND = 65.0 // +/- degrees
 
-			const val ALIGN_ANGLE = 24.0 // degrees
-			var TRANSFER_ANGLE = 28.0 // degrees
-			const val SCORE_ANGLE = 160.0 // degrees
+			const val ALIGN_ANGLE = 10.0 // degrees
+			var TRANSFER_ANGLE = 15.0 // degrees
+			const val SCORE_ANGLE = 155.0 // degrees
 
 			var HORIZONTAL_OFFSET = 0.0 // degrees, + is ccw
 			var VERTICAL_OFFSET = 0.0 // degrees, + is towards scoring

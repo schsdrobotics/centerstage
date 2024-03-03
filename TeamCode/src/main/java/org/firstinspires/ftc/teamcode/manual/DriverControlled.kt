@@ -117,15 +117,6 @@ class DriverControlled : CommandOpMode() {
 		GamepadButton(secondary, Button.DPAD_LEFT).whenPressed(AdjustDeposit(-1.0, deposit))
 		GamepadButton(secondary, Button.DPAD_RIGHT).whenPressed(AdjustDeposit(1.0, deposit))
 
-		GamepadButton(secondary, Button.X)
-			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Purple) }))
-		GamepadButton(secondary, Button.Y)
-			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Green) }))
-		GamepadButton(secondary, Button.A)
-			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.White) }))
-		GamepadButton(secondary, Button.B)
-			.whenActive(InstantCommand({ relayer.selectedToIndicator(Relayer.Indicator.Yellow) }))
-
 		GamepadButton(secondary, Button.LEFT_BUMPER)
 			.whenActive(HoldCommand(launcher))
 

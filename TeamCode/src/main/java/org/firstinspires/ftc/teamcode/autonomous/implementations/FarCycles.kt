@@ -32,13 +32,16 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 		}
 	}
 
+	val score = pose(50.0, -12.5, (-45 - 180).deg)
+	val lineUp = pose(12.0, -12.0, 180.deg)
+
+	val whiteOffset = 49.0
+
 	override val left = run {
 		val poses = object {
 			val purple = pose(-35.0, -32.0, 180.deg)
-			val stacks = pose(-55.5, -12.0, 180.deg)
-			val yellow = pose(55.0, -29.0, 180.deg)
-			val extra = pose(24.0, -12.0, 180.deg)
-			val score = pose(52.0, -12.5, (-70 - 180).deg)
+			val yellow = pose(53.0, -29.0, 180.deg)
+			val stacks = pose(-56.0, -13.0, 180.deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -55,22 +58,35 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.yellow, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val extra = drive.actionBuilder(poses.yellow)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 180.deg)
+		val white = pose(whiteOffset, signed(poses.yellow.position.y), poses.yellow.heading.log())
+
+		val fourth = drive.actionBuilder(poses.yellow)
+			.setTangent(0.0)
+			.splineToLinearHeading(white, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val second = drive.actionBuilder(poses.extra)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.stacks, 180.deg)
+		val extra = drive.actionBuilder(white)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(lineUp, 180.invertibleDeg)
+			.build()
+
+		val second = drive.actionBuilder(lineUp)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(poses.stacks, 180.invertibleDeg)
 			.build()
 
 		val third = drive.actionBuilder(poses.stacks)
-			.setTangent(0.deg)
-			.splineToLinearHeading(poses.score, 345.deg)
+			.setTangent(0.invertibleDeg)
+			.splineToLinearHeading(score, 345.invertibleDeg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = stacks, backstage = NullAction()), extras = listOf(extra, second, third), park = getPark()(drive.actionBuilder(poses.score)))
+		AutoActions(
+			purple,
+			yellow,
+			SingleCycle(stacks = stacks, backstage = NullAction()),
+			extras = listOf(extra, second, third, fourth),
+			park = getPark()(drive.actionBuilder(score))
+		)
 	}
 
 	override val middle = run {
@@ -78,10 +94,8 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 		val poses = object {
 			val purple = pose(-35.0, y, 270.deg)
-			val stacks = pose(-55.5, -12.0, 180.deg)
-			val yellow = pose(55.0, -36.5, 180.deg)
-			val extra = pose(24.0, -12.0, 180.deg)
-			val score = pose(52.0, -13.5, (-70 - 180).deg)
+			val yellow = pose(53.0, -36.5, 180.deg)
+			val stacks = pose(-56.0, -13.0, 180.deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -98,31 +112,42 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.yellow, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val extra = drive.actionBuilder(poses.yellow)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 180.deg)
+		val white = pose(whiteOffset, signed(poses.yellow.position.y), poses.yellow.heading.log())
+
+		val fourth = drive.actionBuilder(poses.yellow)
+			.setTangent(0.0)
+			.splineToLinearHeading(white, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val second = drive.actionBuilder(poses.extra)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.stacks, 180.deg)
+		val extra = drive.actionBuilder(white)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(lineUp, 180.invertibleDeg)
+			.build()
+
+		val second = drive.actionBuilder(lineUp)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(poses.stacks, 180.invertibleDeg)
 			.build()
 
 		val third = drive.actionBuilder(poses.stacks)
-			.setTangent(0.deg)
-			.splineToLinearHeading(poses.score, 345.deg)
+			.setTangent(0.invertibleDeg)
+			.splineToLinearHeading(score, 345.invertibleDeg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = stacks, backstage = NullAction()), extras = listOf(extra, second, third), park = getPark()(drive.actionBuilder(poses.score)))
+		AutoActions(
+			purple,
+			yellow,
+			SingleCycle(stacks = stacks, backstage = NullAction()),
+			extras = listOf(extra, second, third, fourth),
+			park = getPark()(drive.actionBuilder(score))
+		)
 	}
 
 	override val right = run {
 		val poses = object {
 			val purple = pose(-35.0, -32.0, 0.deg)
-			val stacks = pose(-55.5, -12.0, 180.deg)
-			val yellow = pose(55.0, -41.0, 180.deg)
-			val extra = pose(24.0, -12.0, 180.deg)
-			val score = pose(52.0, -12.5, (-70 - 180).deg)
+			val yellow = pose(53.0, -41.0, 180.deg)
+			val stacks = pose(-56.0, -13.0, 180.deg)
 		}
 
 		val purple = drive.actionBuilder(start)
@@ -130,7 +155,7 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.build()
 
 		val stacks = drive.actionBuilder(poses.purple)
-			.setTangent(90.invertibleDeg)
+			.setTangent(-(90).invertibleDeg)
 			.splineToLinearHeading(poses.stacks, 180.invertibleDeg)
 			.build()
 
@@ -139,22 +164,35 @@ class FarCycles(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.splineToLinearHeading(poses.yellow, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val extra = drive.actionBuilder(poses.yellow)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.extra, 180.deg)
+		val white = pose(whiteOffset, signed(poses.yellow.position.y), poses.yellow.heading.log())
+
+		val fourth = drive.actionBuilder(poses.yellow)
+			.setTangent(0.0)
+			.splineToLinearHeading(white, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
-		val second = drive.actionBuilder(poses.extra)
-			.setTangent(180.deg)
-			.splineToLinearHeading(poses.stacks, 180.deg)
+		val extra = drive.actionBuilder(white)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(lineUp, 180.invertibleDeg)
+			.build()
+
+		val second = drive.actionBuilder(lineUp)
+			.setTangent(180.invertibleDeg)
+			.splineToLinearHeading(poses.stacks, 180.invertibleDeg)
 			.build()
 
 		val third = drive.actionBuilder(poses.stacks)
-			.setTangent(0.deg)
-			.splineToLinearHeading(poses.score, 345.deg)
+			.setTangent(0.invertibleDeg)
+			.splineToLinearHeading(score, 345.invertibleDeg)
 			.build()
 
-		AutoActions(purple, yellow, SingleCycle(stacks = stacks, backstage = NullAction()), extras = listOf(extra, second, third), park = getPark()(drive.actionBuilder(poses.score)))
+		AutoActions(
+			purple,
+			yellow,
+			SingleCycle(stacks = stacks, backstage = NullAction()),
+			extras = listOf(extra, second, third, fourth),
+			park = getPark()(drive.actionBuilder(score))
+		)
 	}
 
 	override fun getPark() = { builder: TrajectoryActionBuilder ->

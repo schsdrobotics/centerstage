@@ -15,8 +15,6 @@ import org.firstinspires.ftc.teamcode.hardware.cycles.UnsafeLiftZero
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.ActionCommand
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.ScoreDeposit
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.deposit.commands.TransferDeposit
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.DropIntake
-import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeIn
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeOut
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.IntakeTo
 import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.intake.commands.RaiseIntake
@@ -36,24 +34,18 @@ open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(si
 		IntakeTo(20.0, intake),
 
 		ActionCommand(path.purple),
-		IntakeOut(intake) { 0.65 },
-		WaitCommand(1500),
+		IntakeOut(intake) { 1.0 },
+		WaitCommand(500),
 		StopIntake(intake),
 		RaiseIntake(intake),
 
-		DropPixels(puncher),
-		MoveLiftTo(Lift.Position.INTAKE, Robot.lift),
+		PunchPixels(puncher),
 
 		ActionCommand(path.cycles.initial.stacks),
-		DropIntake(intake),
-		IntakeIn(intake) { 1.0 },
-
-		WaitCommand(2000),
-
-		MoveLiftTo(Lift.Position.ZERO, Robot.lift),
 
 		TransferDeposit(Robot.deposit, false),
 		PunchPixels(puncher),
+		MoveLiftTo(Lift.Position.ZERO, Robot.lift),
 
 		ParallelCommandGroup(
 			ActionCommand(path.yellow),
@@ -64,7 +56,7 @@ open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(si
 				MoveLiftTo(Lift.Position.LOW, Robot.lift),
 				ScoreDeposit(Robot.deposit, false),
 				MoveLiftTo(200, Robot.lift),
-				WaitUntilCommand { drive.pose.position.x >= 53.0 },
+				WaitUntilCommand { drive.pose.position.x >= 52.0 },
 				WaitCommand(1000),
 				DropPixels(puncher),
 			)

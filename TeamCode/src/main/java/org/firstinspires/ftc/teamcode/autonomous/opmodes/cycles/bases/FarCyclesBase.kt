@@ -29,17 +29,17 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.rework.puncher.commands
 
 open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side, position, Nature.Cycles) {
 	override fun first() {
-		intake.target = 20.0; intake.periodic()
+		intake.target = 50.0; intake.periodic()
 		PunchPixels(puncher).initialize()
 	}
 
 	override fun actions() = SequentialCommandGroup(
 		// score purple
-		IntakeTo(20.0, intake),
+		IntakeTo(50.0, intake),
 
 		ActionCommand(path.purple),
-		IntakeOut(intake) { 0.65 },
-		WaitCommand(1000),
+		IntakeOut(intake) { 1.0 },
+		WaitCommand(350),
 		StopIntake(intake),
 		RaiseIntake(intake),
 
@@ -53,42 +53,46 @@ open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side
 
 		WaitCommand(2000),
 
-		MoveLiftTo(Lift.Position.ZERO, Robot.lift),
-
-		TransferDeposit(Robot.deposit, false),
-		WaitCommand(350),
-		PunchPixels(puncher),
-
 		// score yellow
-
 		ParallelCommandGroup(
 			ActionCommand(path.yellow),
+
 			SequentialCommandGroup(
+				TransferDeposit(Robot.deposit, false),
+				WaitCommand(350),
+				PunchPixels(puncher),
+				MoveLiftTo(Lift.Position.ZERO, Robot.lift),
 				StopIntake(intake),
 				RaiseIntake(intake),
 				WaitUntilCommand { drive.pose.position.x >= 8.0 },
+
 				MoveLiftTo(Lift.Position.LOW, Robot.lift),
 				ScoreDeposit(Robot.deposit, false),
 				MoveLiftTo(200, Robot.lift),
-				WaitUntilCommand { drive.pose.position.x >= 53.0 },
+				WaitUntilCommand { drive.pose.position.x >= 51.0 },
 				WaitCommand(500),
 				DropOnePixel(puncher),
+				ActionCommand(path.extras[3]),
+				MoveLiftTo(800, Robot.lift),
 				WaitCommand(500),
 				DropPixels(puncher)
 			)
 		),
 
-		ActionCommand(path.extras[0]),
 
-		// zero lift
+		// move away + zero lift
+		ParallelCommandGroup(
+			ActionCommand(path.extras[0]),
 
-		MoveLiftTo(Lift.Position.LOW.ticks, Robot.lift),
-		TransferDeposit(Robot.deposit, false),
-		WaitCommand(250),
-		UnsafeLiftZero(Robot.lift),
+			SequentialCommandGroup(
+				MoveLiftTo(Lift.Position.LOW.ticks, Robot.lift),
+				TransferDeposit(Robot.deposit, false),
+				WaitCommand(250),
+				UnsafeLiftZero(Robot.lift),
+			)
+		),
 
 		// start: cycle
-
 		ParallelCommandGroup(
 			ActionCommand(path.extras[1]),
 			DropPixels(puncher),
@@ -98,7 +102,7 @@ open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side
 			),
 		),
 
-		IntakeToStackHeight(2, intake),
+		IntakeToStackHeight(3, intake),
 		IntakeIn(intake) { 1.0 },
 
 		WaitCommand(2000),
@@ -116,7 +120,7 @@ open class FarCyclesBase(side: Alliance, position: Side) : AutonomousOpMode(side
 				WaitUntilCommand { drive.pose.position.x >= 8.0 },
 				MoveLiftTo(Lift.Position.MID, Robot.lift),
 				ScoreDeposit(Robot.deposit, false),
-				WaitUntilCommand { drive.pose.position.x >= 52.0 },
+				WaitUntilCommand { drive.pose.position.x >= 49.0 },
 				WaitCommand(500),
 				DropOnePixel(puncher),
 				WaitCommand(500),

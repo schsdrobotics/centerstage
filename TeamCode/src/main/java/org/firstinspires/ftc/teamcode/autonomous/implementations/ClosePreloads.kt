@@ -19,14 +19,14 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 		// Pose2dDual<Arclength>, PosePath, Double) → Double
 		val velocity = VelConstraint { pose, _, _ ->
 			when (pose.position.x.value()) {
-//				in -36.0..12.0 -> MAX_WHEEL_VEL / 1.5
+				in -36.0..12.0 -> MAX_WHEEL_VEL / 1.5
 				else -> MAX_WHEEL_VEL
 			}
 		}
 
 		val accel = AccelConstraint { pose, _, _ ->
 			when (pose.position.x.value()) {
-//				in -36.0..12.0 -> MinMax(PROFILE_DECEL / 1.5, PROFILE_ACCEL / 1.5)
+				in -36.0..12.0 -> MinMax(PROFILE_DECEL / 1.5, PROFILE_ACCEL / 1.5)
 				else -> MinMax(PROFILE_DECEL, PROFILE_ACCEL)
 			}
 		}
@@ -34,8 +34,8 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 	override val left = run {
 		val poses = object {
-			val purple = pose(-35.0 + 48.0, -32.0, 180.deg)
-			val yellow = pose(52.0, -29.0, 180.deg)
+			val purple = pose(-36.0 + 48.0, -32.0, 180.deg)
+			val yellow = pose(55.0, -29.0, 180.deg)
 			val extra = pose(35.0, -60.0, 180.deg)
 		}
 
@@ -60,8 +60,8 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 		val y = (-(25.0 + HEIGHT / 2.0) - 1.5)
 
 		val poses = object {
-			val purple = pose(-35.0 + 48.0, y, 90.deg)
-			val yellow = pose(52.0, -36.5, 180.deg)
+			val purple = pose(-36.0 + 48.0, y, 90.deg)
+			val yellow = pose(55.0, -36.5, 180.deg)
 			val extra = pose(35.0, -60.0, 180.deg)
 		}
 
@@ -71,7 +71,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 		val yellow = drive.actionBuilder(poses.purple)
 			.setTangent(0.invertibleDeg)
-			.splineToLinearHeading(poses.yellow, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
+			.splineToLinearHeading(poses.yellow, (0).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 
 		val extra = drive.actionBuilder(poses.yellow)
@@ -84,8 +84,8 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 	override val right = run {
 		val poses = object {
-			val purple = pose(36.0, -32.0, 180.deg)
-			val yellow = pose(52.0, -41.0, 180.deg)
+			val purple = pose(33.0, -32.0, 180.deg)
+			val yellow = pose(55.0, -41.0, 180.deg)
 			val extra = pose(35.0, -60.0, 180.deg)
 		}
 
@@ -94,7 +94,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 			.build()
 
 		val yellow = drive.actionBuilder(poses.purple)
-			.setTangent(0.invertibleDeg)
+			.setTangent((-90).invertibleDeg)
 			.splineToLinearHeading(poses.yellow, (-45).invertibleDeg, StageConstraints.velocity, StageConstraints.accel)
 			.build()
 

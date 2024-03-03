@@ -35,22 +35,22 @@ open class ClosePreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(
         IntakeTo(20.0, intake),
 
         ActionCommand(path.purple),
-        IntakeOut(intake) { 0.65 },
-        WaitCommand(1500),
+        IntakeOut(intake) { 1.0 },
+        WaitCommand(500),
         StopIntake(intake),
 
         TransferDeposit(deposit, false),
         PunchPixels(puncher),
 
+        MoveLiftTo(Lift.Position.LOW, Robot.lift),
+        ScoreDeposit(deposit, false),
+        MoveLiftTo(150, Robot.lift),
+
         ParallelCommandGroup(
             ActionCommand(path.yellow),
             SequentialCommandGroup(
                 RaiseIntake(intake),
-                WaitUntilCommand { drive.pose.position.x >= 8.0 },
-                MoveLiftTo(Lift.Position.LOW, Robot.lift),
-                ScoreDeposit(deposit, false),
-                MoveLiftTo(Lift.Position.LOW.ticks - 150, Robot.lift),
-                WaitUntilCommand { drive.pose.position.x >= 51.0 },
+                WaitUntilCommand { drive.pose.position.x >= 50.0 },
                 WaitCommand(1000),
                 DropPixels(puncher),
             )
