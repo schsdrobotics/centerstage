@@ -62,7 +62,7 @@ class Deposit(val telemetry: Telemetry, val lift: Lift, val gamepad: GamepadEx? 
 
         if (!lift.cleared) happy = true
 
-        targets = if (lift.cleared && happy && state.vertical == SCORE_ANGLE + VERTICAL_OFFSET) {
+        targets = if (state.vertical == SCORE_ANGLE + VERTICAL_OFFSET) {
             Kinematics.inverse(State(state.vertical, if (abs(locked) > HORIZONTAL_BOUND + 20) state.horizontal else -locked))
         } else {
             Kinematics.inverse(state + adjustment)

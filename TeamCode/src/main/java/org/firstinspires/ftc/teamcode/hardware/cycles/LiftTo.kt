@@ -41,11 +41,15 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			target == Lift.Position.ZERO && deposit.state.vertical == (TRANSFER_ANGLE + VERTICAL_OFFSET) -> {
 				SequentialCommandGroup(
 					UnlockDeposit(deposit),
+
+					if (lift.position <= Lift.Position.LOW.ticks) MoveLiftTo(Lift.Position.LOW, lift) else InstantCommand(),
+
 					ParallelCommandGroup(
 						AlignDeposit(deposit, false),
 						WaitCommand(250),
 						MoveLiftTo(Lift.Position.ZERO, lift),
 					),
+
 					TransferDeposit(deposit),
 				)
 			}
@@ -55,7 +59,7 @@ class LiftTo(position: Lift.Position, lift: Lift, deposit: Deposit) : InstantCom
 			// align, wait 300ms, (go + transfer)
 			target == Lift.Position.ZERO -> {
 				SequentialCommandGroup(
-					if (!lift.cleared) MoveLiftTo(Lift.Position.LOW, lift) else InstantCommand(),
+					if (lift.position <= Lift.Position.LOW.ticks) MoveLiftTo(Lift.Position.LOW, lift) else InstantCommand(),
 					UnlockDeposit(deposit),
 					TransferDeposit(deposit),
 					ParallelCommandGroup(

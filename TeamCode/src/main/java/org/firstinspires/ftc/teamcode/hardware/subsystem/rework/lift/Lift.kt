@@ -55,6 +55,7 @@ class Lift(val telemetry: Telemetry) : EfficientSubsystem() {
         motors.forEach { it.targetPosition = 0 }
         motors.forEach { it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER }
         motors.forEach { it.mode = DcMotor.RunMode.RUN_TO_POSITION }
+        motors.forEach { it.power = 0.7 }
     }
 
     fun targetInches(height: Double) = target(height * TICKS_PER_INCH * sqrt(2.0))

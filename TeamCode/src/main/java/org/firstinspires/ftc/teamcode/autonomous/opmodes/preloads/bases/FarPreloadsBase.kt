@@ -49,13 +49,14 @@ open class FarPreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(si
 
 		ParallelCommandGroup(
 			ActionCommand(path.yellow),
+
 			SequentialCommandGroup(
 				StopIntake(intake),
 				RaiseIntake(intake),
 				WaitUntilCommand { drive.pose.position.x >= 8.0 },
 				MoveLiftTo(Lift.Position.LOW, Robot.lift),
 				ScoreDeposit(Robot.deposit, false),
-				MoveLiftTo(200, Robot.lift),
+				MoveLiftTo(100, Robot.lift),
 				WaitUntilCommand { drive.pose.position.x >= 52.0 },
 				WaitCommand(1000),
 				DropPixels(puncher),

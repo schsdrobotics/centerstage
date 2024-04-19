@@ -36,7 +36,7 @@ open class ClosePreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(
 
         ActionCommand(path.purple),
         IntakeOut(intake) { 1.0 },
-        WaitCommand(500),
+        WaitCommand(1000),
         StopIntake(intake),
 
         TransferDeposit(deposit, false),
@@ -44,7 +44,7 @@ open class ClosePreloadsBase(side: Alliance, position: Side) : AutonomousOpMode(
 
         MoveLiftTo(Lift.Position.LOW, Robot.lift),
         ScoreDeposit(deposit, false),
-        MoveLiftTo(150, Robot.lift),
+        MoveLiftTo(100, Robot.lift),
 
         ParallelCommandGroup(
             ActionCommand(path.yellow),

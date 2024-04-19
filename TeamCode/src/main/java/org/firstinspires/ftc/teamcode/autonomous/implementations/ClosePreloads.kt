@@ -17,6 +17,7 @@ class ClosePreloads(drive: MecanumDrive, color: Alliance) : Auto(drive, color) {
 
 	object StageConstraints {
 		// Pose2dDual<Arclength>, PosePath, Double) → Double
+
 		val velocity = VelConstraint { pose, _, _ ->
 			when (pose.position.x.value()) {
 				in -36.0..12.0 -> MAX_WHEEL_VEL / 1.5
